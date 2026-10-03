@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>NRH Parks Quest</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 24px 20px 60px;
+         background: #f7f1e6; color: #222; }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 34px; margin: 0 0 4px; }
+  p.sub { color: #666; font-size: 17px; margin: 0 0 16px; }
+  .progress { background: #e8e0cf; border-radius: 10px; height: 14px; overflow: hidden; margin: 0 0 6px; }
+  .progress > div { background: #2e7d4f; height: 100%; width: 0%; transition: width .3s; }
+  .pcount { font-size: 15px; color: #555; margin: 0 0 14px; }
+  .controls { display: flex; gap: 10px; margin: 0 0 18px; flex-wrap: wrap; }
+  .controls button { font-size: 16px; padding: 10px 16px; border-radius: 10px;
+    border: 1px solid #c9bfa8; background: #fffdf7; color: #1a3a2a; }
+  .controls button.on { background: #1a3a2a; color: #fff; border-color: #1a3a2a; }
+  .controls button.linklike { border: none; background: none; color: #888; text-decoration: underline;
+    padding: 10px 4px; }
+  .park { background: #fffdf7; border-radius: 14px; padding: 14px 16px; margin: 0 0 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .park.completed { opacity: .55; }
+  .row { display: flex; gap: 14px; align-items: flex-start; cursor: pointer; }
+  .done { width: 30px; height: 30px; margin: 2px 0 0; flex: none; accent-color: #2e7d4f; }
+  .txt { display: flex; flex-direction: column; }
+  .pname { font-size: 22px; font-weight: 700; line-height: 1.25; }
+  .park.completed .pname { text-decoration: line-through; }
+  .paddr { font-size: 15px; color: #666; margin-top: 2px; }
+  .dist { color: #2e7d4f; font-weight: 600; }
+  .links { display: flex; gap: 18px; margin: 10px 0 0 44px; align-items: center; }
+  .links a { font-size: 17px; }
+  .mapbtn { font-size: 15px; padding: 8px 14px; border-radius: 8px; border: 1px solid #c9bfa8;
+    background: #f7f1e6; color: #1a3a2a; }
+  .pmap { margin: 12px 0 0 44px; }
+  .pmap iframe { width: 100%; height: 300px; border: 1px solid #ccc; border-radius: 12px; }
+  .note { font-size: 14px; color: #888; margin-top: 24px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>NRH Parks Quest</h1>
+  <p class="sub">Every park in North Richland Hills. Check them off as you go.</p>
+  <div class="progress"><div id="bar"></div></div>
+  <p class="pcount" id="count"></p>
+  <div class="controls">
+    <button type="button" id="nearbtn">Nearest first</button>
+    <button type="button" id="resetbtn" class="linklike">reset progress</button>
+  </div>
+  <div id="parks">
+    <article class="park" data-id="ace-park" data-lat="32.85283" data-lng="-97.21665">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Ace Park visited">
+        <span class="txt">
+          <span class="pname">Ace Park</span>
+          <span class="paddr">7751 North Richland Boulevard, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=7751%20North%20Richland%20Boulevard%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Ace Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.85283,-97.21665&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="adventure-world-playground" data-lat="32.88405" data-lng="-97.22152">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Adventure World Playground visited">
+        <span class="txt">
+          <span class="pname">Adventure World Playground</span>
+          <span class="paddr">7451 Starnes Road, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=7451%20Starnes%20Road%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Adventure World Playground" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.88405,-97.22152&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="clyde-zellers-park" data-lat="32.83547" data-lng="-97.23417">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Clyde Zellers Park visited">
+        <span class="txt">
+          <span class="pname">Clyde Zellers Park</span>
+          <span class="paddr">4801 Vance Road, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=4801%20Vance%20Road%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Clyde Zellers Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.83547,-97.23417&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="cross-timbers-park" data-lat="32.88809" data-lng="-97.22657">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Cross Timbers Park visited">
+        <span class="txt">
+          <span class="pname">Cross Timbers Park</span>
+          <span class="paddr">7680 Douglas Lane, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=7680%20Douglas%20Lane%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Cross Timbers Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.88809,-97.22657&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="dr-pillow-park" data-lat="32.89714" data-lng="-97.21804">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Dr. Pillow Park visited">
+        <span class="txt">
+          <span class="pname">Dr. Pillow Park</span>
+          <span class="paddr">7501 Continental Trail, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=7501%20Continental%20Trail%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Dr. Pillow Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.89714,-97.21804&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="norich-park" data-lat="32.84621" data-lng="-97.2091">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Norich Park visited">
+        <span class="txt">
+          <span class="pname">Norich Park</span>
+          <span class="paddr">5412 Galway Lane, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=5412%20Galway%20Lane%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Norich Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.84621,-97.2091&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="tipps-canine-hollow-dog-park" data-lat="32.89091" data-lng="-97.19818">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Tipps Canine Hollow Dog Park visited">
+        <span class="txt">
+          <span class="pname">Tipps Canine Hollow Dog Park</span>
+          <span class="paddr">7804 Davis Boulevard, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=7804%20Davis%20Boulevard%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Tipps Canine Hollow Dog Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.89091,-97.19818&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="tommy-sue-brown-park" data-lat="32.89936" data-lng="-97.20161">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Tommy &amp; Sue Brown Park visited">
+        <span class="txt">
+          <span class="pname">Tommy &amp; Sue Brown Park</span>
+          <span class="paddr">8250 Shadywood Lane, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=8250%20Shadywood%20Lane%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Tommy &amp; Sue Brown Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.89936,-97.20161&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="fossil-creek-park" data-lat="32.81545" data-lng="-97.25067">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Fossil Creek Park visited">
+        <span class="txt">
+          <span class="pname">Fossil Creek Park</span>
+          <span class="paddr">6101 Onyx Drive South, North Richland Hills, TX 76117<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=6101%20Onyx%20Drive%20South%2C%20North%20Richland%20Hills%2C%20TX%2076117&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Fossil Creek Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.81545,-97.25067&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="kay-granger-park" data-lat="32.82542" data-lng="-97.23639">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Kay Granger Park visited">
+        <span class="txt">
+          <span class="pname">Kay Granger Park</span>
+          <span class="paddr">4100 Flory Street, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=4100%20Flory%20Street%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Kay Granger Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.82542,-97.23639&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="holiday-lane-athletic-fields" data-lat="32.8437" data-lng="-97.22804">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Holiday Lane Athletic Fields visited">
+        <span class="txt">
+          <span class="pname">Holiday Lane Athletic Fields</span>
+          <span class="paddr">5301 Holiday Lane, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=5301%20Holiday%20Lane%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Holiday Lane Athletic Fields" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.8437,-97.22804&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="linda-spurlock-park" data-lat="32.82386" data-lng="-97.24584">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Linda Spurlock Park visited">
+        <span class="txt">
+          <span class="pname">Linda Spurlock Park</span>
+          <span class="paddr">6400 Glenview Drive, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=6400%20Glenview%20Drive%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Linda Spurlock Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.82386,-97.24584&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="northfield-park" data-lat="32.89091" data-lng="-97.19818">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Northfield Park visited">
+        <span class="txt">
+          <span class="pname">Northfield Park</span>
+          <span class="paddr">7804 Davis Boulevard, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=7804%20Davis%20Boulevard%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Northfield Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.89091,-97.19818&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="richfield-park" data-lat="32.86584" data-lng="-97.2258">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Richfield Park visited">
+        <span class="txt">
+          <span class="pname">Richfield Park</span>
+          <span class="paddr">7250 Chapman Road, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=7250%20Chapman%20Road%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Richfield Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.86584,-97.2258&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="jb-sandlin-park" data-lat="32.89829" data-lng="-97.1923">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark JB Sandlin Park visited">
+        <span class="txt">
+          <span class="pname">JB Sandlin Park</span>
+          <span class="paddr">8925 Thornmeadow Court, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=8925%20Thornmeadow%20Court%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of JB Sandlin Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.89829,-97.1923&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="walkers-creek-park" data-lat="32.85088" data-lng="-97.19999">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Walker&#x27;s Creek Park visited">
+        <span class="txt">
+          <span class="pname">Walker&#x27;s Creek Park</span>
+          <span class="paddr">8403 Emerald Hills Way, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=8403%20Emerald%20Hills%20Way%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Walker&#x27;s Creek Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.85088,-97.19999&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="legacy-park" data-lat="32.87594" data-lng="-97.23223">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Legacy Park visited">
+        <span class="txt">
+          <span class="pname">Legacy Park</span>
+          <span class="paddr">6800 Springdale Lane, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=6800%20Springdale%20Lane%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Legacy Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.87594,-97.23223&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="faram-park" data-lat="32.86755" data-lng="-97.20371">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Faram Park visited">
+        <span class="txt">
+          <span class="pname">Faram Park</span>
+          <span class="paddr">8344 Amundson Drive, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=8344%20Amundson%20Drive%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Faram Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.86755,-97.20371&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="founders-park" data-lat="32.90129" data-lng="-97.21108">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Founders Park visited">
+        <span class="txt">
+          <span class="pname">Founders Park</span>
+          <span class="paddr">7908 Brandon Ct., North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=7908%20Brandon%20Ct.%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Founders Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.90129,-97.21108&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="bedford-euless-road-greenway" data-lat="32.83435" data-lng="-97.20548">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Bedford-Euless Road Greenway visited">
+        <span class="txt">
+          <span class="pname">Bedford-Euless Road Greenway</span>
+          <span class="paddr">8205 Bedford-Euless Road, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=8205%20Bedford-Euless%20Road%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Bedford-Euless Road Greenway" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.83435,-97.20548&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="stormy-plaza" data-lat="32.8544" data-lng="-97.1926">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Stormy Plaza visited">
+        <span class="txt">
+          <span class="pname">Stormy Plaza</span>
+          <span class="paddr">9010 Grand Avenue, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=9010%20Grand%20Avenue%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Stormy Plaza" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.8544,-97.1926&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="the-lakes-at-hometown" data-lat="32.85529" data-lng="-97.19904">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark The Lakes at HomeTown visited">
+        <span class="txt">
+          <span class="pname">The Lakes at HomeTown</span>
+          <span class="paddr">8700 Bridge Street, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=8700%20Bridge%20Street%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of The Lakes at HomeTown" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.85529,-97.19904&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="north-electric-trail" data-lat="32.84431" data-lng="-97.22772">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark North Electric Trail visited">
+        <span class="txt">
+          <span class="pname">North Electric Trail</span>
+          <span class="paddr">5390 Holiday Lane, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=5390%20Holiday%20Lane%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of North Electric Trail" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.84431,-97.22772&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="joann-johnson-trail" data-lat="32.82967" data-lng="-97.22023">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark JoAnn Johnson Trail visited">
+        <span class="txt">
+          <span class="pname">JoAnn Johnson Trail</span>
+          <span class="paddr">4500 City Point Drive, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=4500%20City%20Point%20Drive%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of JoAnn Johnson Trail" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.82967,-97.22023&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="walkers-creek-trail" data-lat="32.85088" data-lng="-97.19999">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Walker&#x27;s Creek Trail visited">
+        <span class="txt">
+          <span class="pname">Walker&#x27;s Creek Trail</span>
+          <span class="paddr">8403 Emerald Hills Way, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=8403%20Emerald%20Hills%20Way%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Walker&#x27;s Creek Trail" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.85088,-97.19999&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="cotton-belt-trail" data-lat="32.86755" data-lng="-97.20371">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Cotton Belt Trail visited">
+        <span class="txt">
+          <span class="pname">Cotton Belt Trail</span>
+          <span class="paddr">8344 Amundson Dr, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=8344%20Amundson%20Dr%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Cotton Belt Trail" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.86755,-97.20371&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="randy-moresi-trail" data-lat="32.82818" data-lng="-97.21313">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Randy Moresi Trail visited">
+        <span class="txt">
+          <span class="pname">Randy Moresi Trail</span>
+          <span class="paddr">4300 City Point Drive, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=4300%20City%20Point%20Drive%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Randy Moresi Trail" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.82818,-97.21313&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="john-barfield-trail" data-lat="32.89625" data-lng="-97.19963">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark John Barfield Trail visited">
+        <span class="txt">
+          <span class="pname">John Barfield Trail</span>
+          <span class="paddr">8201 Davis Blvd, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=8201%20Davis%20Blvd%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of John Barfield Trail" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.89625,-97.19963&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="calloway-branch-trail" data-lat="32.85265" data-lng="-97.22556">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Calloway Branch Trail visited">
+        <span class="txt">
+          <span class="pname">Calloway Branch Trail</span>
+          <span class="paddr">5825 Holiday Lane, North Richland Hills, TX 76053<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=5825%20Holiday%20Lane%2C%20North%20Richland%20Hills%2C%20TX%2076053&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Calloway Branch Trail" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.85265,-97.22556&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="green-valley-community-park" data-lat="32.88747" data-lng="-97.21284">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Green Valley Community Park visited">
+        <span class="txt">
+          <span class="pname">Green Valley Community Park</span>
+          <span class="paddr">7701 Smithfield Road, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=7701%20Smithfield%20Road%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Green Valley Community Park" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.88747,-97.21284&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="cotton-belt-trailhead-at-cambridge" data-lat="32.85314" data-lng="-97.23791">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Cotton Belt Trailhead at Cambridge visited">
+        <span class="txt">
+          <span class="pname">Cotton Belt Trailhead at Cambridge</span>
+          <span class="paddr">6700 Cambridge Drive, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=6700%20Cambridge%20Drive%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Cotton Belt Trailhead at Cambridge" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.85314,-97.23791&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="dolce-plaza" data-lat="32.85355" data-lng="-97.19365">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Dolce Plaza visited">
+        <span class="txt">
+          <span class="pname">Dolce Plaza</span>
+          <span class="paddr">9000 Grand Avenue, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=9000%20Grand%20Avenue%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Dolce Plaza" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.85355,-97.19365&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="fossil-creek-mountain-bike-trails" data-lat="32.81545" data-lng="-97.25067">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Fossil Creek Mountain Bike Trails visited">
+        <span class="txt">
+          <span class="pname">Fossil Creek Mountain Bike Trails</span>
+          <span class="paddr">6101 Onyx Dr. S, North Richland Hills, TX 76180<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=6101%20Onyx%20Dr.%20S%2C%20North%20Richland%20Hills%2C%20TX%2076180&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Fossil Creek Mountain Bike Trails" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.81545,-97.25067&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+    <article class="park" data-id="green-valley-raceway-historic-plaza" data-lat="32.90229" data-lng="-97.20642">
+      <label class="row">
+        <input type="checkbox" class="done" aria-label="Mark Green Valley Raceway Historic Plaza visited">
+        <span class="txt">
+          <span class="pname">Green Valley Raceway Historic Plaza</span>
+          <span class="paddr">7904 North Tarrant Parkway, North Richland Hills, TX 76182<span class="dist"></span></span>
+        </span>
+      </label>
+      <div class="links">
+        <a href="https://www.google.com/maps/dir/?api=1&destination=7904%20North%20Tarrant%20Parkway%2C%20North%20Richland%20Hills%2C%20TX%2076182&travelmode=driving">Maps from here</a>
+        <button type="button" class="mapbtn">Park map</button>
+      </div>
+      <div class="pmap" hidden>
+        <iframe title="Map of Green Valley Raceway Historic Plaza" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+          data-src="https://maps.google.com/maps?q=32.90229,-97.20642&amp;z=16&amp;output=embed"></iframe>
+      </div>
+    </article>
+  </div>
+  <p class="note">Progress is saved on this device. "Nearest first" uses your location
+  just to sort &mdash; nothing leaves your phone.</p>
+</main>
+<script>
+const STORE = "nrh-parks-quest-v1";
+const TOTAL = 34;
+let state = {};
+try { state = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) { state = {}; }
+let nearMode = false;
+let userPos = null;
+
+const parksEl = document.getElementById("parks");
+const articles = Array.from(parksEl.querySelectorAll(".park"));
+
+function save() {
+  try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {}
+}
+
+function haversineMi(lat1, lon1, lat2, lon2) {
+  const R = 3958.8, t = Math.PI / 180;
+  const dLat = (lat2 - lat1) * t, dLon = (lon2 - lon1) * t;
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * t) * Math.cos(lat2 * t) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+function render() {
+  const done = articles.filter(a => state[a.dataset.id]);
+  const todo = articles.filter(a => !state[a.dataset.id]);
+  if (nearMode && userPos) {
+    todo.forEach(a => {
+      const d = haversineMi(userPos.lat, userPos.lon,
+        parseFloat(a.dataset.lat), parseFloat(a.dataset.lng));
+      a._dist = d;
+      a.querySelector(".dist").textContent = " · " + d.toFixed(1) + " mi";
+    });
+    todo.sort((a, b) => a._dist - b._dist);
+  } else {
+    todo.forEach(a => a.querySelector(".dist").textContent = "");
+  }
+  done.forEach(a => a.querySelector(".dist").textContent = "");
+  parksEl.replaceChildren(...todo, ...done);
+  articles.forEach(a => {
+    const isDone = !!state[a.dataset.id];
+    a.classList.toggle("completed", isDone);
+    a.querySelector(".done").checked = isDone;
+  });
+  const n = done.length;
+  document.getElementById("bar").style.width = (100 * n / TOTAL) + "%";
+  document.getElementById("count").textContent = n + " of " + TOTAL + " visited";
+}
+
+articles.forEach(a => {
+  const id = a.dataset.id;
+  a.querySelector(".done").addEventListener("change", ev => {
+    if (ev.target.checked) state[id] = true; else delete state[id];
+    save(); render();
+  });
+  const btn = a.querySelector(".mapbtn");
+  const wrap = a.querySelector(".pmap");
+  const frame = wrap.querySelector("iframe");
+  btn.addEventListener("click", () => {
+    const open = wrap.hidden;
+    wrap.hidden = !open;
+    btn.textContent = open ? "Hide map" : "Park map";
+    if (open && !frame.src) frame.src = frame.dataset.src;
+  });
+});
+
+document.getElementById("nearbtn").addEventListener("click", ev => {
+  if (nearMode) { nearMode = false; ev.target.classList.remove("on"); render(); return; }
+  if (!navigator.geolocation) {
+    ev.target.textContent = "Location unavailable";
+    return;
+  }
+  ev.target.textContent = "Locating…";
+  navigator.geolocation.getCurrentPosition(pos => {
+    userPos = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+    nearMode = true;
+    ev.target.textContent = "Nearest first ✓";
+    ev.target.classList.add("on");
+    render();
+  }, () => {
+    ev.target.textContent = "Nearest first";
+  }, { timeout: 10000 });
+});
+
+document.getElementById("resetbtn").addEventListener("click", () => {
+  if (confirm("Clear all quest progress on this device?")) {
+    state = {}; save(); render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
