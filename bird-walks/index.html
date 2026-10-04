@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bird walks quest</title><style>
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 24px 20px 60px;
+         background: #f7f5ef; color: #222; }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 32px; margin: 8px 0 4px; }
+  p.sub { color: #666; font-size: 17px; margin-top: 0; }
+  .card { background: #fff; border-radius: 14px; padding: 18px 20px; margin: 14px 0;
+          box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .card h2 { font-size: 22px; margin: 0 0 6px; }
+  .card p { font-size: 16px; line-height: 1.5; margin: 6px 0; }
+  .biglink { display: inline-block; font-size: 19px; font-weight: 700; color: #fff;
+             background: #1a3a2a; border-radius: 12px; padding: 14px 22px;
+             text-decoration: none; margin: 8px 0; }
+  .map { width: 100%; height: 300px; border: 1px solid #ccc; border-radius: 12px; margin-top: 10px; }
+  ul.tidy { font-size: 16px; line-height: 1.6; }
+  .walkrow { display: flex; gap: 14px; align-items: flex-start; background: #fff; border-radius: 14px;
+             padding: 16px 18px; margin: 0 0 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); cursor: pointer; }
+  .walkrow.done { opacity: .55; }
+  .walkrow.done .wname { text-decoration: line-through; }
+  .donebox { width: 30px; height: 30px; margin: 2px 0 0; flex: none; accent-color: #2e7d4f; }
+  .wname { font-size: 21px; font-weight: 700; }
+  .wsub { font-size: 15px; color: #666; margin-top: 2px; }
+  .soon { font-size: 14px; color: #a07600; }
+  .note { font-size: 14px; color: #888; margin-top: 24px; }
+</style></head>
+<body><main>
+<p style="font-size:15px;margin:0 0 18px"><a href="https://add-ai-content.github.io/phone-sheets/" style="color:#1a3a2a">&larr; All phone sheets</a></p>
+<h1>Bird walks quest</h1>
+<p class="sub">Emulate every Fort Worth Audubon Society guided walk, solo, on your own schedule.
+Check them off as you go. A second group's walks become quest #2 &mdash; this one stays bounded.</p>
+<label class="walkrow"><input type="checkbox" class="donebox" data-walk="trinity-trails"><span><span class="wname">Trinity Trails Bird Walk</span><span class="wsub" style="display:block">4th Sunday, Sept–May (FWAS) &middot; <a href="trinity-trails/" style="color:#1a3a2a">route page</a></span></span></label><label class="walkrow"><input type="checkbox" class="donebox" data-walk="foster-park"><span><span class="wname">Foster Park Bird Walk</span><span class="wsub" style="display:block">Monthly (FWAS) &middot; <span class="soon">route detail coming</span></span></span></label><label class="walkrow"><input type="checkbox" class="donebox" data-walk="oliver-park"><span><span class="wname">Oliver Park, Mansfield</span><span class="wsub" style="display:block">Third Tuesdays (FWAS) &middot; <span class="soon">route detail coming</span></span></span></label><label class="walkrow"><input type="checkbox" class="donebox" data-walk="parr-park"><span><span class="wname">Parr Park, Grapevine</span><span class="wsub" style="display:block">Quarterly (FWAS) &middot; <span class="soon">route detail coming</span></span></span></label><label class="walkrow"><input type="checkbox" class="donebox" data-walk="kelly-park"><span><span class="wname">Friday Feathers, Kelly Park (Arlington)</span><span class="wsub" style="display:block">First Fridays (FWAS) &middot; <span class="soon">route detail coming</span></span></span></label><label class="walkrow"><input type="checkbox" class="donebox" data-walk="cement-creek"><span><span class="wname">Cement Creek Lake, north Fort Worth</span><span class="wsub" style="display:block">Recurring (FWAS) &middot; <span class="soon">route detail coming</span></span></span></label>
+<div class="card"><h2>Bonus</h2>
+<p><b>(Fall) Migratory Bird Day, Ft. Worth Nature Center &amp; Refuge</b> &mdash; Special event — Oct 10, 2026. A special event, not a recurring walk.</p></div>
+<p class="note">Progress is saved on this device. Routes adapted from FWAS field trip sheets.</p>
+</main>
+<script>
+var KEY="birdwalks-done-v1", done={};
+try{done=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){done={}}
+document.querySelectorAll("input.donebox").forEach(function(b){
+  var w=b.getAttribute("data-walk"); b.checked=!!done[w];
+  b.closest(".walkrow").classList.toggle("done",b.checked);
+  b.addEventListener("change",function(){
+    if(b.checked)done[w]=1;else delete done[w];
+    try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}
+    b.closest(".walkrow").classList.toggle("done",b.checked);
+  });
+});
+</script></body></html>
