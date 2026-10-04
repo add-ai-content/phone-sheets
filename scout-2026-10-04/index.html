@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-10-04</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-10-04";
+const CARDS = [{"n": 1, "title": "Fall Garden Planning Lunch & Learn", "type": "happening", "town": "Cleburne", "drive": "~40", "when": "Wed Oct 7, around midday", "why": "Johnson County Master Gardeners' fall-garden secrets + Guinn Gardens demo-garden tour — free, light lunch provided. His gardener lane, weekday edition.", "stretch": true, "maybe_review": false, "kind": "garden workshop", "when_or_hours": "Wed Oct 7, around midday (light lunch provided; Q&A 1:00-1:30pm)", "startDate": "2026-10-07", "dueDate": "2026-10-07", "oneShot": true, "band": "stretch", "notes": "Listing confirms lunch + Q&A but doesn't pin the exact start time (~noon) — check the event page before going."}, {"n": 2, "title": "Gold Star Card Show", "type": "happening", "town": "Fort Worth", "drive": "~25", "when": "Sat Oct 10 (hours TBA — confirm with promoter)", "why": "Big Fort Worth card show on the TCDB show calendar — set-filler and dollar-box hunting for his collecting, close to home.", "stretch": false, "maybe_review": false, "kind": "card show", "when_or_hours": "Sat Oct 10 (hours TBA)", "startDate": "2026-10-10", "dueDate": "2026-10-10", "oneShot": true, "band": "core", "notes": "Listed on the TCDB card-show calendar and cardshowhub for Oct 10 in Fort Worth — confirm hours/entry with the promoter before going."}, {"n": 3, "title": "Arlington Card Show (Meadowbrook)", "type": "happening", "town": "Arlington", "drive": "~20", "when": "Sat Oct 10 (hours not published — confirm with promoter)", "why": "Recurring Saturday show from a different promoter/venue than the ones he's seen — vintage-friendly local hobby crowd.", "stretch": false, "maybe_review": false, "kind": "card show", "when_or_hours": "Sat Oct 10 (hours TBA)", "startDate": "2026-10-10", "dueDate": "2026-10-10", "oneShot": true, "band": "core", "notes": "Hours not published — confirm with the promoter (Arlington Card Shows, Meadowbrook Rec Center)."}, {"n": 4, "title": "Monarch Migration & Pollinators", "type": "happening", "town": "Fort Worth", "drive": "~25", "when": "Sat Oct 10, 9:30am", "why": "The city's Nature & Narrative series on fall migration and how neighbors help — pairs with his milkweed beds; brand-new monarch program.", "stretch": false, "maybe_review": false, "kind": "nature", "when_or_hours": "Sat Oct 10, 9:30am (Chuck Silcox Park, 2809 Wakecrest Dr)", "startDate": "2026-10-10", "dueDate": "2026-10-10", "oneShot": true, "band": "core", "notes": ""}, {"n": 5, "title": "Pollinator Day", "type": "happening", "town": "Combine/Seagoville", "drive": "~55", "when": "Sat Oct 10, come-and-go (beekeeper classes 10-11:30am & 12-1:30pm)", "why": "New-to-him venue — native bees, butterflies, hands-on pollinator work at the John Bunker Sands Wetland Center; ties straight to his monarch gardening.", "stretch": true, "maybe_review": false, "kind": "nature", "when_or_hours": "Sat Oct 10, come-and-go; beekeeper classes 10-11:30am and 12-1:30pm", "startDate": "2026-10-10", "dueDate": "2026-10-10", "oneShot": true, "band": "stretch", "notes": ""}, {"n": 6, "title": "Second Saturday Bird Walk", "type": "happening", "town": "McKinney", "drive": "~45-50", "when": "Sat Oct 10, 8am (1.5 hrs; included with admission)", "why": "Guided walk through prairie, woodland, and wetland habitats at the Heard's 289-acre sanctuary — exactly his lane, October migration timing.", "stretch": true, "maybe_review": false, "kind": "bird walk", "when_or_hours": "Sat Oct 10, 8am, ~1.5 hrs (Heard Museum, McKinney; included with admission)", "startDate": "2026-10-10", "dueDate": "2026-10-10", "oneShot": true, "band": "stretch", "notes": "Heard's series runs 2nd Saturdays Sept-June; Oct 10 is the 2nd Saturday — confirm at heardmuseum.org before going."}, {"n": 7, "title": "Bonnie & Clyde Days", "type": "happening", "town": "Pilot Point", "drive": "~50", "when": "Sat Oct 10, 2-9pm", "why": "Small-town historic-square festival — food/craft vendors, live music, Model A car demos, free kids zone; new town, browse-not-stage.", "stretch": true, "maybe_review": false, "kind": "festival", "when_or_hours": "Sat Oct 10, 2-9pm (Historic Pilot Point Square)", "startDate": "2026-10-10", "dueDate": "2026-10-10", "oneShot": true, "band": "adjacent", "notes": "Commemorates the 1966 Bonnie and Clyde filming in town. Morning 5K registration closed Oct 4; festival itself is the draw."}, {"n": 8, "title": "Country Day on the Hill", "type": "happening", "town": "Cedar Hill", "drive": "~55", "when": "Sat Oct 10, 9am-6pm (parade 10am)", "why": "89th annual small-town fall festival in historic downtown Cedar Hill — parade, fish fry, arts/crafts, live music; brand-new town.", "stretch": true, "maybe_review": false, "kind": "festival", "when_or_hours": "Sat Oct 10, 9am-6pm (parade 10am; historic downtown Cedar Hill)", "startDate": "2026-10-10", "dueDate": "2026-10-10", "oneShot": true, "band": "stretch", "notes": ""}, {"n": 9, "title": "Waxahachie Farmers Market", "type": "happening", "town": "Waxahachie", "drive": "~50", "when": "Sat Oct 10, 8am-1pm (Saturdays through October)", "why": "The one notable new-town market pick — highly rated downtown market (4.7 stars) running its last October Saturdays; produce, honey, plants, baked goods.", "stretch": true, "maybe_review": false, "kind": "market", "when_or_hours": "Saturdays through October, 8am-1pm (701 Howard Road, Waxahachie)", "startDate": "2026-10-10", "dueDate": "2026-10-10", "oneShot": true, "band": "stretch", "notes": ""}, {"n": 10, "title": "Michelada Festival", "type": "happening", "town": "Fort Worth", "drive": "~25", "when": "Sun Oct 11, 12-8pm", "why": "Free daytime food festival at Sundance Square — michelada contest, birria/pupusas/elotes vendors, banda and norteño music; food-first and festive.", "stretch": false, "maybe_review": false, "kind": "food", "when_or_hours": "Sun Oct 11, 12-8pm (Sundance Square / Main St, Fort Worth)", "startDate": "2026-10-11", "dueDate": "2026-10-11", "oneShot": true, "band": "adjacent", "notes": "Free admission."}, {"n": 11, "title": "Crazy Water Festival", "type": "happening", "town": "Mineral Wells", "drive": "~60", "when": "Thu Oct 8-Sat Oct 10 (main day Sat: 5K 8:30am, vendors, car show)", "why": "Quirky small-town heritage festival celebrating the famous mineral water — 100+ vendors, classic car show, two stages of music; new town at the drive cap.", "stretch": true, "maybe_review": false, "kind": "festival", "when_or_hours": "Thu Oct 8-Sat Oct 10; main day Sat (downtown Mineral Wells)", "startDate": "2026-10-08", "dueDate": "2026-10-10", "oneShot": true, "band": "adjacent", "notes": "Free main-day admission; at the ~60-min drive cap from home."}, {"n": 12, "title": "Fiber Arts Demonstration", "type": "happening", "town": "Plano", "drive": "~40", "when": "Thu Oct 15, 10am-12pm", "why": "Weekday daytime program at the Heritage Farmstead Museum — Dallas Handweavers & Spinners Guild demo weaving, spinning, and dyeing; quiet, browseable, cheap.", "stretch": true, "maybe_review": false, "kind": "museum", "when_or_hours": "Thu Oct 15, 10am-12pm (Heritage Farmstead Museum, Plano)", "startDate": "2026-10-15", "dueDate": "2026-10-15", "oneShot": true, "band": "stretch", "notes": ""}, {"n": 13, "title": "Third Monday Trade Days", "type": "happening", "town": "McKinney", "drive": "~50", "when": "Fri Oct 16-Sun Oct 18 (Fri 8-4, Sat/Sun 8-5)", "why": "Oldest and largest monthly trade days in North Texas — 450+ vendors of vintage and antiques; pure browsing market, his preferred market type.", "stretch": true, "maybe_review": false, "kind": "market", "when_or_hours": "Fri Oct 16-Sun Oct 18 (Fri 8-4, Sat/Sun 8-5; McKinney)", "startDate": "2026-10-16", "dueDate": "2026-10-18", "oneShot": true, "band": "stretch", "notes": "Free entry; $5 parking Sat/Sun."}, {"n": 14, "title": "ArmeniaFest (31st Annual)", "type": "happening", "town": "Carrollton", "drive": "~30", "when": "Fri Oct 16-Sun Oct 18, all day", "why": "Armenian cultural and food festival — kebabs, boereg, lahmajun, bake sale, folk dance; daytime food event with cultural browsing, new venue type.", "stretch": true, "maybe_review": false, "kind": "food", "when_or_hours": "Fri Oct 16-Sun Oct 18, all day (St. Sarkis Church, 4421 Charles St, Carrollton)", "startDate": "2026-10-16", "dueDate": "2026-10-18", "oneShot": true, "band": "stretch", "notes": ""}, {"n": 15, "title": "Crazy Fossil Dig", "type": "happening", "town": "Mineral Wells", "drive": "~55", "when": "Sat Oct 17, 8am-dusk", "why": "Dig-your-own 300-million-year-old fossils at the city Fossil Park — free, daytime, experts on site; genuinely one-of-a-kind.", "stretch": true, "maybe_review": false, "kind": "nature/history", "when_or_hours": "Sat Oct 17, 8am-dusk (Mineral Wells Fossil Park)", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "stretch", "notes": "Free event."}, {"n": 16, "title": "Plano International Festival", "type": "happening", "town": "Plano", "drive": "~40", "when": "Sat Oct 17, 11am-5pm", "why": "Free daytime multicultural festival at Haggard Park — 100+ cultures, international food trucks, folk dance, cultural booths to browse; opens with a naturalization ceremony.", "stretch": true, "maybe_review": false, "kind": "festival", "when_or_hours": "Sat Oct 17, 11am-5pm (Haggard Park, Plano)", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "adjacent", "notes": "Free admission and parking."}, {"n": 17, "title": "McKinney Día de los Muertos Festival", "type": "happening", "town": "McKinney", "drive": "~50", "when": "Sat Oct 17, 12-9pm", "why": "Free daytime cultural festival at TUPPS Brewery — community ofrendas, a monarch-message station (ties his monarch interest), food, and the La Chancla Toss.", "stretch": true, "maybe_review": false, "kind": "festival", "when_or_hours": "Sat Oct 17, 12-9pm (TUPPS Brewery, McKinney)", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "adjacent", "notes": "Free; ends 9pm — within his daytime window but the latest card in the queue."}, {"n": 18, "title": "3rd Saturday Guided Boardwalk Tour", "type": "happening", "town": "Combine/Seagoville", "drive": "~60", "when": "Sat Oct 17, 9-10:30am", "why": "Guided walk into the 2,200-acre John Bunker Sands wetland on the Central Flyway (near-300 species, resident bald eagles) — new venue, October migration timing.", "stretch": true, "maybe_review": false, "kind": "nature", "when_or_hours": "Sat Oct 17, 9-10:30am (John Bunker Sands Wetland Center)", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "stretch", "notes": "Free with admission, no reservation needed; at the ~60-min drive cap from home."}, {"n": 19, "title": "1949 Burger Bar", "type": "place", "town": "Cleburne", "drive": "~40", "when": "Daily 10am-3pm", "why": "Burgers since ~1949 cooked on a 135-year-old grill in a tiny 12x12 brick building — historic, local-favorite, lunch-only; his diner streak continues.", "stretch": true, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Daily 10am-3pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": ""}, {"n": 20, "title": "Celebrity Diner and Bakery", "type": "place", "town": "Waxahachie", "drive": "~50", "when": "Tue-Sun 7:30am-2:30pm (closed Mon)", "why": "Downtown diner plus scratch bakery, daytime-only — new town, and the Ol' South approval says diners are landing.", "stretch": true, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Tue-Sun 7:30am-2:30pm (closed Mon)", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": ""}, {"n": 21, "title": "Hutchins BBQ", "type": "place", "town": "McKinney", "drive": "~55", "when": "Daily 11am-9pm", "why": "Texas Monthly Top 50, cooked twice at the James Beard House — legendary brisket, the 'Texas Twinkie,' and free peach cobbler.", "stretch": true, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Daily 11am-9pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": ""}, {"n": 22, "title": "Swiss Pastry Shop", "type": "place", "town": "Fort Worth", "drive": "~30", "when": "Tue-Sat 7am-5pm (closed Sun/Mon)", "why": "Fort Worth institution 40+ years — breakfast and lunch plus the famous Swiss-style Black Forest Cake, family-run by chefs Hans and Peter.", "stretch": false, "maybe_review": false, "kind": "bakery", "when_or_hours": "Tue-Sat 7am-5pm (closed Sun/Mon); breakfast 7-11, lunch 11-3:30", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": ""}, {"n": 23, "title": "Norma's Cafe", "type": "place", "town": "Dallas (Oak Cliff)", "drive": "~50", "when": "Daily 7am-8pm", "why": "Dallas diner institution founded 1956 — 70 years of Texas home cooking, famous mile-high meringue pies, all-day breakfast.", "stretch": false, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Daily 7am-8pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": ""}, {"n": 24, "title": "407 BBQ", "type": "place", "town": "Argyle", "drive": "~30", "when": "Tue-Thu 11-7, Fri-Sat 11-8 (breakfast tacos Tue-Sat 6:30-9am); closed Sun/Mon", "why": "Voted Best BBQ in DFW (2019 reader poll) — family-owned, sides fried in 100% beef tallow, homemade peach cobbler.", "stretch": false, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Tue-Thu 11-7, Fri-Sat 11-8; breakfast tacos Tue-Sat 6:30-9am; closed Sun/Mon", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": ""}, {"n": 25, "title": "Babe's Chicken Dinner House (original)", "type": "place", "town": "Roanoke", "drive": "~20", "when": "Mon-Sat 11am-9pm, Sun 10:30am-9pm", "why": "The ORIGINAL Babe's (opened 1993) in a 1908 historic downtown Roanoke building — family-style fried chicken, close to home.", "stretch": false, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Mon-Sat 11am-9pm, Sun 10:30am-9pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": ""}, {"n": 26, "title": "Sonny Bryan's Smokehouse (original Inwood)", "type": "place", "town": "Dallas", "drive": "~45", "when": "Open 24/7", "why": "James Beard Award-winning, founded 1958 (family BBQ roots to 1910) — the original Inwood dining room has vintage school desks and sauce in heated beer bottles.", "stretch": false, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Open 24/7", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": ""}, {"n": 27, "title": "Mia's Tex-Mex", "type": "place", "town": "Dallas (Lemmon Ave)", "drive": "~45", "when": "Daily from 11am (weekday lunch specials 11-4)", "why": "Beloved Dallas Tex-Mex since 1981 — the founder invented the brisket taco here; same family recipes for four decades.", "stretch": false, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Daily from 11am; weekday lunch specials 11am-4pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": ""}, {"n": 28, "title": "Cindi's NY Deli & Restaurant", "type": "place", "town": "Dallas", "drive": "~40", "when": "Mon-Sat 6am-9pm, Sun 7am-9pm", "why": "Dallas NY-style deli institution since 1989 — pastrami on rye, matzo ball soup, in-house bakery; founded by Vietnamese refugee Anh Vo.", "stretch": false, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Mon-Sat 6am-9pm, Sun 7am-9pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": ""}, {"n": 29, "title": "Bubba's Cooks Country", "type": "place", "town": "Dallas", "drive": "~45", "when": "Daily 6:30am-10pm", "why": "Park Cities icon since 1981 in a 1927 Texaco station turned art-deco diner — famous fried chicken, catfish, 'cheapest power breakfast in town.'", "stretch": false, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Daily 6:30am-10pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": ""}, {"n": 30, "title": "Maple Leaf Diner", "type": "place", "town": "Dallas", "drive": "~45", "when": "Mon-Fri 7am-2:30pm, Sat-Sun 7am-4pm", "why": "Dallas's only real Canadian diner (Windsor native, 4.8 stars) — authentic poutine with real cheese curds, peameal bacon, Nanaimo bars.", "stretch": false, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Mon-Fri 7am-2:30pm, Sat-Sun 7am-4pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": ""}, {"n": 31, "title": "Pho Noodle & Asian Cuisine", "type": "place", "town": "Waxahachie", "drive": "~50", "when": "Mon-Sat 11am-8pm", "why": "The new-cuisine slot — authentic Vietnamese noodle house in a new town for him; strong pho reviews.", "stretch": true, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Mon-Sat 11am-8pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": ""}, {"n": 32, "title": "Muddbones", "type": "place", "town": "Bonham", "drive": "~60", "when": "Tue-Sat 11-3 (+ dinner 5-8)", "why": "'Best Old Fashion Burger in North Texas' + Best of Texoma, 4.9 stars, free retro arcade — pairs with the Sam Rayburn museum for a Bonham day.", "stretch": true, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Tue-Sat 11am-3pm (dinner 5-8pm)", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "At the ~60-min drive cap from home; pair with the Sam Rayburn Library and Museum for a Bonham day trip."}, {"n": 33, "title": "Ellis County Museum", "type": "place", "town": "Waxahachie", "drive": "~50", "when": "Mon-Sat 10-5, Sun 12-4", "why": "Free local-history museum in the 1889 former Masonic Lodge — Shawnee Trail, agriculture, railroads, plus the Women of Ellis County exhibit (Bessie Coleman).", "stretch": true, "maybe_review": false, "kind": "museum", "when_or_hours": "Mon-Sat 10am-5pm, Sun 12-4pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "Free admission."}, {"n": 34, "title": "Sam Rayburn Library and Museum", "type": "place", "town": "Bonham", "drive": "~60", "when": "Mon-Fri 9-4:30, Sat 10-2 (closed Sun)", "why": "Local-history streak — exact replica of the Speaker's office with his actual DC furniture (1907-1957), plus west-wing galleries.", "stretch": true, "maybe_review": false, "kind": "museum", "when_or_hours": "Mon-Fri 9-4:30, Sat 10-2; closed Sun", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "UT Austin's page says free with Sat 10-2 hours, but third-party listings show Tue-Sat 10-4 and a $6 admission — call (903) 583-2455 before a Saturday visit. At the ~60-min drive cap; pair with Muddbones."}, {"n": 35, "title": "Lake Mineral Wells State Park & Trailway", "type": "place", "town": "Mineral Wells", "drive": "~55", "when": "Daily (state park hours)", "why": "New-town nature day trip — noted birding trail (Red Waterfront Trail), Penitentiary Hollow canyon, 31+ miles of trails plus a 22-mile rails-to-trails.", "stretch": true, "maybe_review": false, "kind": "nature", "when_or_hours": "Daily (state park hours)", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": ""}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
