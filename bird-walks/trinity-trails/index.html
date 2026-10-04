@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trinity Trails Bird Walk (solo) — Bird walks</title><style>
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 24px 20px 60px;
+         background: #f7f5ef; color: #222; }
+  main { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 32px; margin: 8px 0 4px; }
+  p.sub { color: #666; font-size: 17px; margin-top: 0; }
+  .card { background: #fff; border-radius: 14px; padding: 18px 20px; margin: 14px 0;
+          box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .card h2 { font-size: 22px; margin: 0 0 6px; }
+  .card p { font-size: 16px; line-height: 1.5; margin: 6px 0; }
+  .biglink { display: inline-block; font-size: 19px; font-weight: 700; color: #fff;
+             background: #1a3a2a; border-radius: 12px; padding: 14px 22px;
+             text-decoration: none; margin: 8px 0; }
+  .map { width: 100%; height: 300px; border: 1px solid #ccc; border-radius: 12px; margin-top: 10px; }
+  ul.tidy { font-size: 16px; line-height: 1.6; }
+  .walkrow { display: flex; gap: 14px; align-items: flex-start; background: #fff; border-radius: 14px;
+             padding: 16px 18px; margin: 0 0 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); cursor: pointer; }
+  .walkrow.done { opacity: .55; }
+  .walkrow.done .wname { text-decoration: line-through; }
+  .donebox { width: 30px; height: 30px; margin: 2px 0 0; flex: none; accent-color: #2e7d4f; }
+  .wname { font-size: 21px; font-weight: 700; }
+  .wsub { font-size: 15px; color: #666; margin-top: 2px; }
+  .soon { font-size: 14px; color: #a07600; }
+  .note { font-size: 14px; color: #888; margin-top: 24px; }
+</style></head>
+<body><main>
+<p style="font-size:15px;margin:0 0 18px"><a href="https://add-ai-content.github.io/phone-sheets/" style="color:#1a3a2a">&larr; All phone sheets</a> | <a href="https://add-ai-content.github.io/phone-sheets/bird-walks/" style="color:#1a3a2a">Bird walks quest</a></p>
+<h1>Trinity Trails Bird Walk</h1>
+<p class="sub">Solo version of the FWAS guided walk &middot; 4th Sunday, Sept–May (FWAS)</p>
+<label class="walkrow" style="cursor:pointer">
+<input type="checkbox" class="donebox" data-walk="trinity-trails">
+<span><span class="wname">Walked it</span><span class="wsub" style="display:block">Check off when done &mdash; saved on this device</span></span>
+</label>
+<div class="card"><h2>🚗 Drive to the trailhead</h2>
+<p><b>Bellaire Dr S trailhead</b> &mdash; Park along Bellaire Dr S near the bridge; the walk starts on/near the bridge crossing.</p>
+<a class="biglink" href="https://www.google.com/maps/dir/?api=1&destination=32.7043%2C-97.3892&travelmode=driving">Maps from here</a>
+<iframe class="map" src="https://www.google.com/maps?output=embed&saddr=Current+Location&daddr=32.7043%2C-97.3892" loading="lazy"></iframe></div>
+<div class="card"><h2>🚶 Walk the route</h2>
+<p>From the Bellaire Dr S bridge, follow the tributary path down to the Clear Fork Trinity River, then take the paved Trinity Trails path to just under the Chisholm Trail Parkway bridge. Return the way you came. About 2 hours, easy.</p>
+<p class="note">Turnaround pin is approximate — follow the paved trail to the parkway bridge.</p>
+<a class="biglink" href="https://www.google.com/maps/dir/?api=1&origin=32.7043%2C-97.3892&destination=Chisholm%20Trail%20Parkway%2C%20Fort%20Worth%2C%20TX&travelmode=walking">Walking directions</a>
+<iframe class="map" src="https://www.google.com/maps?output=embed&saddr=32.7043%2C-97.3892&daddr=Chisholm%20Trail%20Parkway%2C%20Fort%20Worth%2C%20TX&dirflg=w" loading="lazy"></iframe></div>
+<div class="card"><h2>Good to know</h2><ul class="tidy"><li>About 2 hours, easy and flat, paved trail</li><li>Coffee before: Starbucks, Trinity Commons, 3000 S Hulen St #143</li><li>Bring water; binoculars if you have them</li></ul></div>
+<div class="card"><h2>eBird hotspot</h2><p><a href="https://ebird.org/hotspot/L4230679" style="color:#1a3a2a">Clear Fork Trail Head</a> &mdash; 168 species all-time. Check recent sightings before you go.</p></div>
+<p class="note">Route adapted from the <a href="https://fwas.org/wp-content/uploads/fieldtrip-details/2025-26-trinity-bird-walk.pdf" style="color:#1a3a2a">FWAS field trip sheet (PDF)</a>.
+Group logistics stripped; the walk is the same.</p>
+</main>
+<script>
+var KEY="birdwalks-done-v1", done={};
+try{done=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){done={}}
+document.querySelectorAll("input.donebox").forEach(function(b){
+  var w=b.getAttribute("data-walk"); b.checked=!!done[w];
+  b.closest(".walkrow").classList.toggle("done",b.checked);
+  b.addEventListener("change",function(){
+    if(b.checked)done[w]=1;else delete done[w];
+    try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}
+    b.closest(".walkrow").classList.toggle("done",b.checked);
+  });
+});
+</script></body></html>
