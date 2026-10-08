@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; run</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "run";
+const CARDS = [{"band": "stretch", "drive": "30", "dueDate": "2026-10-11", "kind": "cultural festival", "maybe_review": false, "n": 1, "notes": "4th annual, billed as Texas's largest Italian cultural event — food, wine tastings, bocce tournament, Italian car show Sun 10am–1pm, Marian procession. Free admission.", "oneShot": true, "startDate": "2026-10-10", "stretch": true, "title": "DFW Italian Festival", "town": "Irving", "type": "happening", "when": "Sat Oct 10, 11am–6pm / Sun Oct 11, 11am–5pm", "when_or_hours": "Sat Oct 10 11am–6pm; Sun Oct 11 11am–5pm", "why": "Texas's largest Italian cultural event — food, wine, bocce, and an Italian car show Sunday."}, {"band": "adjacent", "drive": "30", "dueDate": "", "kind": "fall festival", "maybe_review": false, "n": 2, "notes": "Free; A.W. Perry Homestead Museum (1509 N Perry Rd, Carrollton). Pumpkin picking, petting zoo, craft vendors, photo ops on a turn-of-the-20th-century homestead.", "oneShot": true, "startDate": "2026-10-10", "stretch": false, "title": "Perry Pumpkin Patch & Craft Fair", "town": "Carrollton", "type": "happening", "when": "Sat Oct 10, 10am–2pm", "when_or_hours": "Sat Oct 10, 10am–2pm", "why": "Pumpkin picking and craft vendors on a turn-of-the-century homestead."}, {"band": "stretch", "drive": "55", "dueDate": "", "kind": "fall festival", "maybe_review": false, "n": 3, "notes": "From $29.70 adult; 2511 FM 66, Waxahachie. Award-winning fall fantasy faire inside the Renaissance village — folklore, live entertainment, artisan shopping.", "oneShot": true, "startDate": "2026-10-10", "stretch": true, "title": "Scarborough's Hollow Fall Fantasy Festival", "town": "Waxahachie", "type": "happening", "when": "Sat Oct 10, 1–9pm", "when_or_hours": "Sat Oct 10, 1–9pm", "why": "Award-winning fall fantasy faire inside the Renaissance village — folklore, live acts, artisan shopping."}, {"band": "stretch", "drive": "45", "dueDate": "", "kind": "outdoor demo", "maybe_review": false, "n": 4, "notes": "Cedar Hill State Park (Penn Farm). Lone Star Dutch Oven Society demo and potluck — old-fashioned outdoor cooking, daytime and low-key.", "oneShot": true, "startDate": "2026-10-10", "stretch": true, "title": "Dutch Oven Demo & Potluck (Lone Star Dutch Oven Society)", "town": "Cedar Hill", "type": "happening", "when": "Sat Oct 10, 9am", "when_or_hours": "Sat Oct 10, 9:00 AM", "why": "Old-fashioned outdoor cooking demo at Penn Farm — quirky, daytime, low-key."}, {"band": "adjacent", "drive": "35", "dueDate": "", "kind": "museum program", "maybe_review": false, "n": 5, "notes": "Kimbell Art Museum, 3333 Camp Bowie Blvd, Fort Worth. Free; tenor + piano duo performing Debussy, Fauré, Saint-Saëns settings of Verlaine, tied to the new Photography's First Century exhibition.", "oneShot": true, "startDate": "2026-10-10", "stretch": false, "title": "Kimbell Second Saturday: Le monde de Verlaine", "town": "Fort Worth", "type": "happening", "when": "Sat Oct 10, 2–3pm", "when_or_hours": "Sat Oct 10, 2–3pm", "why": "Free chamber performance tied to a brand-new photography exhibition."}, {"band": "stretch", "drive": "30", "dueDate": "", "kind": "toy show", "maybe_review": false, "n": 6, "notes": "NTX Arena, 2401 S I-35, Lewisville. $3 advance / $6 door, free parking. Final one-day show ever (converts to 2-day in 2027); 150+ vendor tables — toy tables routinely turn up trading cards and obscure collectibles.", "oneShot": true, "startDate": "2026-10-10", "stretch": true, "title": "NTX Toy Show — final one-day show ever", "town": "Lewisville", "type": "happening", "when": "Sat Oct 10, 10am–5pm", "when_or_hours": "Sat Oct 10, 10am–5pm", "why": "Final one-day show ever — 150+ vendor tables where trading cards routinely surface."}, {"band": "stretch", "drive": "30", "dueDate": "", "kind": "museum", "maybe_review": false, "n": 7, "notes": "2550 McMillan Pkwy, Fort Worth. Free; Sat 9–6 / Sun 11–6. 200+ cars, thousands of toys/collectibles; just named Best of Texas museum; dog-friendly.", "oneShot": false, "startDate": "", "stretch": true, "title": "DFW Car & Toy Museum", "town": "Fort Worth", "type": "place", "when": "Sat 9–6, Sun 11–6; free", "when_or_hours": "Sat 9–6, Sun 11–6", "why": "Free, quirky collector-adjacent museum — 200+ cars and thousands of toys."}, {"band": "core", "drive": "50", "dueDate": "", "kind": "bird walk", "maybe_review": false, "n": 8, "notes": "Trinity River Audubon Center, Dallas. Guided migration-season walk through Blackland Prairie and wetlands with an Audubon naturalist.", "oneShot": true, "startDate": "2026-10-17", "stretch": false, "title": "Trinity River Audubon Center — Saturday Morning Bird Walk", "town": "Dallas", "type": "happening", "when": "Sat Oct 17, 7:30–9am", "when_or_hours": "Sat Oct 17, 7:30–9:00 AM", "why": "Guided migration-season walk through Blackland Prairie and wetlands."}, {"band": "core", "drive": "45", "dueDate": "", "kind": "plant sale", "maybe_review": false, "n": 9, "notes": "Dogwood Canyon Audubon Center, Cedar Hill. Annual native plant sale at the canyon preserve — native plants for his yard plus the woodland-creek backdrop.", "oneShot": true, "startDate": "2026-10-17", "stretch": false, "title": "Dogwood Canyon Audubon Center — Native Plant Sale", "town": "Cedar Hill", "type": "happening", "when": "Sat Oct 17, 9am–2pm", "when_or_hours": "Sat Oct 17, 9am–2pm", "why": "Annual native plant sale at the canyon — plants for the yard, woodland-creek backdrop."}, {"band": "stretch", "drive": "55", "dueDate": "", "kind": "fall festival", "maybe_review": false, "n": 10, "notes": "Historic square, Kaufman. 9am–4pm; parade kicks off at 9am, 100+ entries, 'Field of Flowers' theme. Classic small-town Texas fall festival in a brand-new town.", "oneShot": true, "startDate": "2026-10-17", "stretch": true, "title": "Kaufman Harvest Fest", "town": "Kaufman", "type": "happening", "when": "Sat Oct 17, 9am–4pm", "when_or_hours": "Sat Oct 17, 9am–4pm", "why": "Classic small-town fall festival on the historic square — brand-new town."}, {"band": "adjacent", "drive": "45", "dueDate": "", "kind": "fall festival", "maybe_review": false, "n": 11, "notes": "Paschall Park, 1001 New Market Rd, Mesquite. Free city-run pumpkin festival — hayride, pumpkin patch, costume contests, food trucks.", "oneShot": true, "startDate": "2026-10-17", "stretch": false, "title": "Mesquite PumpkinFest", "town": "Mesquite", "type": "happening", "when": "Sat Oct 17, 12–5pm", "when_or_hours": "Sat Oct 17, 12–5pm", "why": "Free city-run pumpkin festival — hayride, patch, costume contests, food trucks."}, {"band": "adjacent", "drive": "50", "dueDate": "2026-10-18", "kind": "plant pop-up", "maybe_review": false, "n": 12, "notes": "Native Plant Society of Texas volunteers staffing a fall native-plant table at H-E-B Forney (US Hwy 80) — plant questions answered.", "oneShot": true, "startDate": "2026-10-17", "stretch": false, "title": "NPSOT native plant pop-up at H-E-B Forney", "town": "Forney", "type": "happening", "when": "Sat Oct 17 & Sun Oct 18", "when_or_hours": "Sat Oct 17 & Sun Oct 18", "why": "Native Plant Society volunteers answering plant questions at H-E-B Forney."}, {"band": "stretch", "drive": "55", "dueDate": "2026-10-25", "kind": "fall festival", "maybe_review": false, "n": 13, "notes": "Historic downtown Ennis. Sat 10am–9pm, Sun 10am–8pm; $5 adults, kids free. 22nd-annual downtown festival with hay maze, pumpkin patch, live music — new town, photography-friendly historic downtown.", "oneShot": true, "startDate": "2026-10-24", "stretch": true, "title": "Ennis Autumn Daze", "town": "Ennis", "type": "happening", "when": "Sat Oct 24–Sun Oct 25", "when_or_hours": "Sat Oct 24 10am–9pm; Sun Oct 25 10am–8pm", "why": "22nd-annual downtown festival in a Czech-heritage town — hay maze, pumpkin patch."}, {"band": "adjacent", "drive": "40", "dueDate": "", "kind": "museum program", "maybe_review": false, "n": 14, "notes": "Frisco Heritage Center, 6455 Page St. Free. Trick-or-treating through the historic village with crafts, tintype photographer, fortune teller — historic-village hook, daytime.", "oneShot": true, "startDate": "2026-10-24", "stretch": false, "title": "Heritage Halloween at Frisco Heritage Center", "town": "Frisco", "type": "happening", "when": "Sat Oct 24, 11am–1pm", "when_or_hours": "Sat Oct 24, 11am–1pm", "why": "Daytime trick-or-treat through the historic village — tintype photographer, crafts."}, {"band": "stretch", "drive": "60", "dueDate": "2026-10-25", "kind": "art festival", "maybe_review": false, "n": 15, "notes": "Historic Granbury Square. Fri 10am–7pm, Sat–Sun 10am–4pm. Juried art festival + live music + Masquerade Street Dance. Drive ~1 hr — horizon stretch, flagged.", "oneShot": true, "startDate": "2026-10-23", "stretch": true, "title": "Harvest Moon Festival of the Arts", "town": "Granbury", "type": "happening", "when": "Oct 23–25", "when_or_hours": "Fri Oct 23 10am–7pm; Sat–Sun 10am–4pm", "why": "49th-annual juried art festival on the historic square — stretch drive, flag it."}, {"band": "core", "drive": "35", "dueDate": "", "kind": "restaurant", "maybe_review": false, "n": 16, "notes": "Babes Chicken, Carrollton location. Sat 11am–9pm; weekday lunch 11–2. Iconic family-style Texas comfort-food lunch spot (fried chicken, biscuits, bottomless sides) — beloved local daytime meal, clear reason.", "oneShot": false, "startDate": "", "stretch": false, "title": "Babe's Chicken Dinner House — Carrollton", "town": "Carrollton", "type": "place", "when": "Sat 11am–9pm; weekday lunch 11–2", "when_or_hours": "Sat 11am–9pm; weekday lunch 11am–2pm", "why": "Iconic family-style fried-chicken lunch — biscuits, bottomless sides."}, {"band": "stretch", "drive": "50", "dueDate": "", "kind": "state park", "maybe_review": false, "n": 17, "notes": "Isle du Bois Unit, Pilot Point. 6am–10pm daily; $7/adult (13+), kids free. Big-lake state park in the Eastern Cross Timbers — hiking/biking trails, fishing pier, bird watching.", "oneShot": false, "startDate": "", "stretch": true, "title": "Ray Roberts Lake State Park – Isle du Bois Unit", "town": "Pilot Point", "type": "place", "when": "Daily 6am–10pm; $7", "when_or_hours": "Daily 6am–10pm; $7/adult", "why": "Big-lake state park in the Eastern Cross Timbers — trails, fishing pier, birding."}, {"band": "stretch", "drive": "50", "dueDate": "", "kind": "trail", "maybe_review": false, "n": 18, "notes": "Brockdale Park trailhead, Lucas. Dawn–dusk, always open; CLOSES WHEN WET — check trinitytrailriders.org before going. Volunteer-maintained hiking/equestrian trail along Lake Lavon; second-largest sycamore tree in Texas on the Sycamore Loop.", "oneShot": false, "startDate": "", "stretch": true, "title": "Trinity Trail — Brockdale Park trailhead", "town": "Lucas", "type": "place", "when": "Dawn–dusk; closes when wet", "when_or_hours": "Dawn–dusk; closes when wet — check trinitytrailriders.org", "why": "Volunteer trail along Lake Lavon — home of Texas's second-largest sycamore."}, {"band": "stretch", "drive": "40", "dueDate": "", "kind": "nature park", "maybe_review": false, "n": 19, "notes": "1000 Bear Creek Rd, Lancaster. 6am–10pm daily. Quiet nature park with walking trails, fishing pond with dock, butterfly garden, Cleo Hearn equestrian trail — a quadrant of Dallas County he hasn't scouted.", "oneShot": false, "startDate": "", "stretch": true, "title": "Bear Creek Nature Park", "town": "Lancaster", "type": "place", "when": "Daily 6am–10pm", "when_or_hours": "Daily 6am–10pm", "why": "Quiet trails, fishing pond, butterfly garden — an unscouted Dallas County quadrant."}, {"band": "stretch", "drive": "55", "dueDate": "", "kind": "lavender farm", "maybe_review": false, "n": 20, "notes": "Gainesville. Fri–Sun 9–5; café 10:30–3:30. Farm season runs March–October, so this is the last weeks of the season — go soon. 1,000-plant lavender field, walk-through butterfly garden, aviaries with birds, farm animals, lavender café.", "oneShot": false, "startDate": "", "stretch": true, "title": "Lavender Ridge Farms", "town": "Gainesville", "type": "place", "when": "Fri–Sun 9–5; season ends in Oct", "when_or_hours": "Fri–Sun 9–5 (season ends October — go soon); café 10:30–3:30", "why": "1,000-plant lavender field, butterfly garden, aviaries — a photographer's fall afternoon."}, {"band": "stretch", "drive": "50", "dueDate": "", "kind": "waterfront", "maybe_review": false, "n": 21, "notes": "Rockwall. Public boardwalk always open. Mediterranean-style waterfront boardwalk on Lake Ray Hubbard — marina, limestone promenades, shops, lakeside restaurants, weekend markets.", "oneShot": false, "startDate": "", "stretch": true, "title": "The Harbor", "town": "Rockwall", "type": "place", "when": "Boardwalk always open", "when_or_hours": "Public boardwalk always open", "why": "Mediterranean-style waterfront boardwalk on Lake Ray Hubbard — lake-town stroll."}, {"band": "stretch", "drive": "50", "dueDate": "", "kind": "downtown", "maybe_review": false, "n": 22, "notes": "Celina. Shops vary; square always open. 'Rollertown' — walkable square of 100+ year-old buildings, indie boutiques, Rollertown Beerworks taproom, Celina Area Heritage Association museum (211 W Pecan St).", "oneShot": false, "startDate": "", "stretch": true, "title": "Historic downtown Celina", "town": "Celina", "type": "place", "when": "Shops vary; square always open", "when_or_hours": "Square always open; shops vary", "why": "'Rollertown' — 100+ year-old buildings, indie boutiques, heritage museum."}, {"band": "stretch", "drive": "55", "dueDate": "", "kind": "downtown", "maybe_review": false, "n": 23, "notes": "Ennis. Always open; Ennis Welcome Center Mon–Fri 8–5, Sat 9–3. The 'Bluebonnet City of Texas' with deep Czech roots — Ennis Railroad & Cultural Heritage Museum downtown, Czech bakeries on Main, Veterans Memorial Park bluebonnet prairie with paved walking path.", "oneShot": false, "startDate": "", "stretch": true, "title": "Historic downtown Ennis", "town": "Ennis", "type": "place", "when": "Always open; Welcome Center Sat 9–3", "when_or_hours": "Always open; Welcome Center Sat 9–3", "why": "Czech-heritage downtown — railroad museum, Czech bakeries, bluebonnet prairie park."}, {"band": "stretch", "drive": "50", "dueDate": "", "kind": "downtown", "maybe_review": false, "n": 24, "notes": "Forney. Always open; Spellman Museum hours vary (free admission, 200 S Bois D'Arc St). Self-billed 'Antique Capital of Texas' — compact Main Street corridor, Forney Mural at 117 E Main, free two-room Spellman Museum of Forney History.", "oneShot": false, "startDate": "", "stretch": true, "title": "Historic downtown Forney", "town": "Forney", "type": "place", "when": "Always open; Spellman Museum free, hours vary", "when_or_hours": "Always open; Spellman Museum hours vary (free)", "why": "'Antique Capital of Texas' — Main Street corridor, mural, free history museum."}, {"band": "adjacent", "drive": "30", "dueDate": "", "kind": "bar & grill", "maybe_review": false, "n": 25, "notes": "96 McMakin Rd, Bartonville. Sun 9–9, Sat 11–12, Thu/Fri from 3pm. 140-year-old former grocery/feed store/gas station turned bar & grill — Texas Wagyu burgers, patio fire pit, regular live music in a building with real history.", "oneShot": false, "startDate": "", "stretch": false, "title": "The Bartonville Store", "town": "Bartonville", "type": "place", "when": "Sun 9–9, Sat 11–12, Thu/Fri from 3pm", "when_or_hours": "Sun 9–9; Sat 11–12; Thu/Fri from 3pm", "why": "140-year-old former feed store turned bar & grill — Texas Wagyu burgers, patio fire pit."}, {"band": "stretch", "drive": "50", "dueDate": "", "kind": "diner", "maybe_review": false, "n": 26, "notes": "127 N Ohio St, Celina. Tue–Sat 11–9, Sun 11–3, closed Mon. Southern comfort diner in a 100+ year-old brick building on the square — chicken-fried steak, fried okra, famous homemade pie case (coconut cream, chocolate).", "oneShot": false, "startDate": "", "stretch": true, "title": "Lucy's on the Square", "town": "Celina", "type": "place", "when": "Tue–Sat 11–9, Sun 11–3", "when_or_hours": "Tue–Sat 11–9; Sun 11–3; closed Mon", "why": "Century-old Southern diner on the square — chicken-fried steak, famous pie case."}, {"band": "stretch", "drive": "50", "dueDate": "", "kind": "bakery", "maybe_review": false, "n": 27, "notes": "106 E Main St, Forney. Mon–Sat 7–7, Sun 8–3. Beloved Main Street bakery-café (4.9★, 359 reviews) — D Magazine-praised pastries (tres leches bundt, sticky buns) plus a real lunch menu of sandwiches and quiche.", "oneShot": false, "startDate": "", "stretch": true, "title": "Latham Bakery", "town": "Forney", "type": "place", "when": "Mon–Sat 7–7, Sun 8–3", "when_or_hours": "Mon–Sat 7–7; Sun 8–3", "why": "Beloved Main Street bakery-café — D Magazine-praised pastries plus a real lunch menu."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
