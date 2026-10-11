@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Porch Puzzles</title>
+<style>
+  :root { --bg:#1c2420; --panel:#26302b; --accent:#e0a458; --text:#f2ede2; --muted:#a8a094; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; overscroll-behavior:none; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,system-ui,"Segoe UI",sans-serif;
+         display:flex; flex-direction:column; height:100dvh; overflow:hidden; }
+  header { padding:10px 16px 6px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  header h1 { font-size:20px; margin:0; font-weight:700; letter-spacing:.5px; }
+  header h1 span { color:var(--accent); }
+  #stats { margin-left:auto; font-size:14px; color:var(--muted); display:flex; gap:14px; }
+  #stats b { color:var(--text); font-variant-numeric:tabular-nums; }
+  #controls { background:var(--panel); padding:8px 12px; display:flex; gap:10px; align-items:center;
+               flex-wrap:wrap; border-top:1px solid #00000040; border-bottom:1px solid #00000040; }
+  .thumbs { display:flex; gap:8px; }
+  .thumbs img { width:52px; height:52px; object-fit:cover; border-radius:8px; cursor:pointer;
+                border:2px solid transparent; opacity:.65; }
+  .thumbs img.sel { border-color:var(--accent); opacity:1; }
+  .seg { display:flex; gap:4px; background:#00000030; border-radius:10px; padding:3px; }
+  .seg button { border:0; background:transparent; color:var(--muted); font-size:14px; font-weight:600;
+                padding:6px 12px; border-radius:8px; cursor:pointer; }
+  .seg button.sel { background:var(--accent); color:#1c2420; }
+  #newbtn { border:0; background:#3a4a41; color:var(--text); font-size:14px; font-weight:600;
+            padding:8px 14px; border-radius:10px; cursor:pointer; }
+  #newbtn:active { transform:scale(.96); }
+  #previewToggle { font-size:13px; color:var(--muted); background:none; border:1px solid #ffffff25;
+                   border-radius:8px; padding:6px 10px; cursor:pointer; }
+  #field { position:relative; flex:1; overflow:hidden; touch-action:none;
+           background:radial-gradient(ellipse at 50% 40%, #243029 0%, var(--bg) 75%); }
+  #field canvas.piece { position:absolute; touch-action:none; cursor:grab; filter:drop-shadow(0 2px 3px #000a); }
+  #field canvas.piece.drag { cursor:grabbing; filter:drop-shadow(0 6px 10px #000c); }
+  #preview { position:absolute; right:10px; bottom:10px; width:110px; border-radius:8px;
+             border:2px solid #ffffff30; display:none; pointer-events:none; }
+  #win { position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+         background:#000000b0; z-index:9999; }
+  #win .card { background:var(--panel); border-radius:16px; padding:28px 36px; text-align:center;
+               border:1px solid #ffffff20; }
+  #win h2 { margin:0 0 8px; font-size:24px; }
+  #win p { margin:6px 0; color:var(--muted); }
+  #win p b { color:var(--accent); font-size:20px; }
+  #win button { margin-top:14px; border:0; background:var(--accent); color:#1c2420; font-weight:700;
+                font-size:16px; padding:10px 24px; border-radius:12px; cursor:pointer; }
+  #hint { text-align:center; font-size:12px; color:var(--muted); padding:4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span>◈</span> Porch Puzzles</h1>
+  <div id="stats"><span>⏱ <b id="clock">0:00</b></span><span>best <b id="best">—</b></span></div>
+</header>
+<div id="controls">
+  <div class="thumbs" id="thumbs"></div>
+  <div class="seg" id="pieceSeg">
+    <button data-n="24">24</button>
+    <button data-n="48" class="sel">48</button>
+    <button data-n="96">96</button>
+  </div>
+  <button id="newbtn">↻ new puzzle</button>
+  <button id="previewToggle">preview</button>
+</div>
+<div id="field"><img id="preview" alt=""></div>
+<div id="hint">drag pieces · they snap when close · double-tap a piece to bring it forward</div>
+<div id="win"><div class="card">
+  <h2>Solved! 🎉</h2>
+  <p>time: <b id="wintime"></b></p>
+  <p id="winbest"></p>
+  <button id="again">another one</button>
+</div></div>
+<script>
+"use strict";
+const PHOTOS = [
+  { id:"hawk",       src:"img/hawk.jpg",       label:"hawk splash" },
+  { id:"owl",        src:"img/owl.jpg",        label:"screech owl" },
+  { id:"woodpecker", src:"img/woodpecker.jpg", label:"woodpecker" },
+  { id:"butterfly",  src:"img/butterfly.jpg",  label:"butterfly" },
+];
+const field = document.getElementById('field');
+const clockEl = document.getElementById('clock');
+const bestEl = document.getElementById('best');
+let photo = PHOTOS[0], pieceTarget = 48;
+let img = new Image();
+let cols=0, rows=0, s=0, tab=0, boardImg=null;
+let pieces=[], grid=[], groups=new Map(), nextGroup=1, zTop=1;
+let startTime=0, timerOn=false, timerId=null, moves=0;
+let drag=null;
+
+/* ---------- photo picker ---------- */
+const thumbsEl = document.getElementById('thumbs');
+PHOTOS.forEach((p,i)=>{
+  const im=document.createElement('img'); im.src=p.src; im.alt=p.label; im.title=p.label;
+  if(i===0) im.classList.add('sel');
+  im.onclick=()=>{ document.querySelectorAll('.thumbs img').forEach(e=>e.classList.remove('sel'));
+                   im.classList.add('sel'); photo=p; newGame(); };
+  thumbsEl.appendChild(im);
+});
+document.querySelectorAll('#pieceSeg button').forEach(b=>{
+  b.onclick=()=>{ document.querySelectorAll('#pieceSeg button').forEach(e=>e.classList.remove('sel'));
+                  b.classList.add('sel'); pieceTarget=+b.dataset.n; newGame(); };
+});
+document.getElementById('newbtn').onclick=()=>newGame();
+document.getElementById('again').onclick=()=>{ document.getElementById('win').style.display='none'; newGame(); };
+const previewImg=document.getElementById('preview');
+document.getElementById('previewToggle').onclick=()=>{
+  previewImg.style.display = previewImg.style.display==='block' ? 'none':'block';
+};
+
+/* ---------- best times ---------- */
+function bestKey(){ return photo.id+':'+pieces.length; }
+function getBest(){ try{ return JSON.parse(localStorage.getItem('porchPuzzlesBest')||'{}')[bestKey()]||null; }catch(e){ return null; } }
+function setBest(sec){
+  let all={}; try{ all=JSON.parse(localStorage.getItem('porchPuzzlesBest')||'{}'); }catch(e){}
+  if(!all[bestKey()] || sec<all[bestKey()]){ all[bestKey()]=sec; localStorage.setItem('porchPuzzlesBest',JSON.stringify(all)); return true; }
+  return false;
+}
+function fmt(sec){ sec=Math.floor(sec); return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0'); }
+function refreshBest(){ const b=getBest(); bestEl.textContent = b==null ? '—' : fmt(b); }
+
+/* ---------- jigsaw tab edge ---------- */
+function edgePath(ctx, L, out){
+  // straight edge from (0,0) to (L,0); bump toward out*(+y). out in {-1,0,1}
+  if(!out){ ctx.lineTo(L,0); return; }
+  const d=out, h=L*0.20;
+  ctx.lineTo(L*0.30,0);
+  ctx.bezierCurveTo(L*0.32,0, L*0.345,d*L*0.02, L*0.365,d*L*0.06);
+  ctx.bezierCurveTo(L*0.345,d*L*0.16, L*0.40,d*h, L*0.50,d*h);
+  ctx.bezierCurveTo(L*0.60,d*h, L*0.655,d*L*0.16, L*0.635,d*L*0.06);
+  ctx.bezierCurveTo(L*0.655,d*L*0.02, L*0.68,0, L*0.70,0);
+  ctx.lineTo(L,0);
+}
+function piecePath(ctx, e){
+  // e = {top,right,bottom,left} each -1/0/1; +1 means tab sticks OUT of this piece
+  const t=tab, S=s;
+  ctx.beginPath();
+  ctx.moveTo(t,t);
+  edgePath(ctx,S,e.top);                            // top, going +x, outward = -y
+  ctx.save(); ctx.translate(t+S,t); ctx.rotate(Math.PI/2); edgePath(ctx,S,-e.right); ctx.restore();
+  ctx.save(); ctx.translate(t+S,t+S); ctx.rotate(Math.PI); edgePath(ctx,S,-e.bottom); ctx.restore();
+  ctx.save(); ctx.translate(t,t+S); ctx.rotate(-Math.PI/2); edgePath(ctx,S,e.left); ctx.restore();
+  ctx.closePath();
+}
+
+/* ---------- game setup ---------- */
+function newGame(){
+  stopTimer(); clockEl.textContent='0:00'; moves=0;
+  document.getElementById('win').style.display='none';
+  field.querySelectorAll('canvas.piece').forEach(c=>c.remove());
+  pieces=[]; groups=new Map(); nextGroup=1; zTop=1;
+  img.onload=()=>buildPuzzle();
+  img.src=photo.src;
+  previewImg.src=photo.src;
+}
+function buildPuzzle(){
+  const fw=field.clientWidth, fh=field.clientHeight;
+  const aspect=img.naturalWidth/img.naturalHeight;
+  cols=Math.max(3,Math.round(Math.sqrt(pieceTarget*aspect)));
+  rows=Math.max(3,Math.round(pieceTarget/cols));
+  const boardW=Math.min(fw*0.94, fh*0.94*aspect);
+  s=boardW/cols; tab=s*0.24;
+  // board image at exact puzzle scale
+  boardImg=document.createElement('canvas');
+  boardImg.width=Math.round(cols*s); boardImg.height=Math.round(rows*s);
+  const bctx=boardImg.getContext('2d');
+  bctx.drawImage(img,0,0,boardImg.width,boardImg.height);
+  // complementary edges
+  const vEdge=[], hEdge=[]; // vEdge[r][c] = edge between (r,c-1)-(r,c); hEdge[r][c] between (r-1,c)-(r,c)
+  for(let r=0;r<rows;r++){ vEdge[r]=[]; for(let c=0;c<=cols;c++) vEdge[r][c]= (c===0||c===cols)?0:(Math.random()<0.5?1:-1); }
+  for(let r=0;r<=rows;r++){ hEdge[r]=[]; for(let c=0;c<cols;c++) hEdge[r][c]= (r===0||r===rows)?0:(Math.random()<0.5?1:-1); }
+  grid=[];
+  for(let r=0;r<rows;r++){ grid[r]=[];
+    for(let c=0;c<cols;c++){
+      const e={ top:hEdge[r][c], bottom:hEdge[r+1][c], left:vEdge[r][c], right:vEdge[r][c+1] };
+      // neighbor's complementary edge is the negative of ours by construction of shared arrays
+      const cv=document.createElement('canvas');
+      const pw=Math.ceil(s+2*tab), ph=Math.ceil(s+2*tab);
+      cv.width=pw; cv.height=ph; cv.className='piece';
+      const pctx=cv.getContext('2d');
+      piecePath(pctx,e);
+      pctx.save(); pctx.clip();
+      pctx.drawImage(boardImg, c*s-tab, r*s-tab, s+2*tab, s+2*tab, 0,0, pw,ph);
+      pctx.restore();
+      piecePath(pctx,e);
+      pctx.strokeStyle='rgba(0,0,0,.35)'; pctx.lineWidth=1.5; pctx.stroke();
+      const p={gx:c, gy:r, el:cv, group:nextGroup++, x:0, y:0};
+      cv._piece=p;
+      // scatter
+      p.x=Math.random()*(fw-pw); p.y=Math.random()*(fh-ph);
+      cv.style.left=p.x+'px'; cv.style.top=p.y+'px'; cv.style.zIndex=zTop++;
+      attachHandlers(cv);
+      field.appendChild(cv);
+      pieces.push(p); grid[r][c]=p; groups.set(p.group,[p]);
+    }
+  }
+  refreshBest();
+}
+function positionEl(p){ p.el.style.left=p.x+'px'; p.el.style.top=p.y+'px'; }
+
+/* ---------- drag & snap ---------- */
+function attachHandlers(cv){
+  cv.addEventListener('pointerdown',ev=>{
+    ev.preventDefault();
+    const p=cv._piece, g=groups.get(p.group);
+    g.forEach(q=>{ q.el.style.zIndex=zTop; q.el.classList.add('drag'); });
+    zTop++;
+    drag={group:g, lastX:ev.clientX, lastY:ev.clientY, moved:false};
+    cv.setPointerCapture(ev.pointerId);
+    if(!timerOn) startTimer();
+  });
+  cv.addEventListener('pointermove',ev=>{
+    if(!drag) return;
+    const dx=ev.clientX-drag.lastX, dy=ev.clientY-drag.lastY;
+    if(Math.abs(dx)+Math.abs(dy)>0) drag.moved=true;
+    drag.lastX=ev.clientX; drag.lastY=ev.clientY;
+    drag.group.forEach(q=>{ q.x+=dx; q.y+=dy; positionEl(q); });
+  });
+  const drop=ev=>{
+    if(!drag) return;
+    const g=drag.group; drag=null;
+    g.forEach(q=>q.el.classList.remove('drag'));
+    trySnap(g);
+    if(groups.size===1) win();
+  };
+  cv.addEventListener('pointerup',drop);
+  cv.addEventListener('pointercancel',drop);
+  cv.addEventListener('dblclick',ev=>{
+    ev.preventDefault();
+    const p=cv._piece;
+    groups.get(p.group).forEach(q=>{ q.el.style.zIndex=zTop; });
+    zTop++;
+  });
+}
+function trySnap(g){
+  const tol=s*0.28, dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  let merged=true;
+  while(merged){
+    merged=false;
+    for(const p of [...g]){
+      for(const [dx,dy] of dirs){
+        const nr=p.gy+dy, nc=p.gx+dx;
+        if(nr<0||nr>=rows||nc<0||nc>=cols) continue;
+        const q=grid[nr][nc];
+        if(q.group===p.group) continue;
+        const ex=p.x+dx*s, ey=p.y+dy*s;
+        if(Math.abs(q.x-ex)<tol && Math.abs(q.y-ey)<tol){
+          const ox=ex-q.x, oy=ey-q.y;
+          const qg=groups.get(q.group);
+          qg.forEach(r=>{ r.x+=ox; r.y+=oy; r.group=p.group; positionEl(r); });
+          groups.delete(q.group);
+          qg.forEach(r=>g.push(r));
+          groups.set(p.group,g);
+          merged=true;
+        }
+      }
+    }
+  }
+}
+
+/* ---------- timer & win ---------- */
+function startTimer(){ timerOn=true; startTime=Date.now();
+  timerId=setInterval(()=>{ clockEl.textContent=fmt((Date.now()-startTime)/1000); },500); }
+function stopTimer(){ timerOn=false; if(timerId) clearInterval(timerId); timerId=null; }
+function win(){
+  stopTimer();
+  const sec=(Date.now()-startTime)/1000;
+  document.getElementById('wintime').textContent=fmt(sec);
+  const isBest=setBest(sec);
+  document.getElementById('winbest').innerHTML = isBest ? 'new best time! 🏆' :
+    ('best: <b>'+fmt(getBest())+'</b>');
+  refreshBest();
+  setTimeout(()=>{ document.getElementById('win').style.display='flex'; },350);
+}
+window.addEventListener('resize',()=>{ /* keep pieces where they are */ });
+newGame();
+</script>
+</body>
+</html>
