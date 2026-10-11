@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shotcut for Dummies in Crayon</title>
+<style>
+  :root { --ink:#2b2b2b; --paper:#fffdf7; --crayon:#e8590c; --crayon-soft:#fff4e6; --card:#ffffff; --muted:#6b6b6b; --line:#eee3d0; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height:1.65; font-size:18px; }
+  .wrap { max-width:680px; margin:0 auto; padding:24px 20px 64px; }
+  header.hero { text-align:center; padding:36px 0 12px; }
+  header.hero .crayon { font-size:52px; }
+  h1 { font-size:34px; line-height:1.2; margin:12px 0 8px; }
+  .sub { color:var(--muted); font-size:17px; max-width:560px; margin:0 auto; }
+  .intro { background:var(--crayon-soft); border:2px solid var(--line); border-radius:16px; padding:20px 22px; margin:28px 0; font-size:17px; }
+  .toc { margin:28px 0; padding:0; list-style:none; }
+  .toc li { margin:6px 0; }
+  .toc a { color:var(--crayon); text-decoration:none; font-weight:600; }
+  .lesson { background:var(--card); border:2px solid var(--line); border-radius:16px; padding:22px; margin:26px 0; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+  .lesson h2 { margin:0 0 4px; font-size:24px; }
+  .lesson h2 .num { display:inline-block; background:var(--crayon); color:#fff; border-radius:50%; width:34px; height:34px; text-align:center; line-height:34px; font-size:18px; margin-right:8px; vertical-align:2px; }
+  .sec { margin:16px 0 0; }
+  .sec h3 { font-size:15px; text-transform:uppercase; letter-spacing:.08em; color:var(--crayon); margin:0 0 6px; }
+  .sec p { margin:0; }
+  .btns { background:#f8f5ec; border-left:4px solid var(--crayon); padding:12px 16px; border-radius:0 12px 12px 0; }
+  .btns p { margin:0; }
+  kbd { background:#2b2b2b; color:#fff; border-radius:6px; padding:1px 8px; font-family:inherit; font-size:16px; white-space:nowrap; }
+  .assign { background:#f0f9f0; border:2px dashed #8fbf8f; border-radius:12px; padding:14px 18px; }
+  .assign h3 { color:#2f7d32; }
+  footer { text-align:center; color:var(--muted); margin-top:48px; font-size:16px; }
+  footer .crayon { font-size:40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="crayon">🖍️</div>
+  <h1>Shotcut for Dummies in Crayon</h1>
+  <p class="sub">A one-day-at-a-time lesson plan for your reel-finishing workbench: Shotcut on the FrostHP. Short sentences. Plain words. Zero jargon. One porch assignment per day.</p>
+</header>
+
+<div class="intro">
+  Here's the truth: LosslessCut is the paper cutter — fast, rough, one job. Shotcut is the workbench, where your picked beats become a finished reel. You've already got the happy path down. This plan is the whole shop: every panel, every filter you'll actually touch, and the full finishing workflow. One standing rule runs through everything: <strong>the bird decides the framing, never the geometry.</strong> Go at your own pace.
+</div>
+
+<ol class="toc">
+  <li><a href="#l1">1 — The workbench tour: panels</a></li>
+  <li><a href="#l2">2 — Getting clips on the timeline</a></li>
+  <li><a href="#l3">3 — Cutting: S is for snip</a></li>
+  <li><a href="#l4">4 — The 9:16 crop done RIGHT</a></li>
+  <li><a href="#l5">5 — Filters tour: the only four you need</a></li>
+  <li><a href="#l6">6 — Text overlays</a></li>
+  <li><a href="#l7">7 — Stamping the "add" watermark</a></li>
+  <li><a href="#l8">8 — Audio: mute the wind, add the music</a></li>
+  <li><a href="#l9">9 — Transitions (and why to use almost none)</a></li>
+  <li><a href="#l10">10 — Speed: slow motion</a></li>
+  <li><a href="#l11">11 — Export: the 1080×1920 finish line</a></li>
+  <li><a href="#l12">12 — The reel-finishing workflow</a></li>
+</ol>
+
+<div class="lesson" id="l1">
+  <h2><span class="num">1</span>The workbench tour: what all these panels are</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Shotcut looks like an airplane cockpit the first time. It's really just a kitchen with four counters. <strong>Preview</strong> (top middle) is the plate — what the finished dish looks like. <strong>Timeline</strong> (bottom) is the counter where you lay out ingredients in order. <strong>Source / Playlist</strong> (top left) is the pantry — clips waiting to be used. <strong>Filters</strong> and <strong>Properties</strong> (usually on the side) are the spice rack — click a clip, then season it. That's the whole kitchen. Everything else is drawers you rarely open.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Open Shotcut. <strong>Before you touch a single clip:</strong> go to <kbd>Settings</kbd> → <kbd>Video Mode</kbd> → <kbd>Vertical HD 30fps</kbd>. That's the 1080×1920 canvas your reels live on. Do this first, every time — changing it after clips are on the timeline scrambles your layout. Canvas first, clips second. Always.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Open Shotcut, set the video mode, then close it without doing anything else. Do it three times. Boring? Good. You want this to be muscle memory, because forgetting it is the single most annoying mistake in this whole plan.</p></div>
+</div>
+
+<div class="lesson" id="l2">
+  <h2><span class="num">2</span>Getting clips on the timeline</h2>
+  <div class="sec"><h3>The crayon version</h3><p>A clip sitting in the pantry does nothing. You have to carry it to the counter. Opening a file just <em>looks</em> at it. Dragging it to the timeline <em>uses</em> it. The timeline is a conveyor belt running left to right — whatever is on it, in order, is your video.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p><kbd>File</kbd> → <kbd>Open File</kbd> (or just drag a video in from Double Commander) — it lands in the Playlist pantry. Now <strong>drag it down onto the timeline</strong>. Press <kbd>Space</kbd> to play, <kbd>Space</kbd> again to pause. <kbd>←</kbd> and <kbd>→</kbd> nudge one frame at a time. The slider at the bottom of the timeline zooms in and out — zoom in when your beats are short, because splitting a 3-second moment on a zoomed-out timeline is an exercise in frustration.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Open one bird clip, drag it to the timeline, and play it with <kbd>Space</kbd>. Zoom the timeline all the way in, then all the way out. Notice how the clip is just a long bar with a sound wave under it. That's your raw material. Nothing to break yet.</p></div>
+</div>
+
+<div class="lesson" id="l3">
+  <h2><span class="num">3</span>Cutting: S is for snip</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Editing is mostly throwing away. You keep the 4 seconds where the hawk yawns and ditch the 40 seconds where it sits there like a feathered traffic cone. <strong>Splitting</strong> cuts the bar into pieces. <strong>Deleting</strong> removes a piece. The only question is whether the pieces behind it slide shut or leave a hole.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Park the playhead where a beat <strong>starts</strong> and press <kbd>S</kbd> — snip. Move to where the beat <strong>ends</strong>, press <kbd>S</kbd> again. The beat is now its own piece. Click a junk piece and press <kbd>Delete</kbd> — it's gone, but it leaves a gap (that's called a <strong>lift</strong>). Press <kbd>X</kbd> instead and the gap snaps shut, everything sliding left (that's a <strong>ripple delete</strong>). In practice: <kbd>S</kbd> to cut, <kbd>X</kbd> to remove junk. Drag any clip's left or right edge to trim it longer or shorter without cutting.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Take a long feeder clip and isolate one good 5-second beat: <kbd>S</kbd> at the start, <kbd>S</kbd> at the end, <kbd>X</kbd> the junk on both sides. Drag the keeper to the very start of the timeline. You just edited. That's 90% of the job, right there.</p></div>
+</div>
+
+<div class="lesson" id="l4">
+  <h2><span class="num">4</span>The 9:16 crop done RIGHT (the bird decides)</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Your footage is wide. Instagram reels are tall. Something has to give — and what gives is the left and right edges. The deadly sin is letting the software pick which slice survives, because the software doesn't know where the bird is. That's how you get a headless hawk. <strong>You</strong> pick the slice. Every time. Eyeballs on the bird, then crop.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Click your clip on the timeline. Open <kbd>Filters</kbd>, hit the <kbd>+</kbd>, go to <kbd>Video</kbd>, and add <kbd>Size, Position &amp; Rotate</kbd>. Raise the <kbd>Zoom</kbd> slider until the video fills the tall canvas edge to edge — no black bars left. (Why this order: cropping a video that's floating small inside a big black canvas just gives you a smaller floating video. Fill first, then choose the slice.) Now hit <kbd>+</kbd> again and add <kbd>Crop: Rectangle</kbd>. A rectangle appears over your video in the preview. <strong>Drag its corners until the box sits on the bird</strong> — not the middle of the frame, the bird. The numbers underneath (Left / Top / Right / Bottom) do the same thing precisely, in pixels. Scrub through the whole clip and make sure the bird never leaves the box — if it wanders, widen the box or reposition it.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Take a clip where the bird is off to one side. Crop it two ways: once blind-centered, once with the box on the bird. Compare. The blind one probably beheads your subject. That's the lesson, and it's the one rule in this whole plan you never break.</p></div>
+</div>
+
+<div class="lesson" id="l5">
+  <h2><span class="num">5</span>Filters panel tour: the only four you need</h2>
+  <div class="sec"><h3>The crayon version</h3><p>The Filters panel is a spice rack with 200 jars, and you need four of them. Everything else is for people making documentaries about cheese. The four: <strong>Sharpen</strong> (crisps up soft feathers — a <em>mild</em> pass, you're polishing, not sanding), <strong>Brightness</strong>, <strong>Contrast</strong>, and <strong>White Balance</strong> (fixes the pumpkin-orange porch-light look). Filters stack on a clip in order, top to bottom — and you can turn any of them off with the little checkbox to compare before/after.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Click a clip on the timeline → <kbd>Filters</kbd> → <kbd>+</kbd> → <kbd>Video</kbd> → pick one. For sharpen: add <kbd>Sharpen</kbd> and nudge the <kbd>Amount</kbd> up just a little — if the feathers start looking crunchy or sparkly, you've gone too far; back it off. For porch-light orange: add <kbd>White Balance</kbd> and pick a cooler temperature until white looks white again. To remove a filter, select it in the list and hit the <kbd>−</kbd> button.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Take a soft, slightly orange feeder clip. Add Sharpen (small amount), then White Balance (cool it down). Toggle each filter's checkbox off and on. See the difference each one makes? That's your whole color-correction kit. Four jars.</p></div>
+</div>
+
+<div class="lesson" id="l6">
+  <h2><span class="num">6</span>Text overlays: words on the video</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Sometimes the video wants a label — a species name, a date, "he's back." Text in Shotcut is a filter you stick on a clip, like a Post-it on a photograph. One gotcha: the text box only shows up when the playhead is sitting on top of the clip that has the filter. No playhead on the clip, no text box. That's not a bug, that's just how it is.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Click the clip on the timeline, make sure the <strong>playhead is parked over it</strong>, then <kbd>Filters</kbd> → <kbd>+</kbd> → <kbd>Video</kbd> → <kbd>Text: Rich</kbd>. A rectangle appears on the preview — type right in it. The little toolbar along the top of the rectangle sets the font, size, and color. Drag the rectangle where you want the words to sit. Big and readable beats fancy — this is a phone screen, not a movie poster. (Your reel <em>covers</em> stay photo-only, no shouty text — that's a separate rule, and it still stands. This is for words <em>inside</em> the video.)</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Put your name and today's date on a 5-second clip, bottom corner, white text. Play it. If you can read it on your phone without squinting, you nailed it.</p></div>
+</div>
+
+<div class="lesson" id="l7">
+  <h2><span class="num">7</span>Stamping the "add" watermark on video</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Your watermark PNG is a rubber stamp. In Shotcut, stamping means putting the PNG on a track <em>above</em> your video and shrinking it into a corner. It works fine — but here's the standing rule from your own workflow: <strong>for finished reels, the watermark gets stamped with ffmpeg AFTER export, after the final resize, at 80px wide.</strong> Shotcut bakes the stamp in during export, which breaks the "stamp after resize" rule. So: Shotcut stamping is for drafts and non-reel videos. Finished reels get the ffmpeg stamp, like always.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p><kbd>File</kbd> → <kbd>Open File</kbd> and open your <strong>watermark PNG</strong> (the Vollkorn Italic "add" one). Drag it onto the timeline on the <strong>track above</strong> your video (V2). Stretch its ends to match the video's length. Click the PNG clip → <kbd>Filters</kbd> → <kbd>+</kbd> → <kbd>Video</kbd> → <kbd>Size, Position &amp; Rotate</kbd> → drag the <kbd>Zoom</kbd> slider way down and drag the little image into a corner. Small and subtle, like on your photos.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Stamp the watermark on a draft clip and export it (Lesson 11). Compare the stamp's crispness against one of your ffmpeg-stamped reels. See why the ffmpeg-after-export rule exists? Drafts in Shotcut, finals get the real stamp.</p></div>
+</div>
+
+<div class="lesson" id="l8">
+  <h2><span class="num">8</span>Audio: mute the wind, add the music</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Camera audio is mostly wind, traffic, and your neighbor's leaf blower. For reels you usually want it gone, replaced by music — or nothing at all. Audio lives on its own lane under the video, and every clip's sound can be turned down, ripped out, or faded like a song ending on the radio.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>To kill camera audio: right-click the clip → <kbd>Detach Audio</kbd> — the sound becomes its own piece on an audio track; click it and press <kbd>Delete</kbd>. (Or simpler: click the little <strong>speaker icon</strong> on the track header to mute the whole track.) To add music: <kbd>File</kbd> → <kbd>Open File</kbd> your music file, drag it onto an audio track, and drag its edges to fit. To fade: select the music clip → <kbd>Filters</kbd> → <kbd>+</kbd> → <kbd>Audio</kbd> → <kbd>Fade In</kbd> (or <kbd>Fade Out</kbd>) — set the duration to a couple of seconds so it doesn't start or stop with a clunk. Keep music modest — if you have to strain to hear anything else, it's too loud.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Take a clip with windy audio. Detach and delete the audio. Add any music file, fade it in over 2 seconds and out over 2 seconds at the end. Play it. Wind: gone. Vibe: present.</p></div>
+</div>
+
+<div class="lesson" id="l9">
+  <h2><span class="num">9</span>Transitions (and why to use almost none)</h2>
+  <div class="sec"><h3>The crayon version</h3><p>A transition is the glue between two clips. The fanciest glue in the store is the dissolve — one clip melting into the next. Here's the thing: your reels are bird beats. Beats want <strong>hard cuts</strong> — clip, clip, clip, like a heartbeat. Dissolves make bird videos feel sleepy, like a nature documentary from 1987. Use almost none. The one exception: fading to black at the very start and very end, which is just good manners.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>For a dissolve (when you really want one): drag one clip's edge <strong>over</strong> its neighbor on the same track — where they overlap, Shotcut makes a transition. For clean ends: select the first clip → <kbd>Filters</kbd> → <kbd>+</kbd> → <kbd>Video</kbd> → <kbd>Fade In Video</kbd>; select the last clip → <kbd>Fade Out Video</kbd>. Two seconds each. That's the whole transition kit, and 95% of the time you'll use only the fades.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Put three beats on the timeline. Play them with hard cuts — no transitions at all. Then add one dissolve in the middle and play it again. Feel how the dissolve slows everything down? Trust the cuts.</p></div>
+</div>
+
+<div class="lesson" id="l10">
+  <h2><span class="num">10</span>Speed: slow motion for bird motion</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Some bird moments deserve to be savored — a landing, a wing stretch, the yawn. Slow motion stretches time. The catch: Shotcut can't invent frames it doesn't have. Footage shot at 60fps slowed to half speed on a 30fps timeline stays silky, because every frame is real. Footage shot at 30fps slowed down gets choppy, because Shotcut is just showing each frame twice. Slow-mo loves high-frame-rate footage and merely tolerates the rest.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Click the clip on the timeline → open the <kbd>Properties</kbd> panel → find <kbd>Speed</kbd>. Set it to <kbd>0.5</kbd> for half speed. The clip gets longer on the timeline — that's normal, it's the same moment stretched out. If it looks choppy, your source was 30fps and there's no fix in Shotcut; save slow-mo for your 60fps clips.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Find a 3-second landing or takeoff in a 60fps clip. Set speed to 0.5. Play it. Then try the same thing on a 30fps clip and compare. You'll see exactly which footage earns slow-mo and which doesn't.</p></div>
+</div>
+
+<div class="lesson" id="l11">
+  <h2><span class="num">11</span>Export: the 1080×1920 finish line</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Exporting is developing the photograph — everything on the timeline gets baked into one video file. Two things matter: the <strong>size</strong> (must be 1080×1920, tall, for reels) and the <strong>quality</strong> (big enough to look good, small enough to upload without growing old). The size follows your video mode from Lesson 1 — that's why the canvas came first. The quality is a slider, and there is a sweet spot.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p><kbd>Ctrl</kbd>+<kbd>S</kbd> first — save the project, every time, before you export. (Shotcut has autosave, but the two seconds this takes have saved many afternoons.) Click <kbd>Export</kbd> in the top toolbar. Check that the resolution reads <strong>1080×1920</strong>. Set quality to <strong>55%</strong>. Click <kbd>Export File</kbd>, name it, and watch the Jobs panel on the right do its thing. Hardware encoding is fine for drafts. <strong>Learned the hard way:</strong> 70% quality on a 50-second clip produced a 168 MB monster. For Instagram reels, 55–60% looks identical on a phone at a fraction of the size.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Export any 10-second test clip at 55%. Check the file size. Now you know exactly what a reel costs in megabytes before you make a real one.</p></div>
+</div>
+
+<div class="lesson" id="l12">
+  <h2><span class="num">12</span>The reel-finishing workflow: start to finish</h2>
+  <div class="sec"><h3>The crayon version</h3><p>You know all the gears. Here's the daily drive, in order. Your LosslessCut selects come in one end; a finished, watermarked reel comes out the other. Follow the order — every step assumes the one before it.</p></div>
+  <div class="sec"><h3>The routine</h3><p>
+    <strong>1. Canvas first:</strong> new project → <kbd>Settings</kbd> → <kbd>Video Mode</kbd> → <kbd>Vertical HD 30fps</kbd>. (Lesson 1)<br><br>
+    <strong>2. Lay down the selects:</strong> drag your LosslessCut cuts onto the timeline in order. (Lesson 2)<br><br>
+    <strong>3. Carve the beats:</strong> <kbd>S</kbd> to split, <kbd>X</kbd> to ripple-delete the junk, drag edges to trim. (Lesson 3)<br><br>
+    <strong>4. Crop on the bird:</strong> <kbd>Size, Position &amp; Rotate</kbd> to fill the tall canvas, then <kbd>Crop: Rectangle</kbd> dragged <strong>onto the bird</strong> — never blind-center. Scrub the whole clip to confirm. (Lesson 4)<br><br>
+    <strong>5. Season it:</strong> <kbd>Sharpen</kbd> (mild), <kbd>White Balance</kbd> if the porch lights turned everything orange. (Lesson 5)<br><br>
+    <strong>6. Words if needed:</strong> <kbd>Text: Rich</kbd> for a species name or date — never on the cover, covers stay photo-only. (Lesson 6)<br><br>
+    <strong>7. Sound:</strong> detach and ditch the wind, add music, <kbd>Fade In/Out</kbd> the audio. (Lesson 8)<br><br>
+    <strong>8. Ends:</strong> <kbd>Fade In Video</kbd> on the first clip, <kbd>Fade Out Video</kbd> on the last. No dissolves between beats. (Lesson 9)<br><br>
+    <strong>9. Save:</strong> <kbd>Ctrl</kbd>+<kbd>S</kbd>. (Lesson 11)<br><br>
+    <strong>10. Export:</strong> 1080×1920, 55% quality, <kbd>Export File</kbd>. (Lesson 11)<br><br>
+    <strong>11. Watermark:</strong> ffmpeg stamp <strong>after</strong> export, 80px wide — the standing rule. (Lesson 7)
+  </p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Run the whole routine on a real reel, start to finish. Time yourself. The first one takes an hour. The fifth one takes twenty minutes. That's the workbench paying you back.</p></div>
+</div>
+
+<footer>
+  <div class="crayon">🖍️</div>
+  <p><em>Crayon down. You did it, one day at a time.</em></p>
+</footer>
+
+</div>
+</body>
+</html>
