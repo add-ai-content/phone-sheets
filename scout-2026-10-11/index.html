@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-10-11</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-10-11";
+const CARDS = [{"assigned": "", "band": "core", "drive": "~20 min", "dueDate": "2026-10-25", "kind": "art/craft festival", "maybe_review": false, "n": 1, "notes": "The Shops at Clearfork, 5135 Monahans Ave, Fort Worth. Free; live craft demos + classical music. artworthfest.org", "oneShot": false, "startDate": "2026-10-23", "stretch": false, "title": "Art Worth Festival (5th annual)", "town": "Fort Worth", "type": "happening", "when": "Fri Oct 23, 10am-6pm; Sat Oct 24, 10am-5pm; Sun Oct 25, 11am-4pm", "when_or_hours": "Oct 23-25 (Fri 10-6, Sat 10-5, Sun 11-4); free", "why": "Free juried fine-art and craft fair with live glassblowing, metalsmithing, pottery, and woodturning demos — browsing-type market energy, close to home."}, {"assigned": "", "band": "stretch", "drive": "~45-50 min", "dueDate": "2026-10-17", "kind": "vendor market", "maybe_review": false, "n": 2, "notes": "Cleburne Conference Center, 1501 W Henderson St, Cleburne. Curated booths, giveaways, food. Eventbrite listing.", "oneShot": true, "startDate": "2026-10-17", "stretch": true, "title": "Shopping Days - Cleburne", "town": "Cleburne", "type": "happening", "when": "Sat Oct 17, 9am-4pm", "when_or_hours": "Sat Oct 17, 9am-4pm", "why": "Curated small-business vendor market with shopper giveaways and food — his browsing-first market style, in a town he's never scouted."}, {"assigned": "", "band": "adjacent", "drive": "~30 min", "dueDate": "2026-10-18", "kind": "fall festival", "maybe_review": false, "n": 3, "notes": "Gables Water Street, 5270 N O'Connor Blvd, Irving. Free; local boutiques + handmade goods + food.", "oneShot": true, "startDate": "2026-10-18", "stretch": true, "title": "Irving Fall Festival", "town": "Irving", "type": "happening", "when": "Sun Oct 18, 11am-5pm", "when_or_hours": "Sun Oct 18, 11am-5pm; free", "why": "Free fall-vendor market along the Water Street boardwalk — boutiques, handmade goods, food. Easy Sunday stroll in a brand-new town."}, {"assigned": "", "band": "core", "drive": "~20 min", "dueDate": "2026-10-18", "kind": "book fair", "maybe_review": false, "n": 4, "notes": "Cowtown Brewing Company, 1301 E Belknap St, Fort Worth. Free; local authors + book vendors + fall makers.", "oneShot": true, "startDate": "2026-10-18", "stretch": false, "title": "Fort Worth Fall-iday Book Fair", "town": "Fort Worth", "type": "happening", "when": "Sun Oct 18, 12-5pm", "when_or_hours": "Sun Oct 18, 12-5pm; free", "why": "Free local-author and book-vendor fair with fall-themed makers at a brewery — he's a library-book-sale guy, and this one's brand new."}, {"assigned": "", "band": "stretch", "drive": "~50 min", "dueDate": "2026-10-25", "kind": "farm fall festival", "maybe_review": false, "n": 5, "notes": "1004 W Bethesda Rd, Cleburne. 'Biggest Backyard in Texas'; hayrides, pumpkin patch, farm animals. Kid-heavy crowd. mainstayfarm.com", "oneShot": false, "startDate": "2026-10-24", "stretch": true, "title": "Mainstay Farm Park - Pumpkin Fall Days", "town": "Cleburne", "type": "happening", "when": "Sat Oct 24, 10am-6pm; Sun Oct 25, 11am-6pm", "when_or_hours": "Oct 23-25 (Sat 10-6, Sun 11-6); ~$24 admission", "why": "The region's signature farm-fall outing: 30+ attractions, farm animals, hayrides, pumpkin patch, street tacos and brisket sandwiches. Kid-heavy, ~$24 — but a full fall day."}, {"assigned": "", "band": "stretch", "drive": "~50 min", "dueDate": "2026-10-24", "kind": "farm open house", "maybe_review": false, "n": 6, "notes": "Highpoint Performance Horses, 11015 Cole Rd, Pilot Point. Stallion showcase, vendors, live music, exotic animals.", "oneShot": true, "startDate": "2026-10-24", "stretch": true, "title": "Stallion Showcase & Open House", "town": "Pilot Point", "type": "happening", "when": "Sat Oct 24, 10am-4pm", "when_or_hours": "Sat Oct 24, 10am-4pm", "why": "Horse-farm open house with stallion showcase, vendors, live music, and exotic animals — quirky, daytime, genuinely different outing type in a new town."}, {"assigned": "", "band": "adjacent", "drive": "~30 min", "dueDate": "2026-10-24", "kind": "fall festival", "maybe_review": false, "n": 7, "notes": "St. Jude Catholic Church, E Dallas St, Mansfield. Food, vendors, activities; runs to 9pm but daytime-friendly.", "oneShot": true, "startDate": "2026-10-24", "stretch": true, "title": "48th Annual St. Jude Fall Festival", "town": "Mansfield", "type": "happening", "when": "Sat Oct 24, 11am-9pm", "when_or_hours": "Sat Oct 24, 11am-9pm", "why": "One of Mansfield's longest-running fall traditions: food, vendors, festival activities all afternoon — a daytime outing with an evening tail."}, {"assigned": "", "band": "stretch", "drive": "~50-55 min", "dueDate": "2026-10-24", "kind": "craft/vendor fair", "maybe_review": false, "n": 8, "notes": "Wylie High School, 2550 W FM 544, Wylie. Free; 80-100 vendors. dfwcrafts.com listing.", "oneShot": true, "startDate": "2026-10-24", "stretch": true, "title": "WHS Craft & Vendor Fair", "town": "Wylie", "type": "happening", "when": "Sat Oct 24, 9am-4pm", "when_or_hours": "Sat Oct 24, 9am-4pm; free", "why": "Free annual fair with 80-100 vendors raising senior-scholarship money — a big indoor browse in a new town, without mega-festival crowds."}, {"assigned": "", "band": "stretch", "drive": "~45 min", "dueDate": "2026-10-24", "kind": "fall festival", "maybe_review": false, "n": 9, "notes": "First Rowlett United Methodist Church, 4405 Main St, Rowlett. Free; games, food, fall activities.", "oneShot": true, "startDate": "2026-10-24", "stretch": true, "title": "Fall Fest at First Rowlett UMC", "town": "Rowlett", "type": "happening", "when": "Sat Oct 24, 10am-3pm", "when_or_hours": "Sat Oct 24, 10am-3pm; free", "why": "Free community fall fest — games, food, fall activities. Easy low-key Saturday in a new lakeside town."}, {"assigned": "", "band": "stretch", "drive": "~50 min", "dueDate": "2026-10-24", "kind": "halloween event", "maybe_review": false, "n": 10, "notes": "Historic Pilot Point Square. Games + 6:30pm costume contest; haunted Opera House tour 5-9pm.", "oneShot": true, "startDate": "2026-10-24", "stretch": true, "title": "Scare on the Square", "town": "Pilot Point", "type": "happening", "when": "Sat Oct 24, 4-7pm", "when_or_hours": "Sat Oct 24, 4-7pm", "why": "Games, activities, and a 6:30pm costume contest on the historic square, plus a haunted Opera House tour 5-9pm. Late-afternoon timing — pairs with the square itself (card 21)."}, {"assigned": "", "band": "stretch", "drive": "~55-60 min", "dueDate": "2026-10-17", "kind": "fall festival", "maybe_review": false, "n": 11, "notes": "Royse City. 36th annual; live entertainment, carnival, food vendors, fireworks finale. festivalnet.com listing — verify hours before driving.", "oneShot": true, "startDate": "2026-10-17", "stretch": true, "title": "Royse City FunFest (36th annual)", "town": "Royse City", "type": "happening", "when": "Sat Oct 17, daytime (exact hours not published — confirm before driving)", "when_or_hours": "Sat Oct 17, daytime (hours not published online — confirm via Royse City Tri-County Chamber 972-636-5000)", "why": "Classic small-town fall fest: live entertainment, carnival rides, shopping, local food vendors — in a brand-new town, worth the drive."}, {"assigned": "", "band": "core", "drive": "~50 min", "dueDate": "", "kind": "aviation museum", "maybe_review": false, "n": 12, "notes": "Love Field area, Dallas. 13+ galleries; special-event closure Oct 16 — check site before visiting. flightmuseum.com", "oneShot": false, "startDate": "", "stretch": false, "title": "Frontiers of Flight Museum", "town": "Dallas", "type": "place", "when": "Mon-Sat 10am-5pm, Sun 1-5pm; $20 adults", "when_or_hours": "Mon-Sat 10am-5pm, Sun 1-5pm; $20 adults", "why": "Smithsonian-affiliated: an SR-71, the Vought V-173 'Flying Pancake,' the Apollo 7 command module — the perfect indoor complement to his PiAware/aircraft obsession."}, {"assigned": "", "band": "core", "drive": "~20 min", "dueDate": "", "kind": "aviation museum", "maybe_review": false, "n": 13, "notes": "3300 Ross Ave, Fort Worth (Meacham Airport). 4.9-star; volunteer docents, watch planes land next door. fortworthaviationmuseum.com", "oneShot": false, "startDate": "", "stretch": false, "title": "Fort Worth Aviation Museum", "town": "Fort Worth", "type": "place", "when": "Sat 9am-2pm, Thu 9am-1pm, Sun 11am-3pm; ~$9 adults (hours vary by source — confirm)", "when_or_hours": "Sat 9am-2pm, Thu 9am-1pm, Sun 11am-3pm; ~$9 adults", "why": "25+ touchable military aircraft — sit in an F-4 Phantom cockpit, F-14 Tomcat, YF-16 prototype — right next to Meacham Airport. A 'petting zoo for planes.'"}, {"assigned": "", "band": "adjacent", "drive": "~30 min", "dueDate": "", "kind": "history museum", "maybe_review": false, "n": 14, "notes": "2515 W 5th St, Irving. 90-min docent-led tour, advance online ticket required. irvingarchivesandmuseum.com", "oneShot": false, "startDate": "", "stretch": true, "title": "Ruth Paine House Museum", "town": "Irving", "type": "place", "when": "Guided tours Tue-Sat 10am, noon, 2pm, 4pm; $12 (reserve 24h ahead)", "when_or_hours": "Tours Tue-Sat 10am/12pm/2pm/4pm; $12 (reservations required, 24h ahead)", "why": "The restored 1963 home where Oswald slept the night before the JFK assassination — projected vignettes, Warren Commission photos. History-buff bait in a new town."}, {"assigned": "", "band": "stretch", "drive": "~45 min", "dueDate": "", "kind": "state park", "maybe_review": false, "n": 15, "notes": "Cleburne. 13+ mi trails, Cedar Lake, CCC dams. tpwd.texas.gov/state-parks/cleburne", "oneShot": false, "startDate": "", "stretch": true, "title": "Cleburne State Park", "town": "Cleburne", "type": "place", "when": "Daily 7am-10pm; day use $6 (13+)", "when_or_hours": "Daily 7am-10pm; day use $6 (13+)", "why": "528 acres, 13+ miles of hiking/biking trails, 116-acre spring-fed Cedar Lake, 1930s CCC dams — a real trail system plus water for a park-leaning birder/hiker."}, {"assigned": "", "band": "stretch", "drive": "~40-45 min", "dueDate": "", "kind": "living-history museum", "maybe_review": false, "n": 16, "notes": "On Lake Pat Cleburne. Old West town, working blacksmith, Native American museum. thechisholmtrailoutdoormuseum.com", "oneShot": false, "startDate": "", "stretch": true, "title": "Chisholm Trail Outdoor Museum", "town": "Cleburne", "type": "place", "when": "Fri/Sat 10am-5pm, Sun 1-5pm; $10 adults", "when_or_hours": "Fri/Sat 10am-5pm, Sun 1-5pm; $10 adults (closed mid-Dec to mid-Feb)", "why": "1800s Old West town with a working blacksmith shop and Native American museum on Lake Pat Cleburne — outdoor wandering plus lake views."}, {"assigned": "", "band": "stretch", "drive": "~60 min", "dueDate": "", "kind": "history museum", "maybe_review": false, "n": 17, "notes": "Greenville. Hall of Heroes, working cotton compress, Main Street replica. cottonmuseum.com", "oneShot": false, "startDate": "", "stretch": true, "title": "Audie Murphy American Cotton Museum", "town": "Greenville", "type": "place", "when": "Tue-Sat 10am-5pm, closed Sun/Mon; $10", "when_or_hours": "Tue-Sat 10am-5pm, closed Sun/Mon; $10", "why": "WWII hero's Hall of Heroes plus a working cotton-compress engine and 1920s Main Street replica — strong reviews, and it opens the Greenville corridor."}, {"assigned": "", "band": "adjacent", "drive": "~40 min", "dueDate": "", "kind": "history museum", "maybe_review": false, "n": 18, "notes": "Mansfield. Early-town exhibits + 1860s Man House. mansfieldtexas.gov", "oneShot": false, "startDate": "", "stretch": true, "title": "Mansfield Historical Museum & Heritage Center", "town": "Mansfield", "type": "place", "when": "Tue-Sat 10am-4pm, closed Sun/Mon; free", "when_or_hours": "Tue-Sat 10am-4pm, closed Sun/Mon; free", "why": "Two floors of early-Mansfield exhibits plus the restored 1860s Man House, home of the town's founder — free and close."}, {"assigned": "", "band": "adjacent", "drive": "~45 min", "dueDate": "", "kind": "lake park", "maybe_review": false, "n": 19, "notes": "Little Elm (Lewisville Lake). Nature trail + shoreline. littleelm.org", "oneShot": false, "startDate": "", "stretch": true, "title": "Little Elm Park", "town": "Little Elm", "type": "place", "when": "Mon-Fri 5am-9pm, Sat 7am-5pm, Sun 12-5pm", "when_or_hours": "Mon-Fri 5am-9pm, Sat 7am-5pm, Sun 12-5pm", "why": "1.5-mile Johnny Broyles Nature Trail plus Lewisville Lake shoreline — waterbirds, sunrises, photo ops. Right in his birding/photographer lane."}, {"assigned": "", "band": "adjacent", "drive": "~35 min", "dueDate": "", "kind": "lake park", "maybe_review": false, "n": 20, "notes": "Lake Dallas (Lewisville Lake). Fishing pier + ~1-mi trail; Army Corps leased. lakedallas.com", "oneShot": false, "startDate": "", "stretch": true, "title": "Willow Grove Park", "town": "Lake Dallas", "type": "place", "when": "Daily 6am-10pm (day use)", "when_or_hours": "Daily 6am-10pm (day use; small gate fees may apply)", "why": "Lake Lewisville shoreline park with a fishing pier and ~1-mile trail — easy morning birding/photo walk, closer than Little Elm."}, {"assigned": "", "band": "stretch", "drive": "~60 min", "dueDate": "", "kind": "historic district", "maybe_review": false, "n": 21, "notes": "Pilot Point. 1870s-1890s buildings, antique shops; Texas Tulips nearby (seasonal). postsignal.com", "oneShot": false, "startDate": "", "stretch": true, "title": "Historic downtown Pilot Point square", "town": "Pilot Point", "type": "place", "when": "Square always open; shops daytime incl. Saturdays", "when_or_hours": "Public square always open; shops daytime", "why": "Texas Main Street square of 1870s-1890s buildings — small-town photo walk plus antique-shop browsing (collector angle). Pairs same-day with card 6."}, {"assigned": "", "band": "stretch", "drive": "~50 min", "dueDate": "", "kind": "antique mall", "maybe_review": false, "n": 22, "notes": "Kaufman square. Antique mall / vintage market. mercantileongrove.com", "oneShot": false, "startDate": "", "stretch": true, "title": "The Mercantile on Grove", "town": "Kaufman", "type": "place", "when": "Tue-Fri 10am-6pm, Sat 10am-4pm, closed Sun/Mon", "when_or_hours": "Tue-Fri 10am-6pm, Sat 10am-4pm, closed Sun/Mon", "why": "Antique-mall browsing off the Kaufman square — his browsing sweet spot and a hunting ground for the retirement collectibles project."}, {"assigned": "", "band": "core", "drive": "~50 min", "dueDate": "", "kind": "science museum", "maybe_review": false, "n": 23, "notes": "2201 N Field St, Dallas (Victory Park). 11 halls; Soccer exhibit extended thru Jan 4, 2027. perotmuseum.org", "oneShot": false, "startDate": "", "stretch": false, "title": "Perot Museum of Nature and Science", "town": "Dallas", "type": "place", "when": "Wed-Mon 10am-5pm (closed Tue); $27 adults", "when_or_hours": "Wed-Mon 10am-5pm, closed Tue; $27 adults; timed entry", "why": "Famous daytime science museum: 11 exhibit halls, T. rex, gems and minerals hall, dinosaur-to-modern-bird links — a birder will enjoy that thread."}, {"assigned": "", "band": "stretch", "drive": "~55 min", "dueDate": "", "kind": "restaurant (BBQ)", "maybe_review": false, "n": 24, "notes": "Royse City. TM 2025 Top 50 honorable mention; post-oak brisket. smokesessionsbbq.com", "oneShot": false, "startDate": "", "stretch": true, "title": "Smoke Sessions Barbecue", "town": "Royse City", "type": "place", "when": "Mon 11am-5pm, Tue-Thu 11am-8pm, Fri-Sat 11am-10pm, Sun 11am-6pm", "when_or_hours": "Mon 11-5, Tue-Thu 11-8, Fri-Sat 11-10, Sun 11-6", "why": "Famous: Texas Monthly Top 50 2025 honorable mention — post-oak brisket, brisket egg rolls, open since 2017. Daytime-friendly BBQ worth the drive."}, {"assigned": "", "band": "adjacent", "drive": "~45-50 min", "dueDate": "", "kind": "restaurant (Tex-Mex BBQ)", "maybe_review": false, "n": 25, "notes": "Allen. 37+ years; brisket birria tacos, glass-walled pit room. vaquerostxbbq.com", "oneShot": false, "startDate": "", "stretch": true, "title": "Vaqueros Texas Bar-B-Q", "town": "Allen", "type": "place", "when": "Sun-Thu 11am-8pm, Fri-Sat 11am-9pm", "when_or_hours": "Sun-Thu 11am-8pm, Fri-Sat 11am-9pm", "why": "Famous: 37+ year DFW Tex-Mex BBQ institution — brisket birria tacos, cochinita pibil, and a glass-walled pit room where you watch the smoke."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
