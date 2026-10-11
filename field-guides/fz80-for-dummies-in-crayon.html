@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FZ80 for Dummies in Crayon</title>
+<style>
+  :root { --ink:#2b2b2b; --paper:#fffdf7; --crayon:#e8590c; --crayon-soft:#fff4e6; --card:#ffffff; --muted:#6b6b6b; --line:#eee3d0; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height:1.65; font-size:18px; }
+  .wrap { max-width:680px; margin:0 auto; padding:24px 20px 64px; }
+  header.hero { text-align:center; padding:36px 0 12px; }
+  header.hero .crayon { font-size:52px; }
+  h1 { font-size:34px; line-height:1.2; margin:12px 0 8px; }
+  .sub { color:var(--muted); font-size:17px; max-width:560px; margin:0 auto; }
+  .intro { background:var(--crayon-soft); border:2px solid var(--line); border-radius:16px; padding:20px 22px; margin:28px 0; font-size:17px; }
+  .toc { margin:28px 0; padding:0; list-style:none; }
+  .toc li { margin:6px 0; }
+  .toc a { color:var(--crayon); text-decoration:none; font-weight:600; }
+  .lesson { background:var(--card); border:2px solid var(--line); border-radius:16px; padding:22px; margin:26px 0; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+  .lesson h2 { margin:0 0 4px; font-size:24px; }
+  .lesson h2 .num { display:inline-block; background:var(--crayon); color:#fff; border-radius:50%; width:34px; height:34px; text-align:center; line-height:34px; font-size:18px; margin-right:8px; vertical-align:2px; }
+  .sec { margin:16px 0 0; }
+  .sec h3 { font-size:15px; text-transform:uppercase; letter-spacing:.08em; color:var(--crayon); margin:0 0 6px; }
+  .sec p { margin:0; }
+  .btns { background:#f8f5ec; border-left:4px solid var(--crayon); padding:12px 16px; border-radius:0 12px 12px 0; }
+  .btns p { margin:0; }
+  kbd { background:#2b2b2b; color:#fff; border-radius:6px; padding:1px 8px; font-family:inherit; font-size:16px; white-space:nowrap; }
+  .assign { background:#f0f9f0; border:2px dashed #8fbf8f; border-radius:12px; padding:14px 18px; }
+  .assign h3 { color:#2f7d32; }
+  footer { text-align:center; color:var(--muted); margin-top:48px; font-size:16px; }
+  footer .crayon { font-size:40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="crayon">🖍️</div>
+  <h1>FZ80 for Dummies in Crayon</h1>
+  <p class="sub">A one-day-at-a-time lesson plan for your Panasonic Lumix DMC-FZ80. Short sentences. Plain words. Zero jargon. One porch assignment per day.</p>
+</header>
+
+<div class="intro">
+  Here's the truth: iA mode got you published Instagram shots. The drowsy dove? iA. The owlet reel? iA-adjacent. You don't suck — you've been driving an automatic and doing just fine. This plan is about learning the stick shift, one gear per day. Go at your own pace.
+</div>
+
+<ol class="toc">
+  <li><a href="#l1">1 — Off iA: P mode</a></li>
+  <li><a href="#l2">2 — A mode: blurry flower backgrounds</a></li>
+  <li><a href="#l3">3 — S mode: freezing hummingbird wings</a></li>
+  <li><a href="#l4">4 — ISO: the brightness dial</a></li>
+  <li><a href="#l5">5 — Focus modes + manual focus for the moon</a></li>
+  <li><a href="#l6">6 — 4K Photo: the bird cheat code</a></li>
+  <li><a href="#l7">7 — Post Focus: flower close-ups</a></li>
+  <li><a href="#l8">8 — Burst shooting: birds in flight</a></li>
+  <li><a href="#l9">9 — Self-timer + tripod: shake-free 60x zoom</a></li>
+  <li><a href="#l10">10 — Exposure compensation: outsmarting the meter</a></li>
+  <li><a href="#l11">11 — White balance: true colors</a></li>
+  <li><a href="#l12">12 — The porch workflow: putting it all together</a></li>
+</ol>
+
+<div class="lesson" id="l1">
+  <h2><span class="num">1</span>Off iA: P mode (training wheels with benefits)</h2>
+  <div class="sec"><h3>The crayon version</h3><p>iA is the camera driving. P mode is you driving, but the car still has power steering. The camera still picks the brightness settings, but now YOU get to change the fun stuff — ISO, white balance, focus tricks — without it overriding you. Nothing can go badly wrong in P. It's the shallow end with a lifeguard.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Turn the big dial on top of the camera from <kbd>iA</kbd> to <kbd>P</kbd>. That's it. You're in. The screen looks almost the same, but now the arrow buttons do things.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Put it on P, point at the feeder, and take the same picture you always take. Then press the <kbd>▲</kbd> arrow — that's ISO now (more on that in Lesson 4). Notice the camera didn't stop you. Welcome to the driver's seat.</p></div>
+</div>
+
+<div class="lesson" id="l2">
+  <h2><span class="num">2</span>A mode: blurry backgrounds for flower portraits</h2>
+  <div class="sec"><h3>The crayon version</h3><p>The lens is an eye. Aperture is how wide the eye opens. Wide open (small f-number like f/2.8) = only the flower is sharp, everything behind it melts into butter. Squinted (big f-number like f/8) = everything sharp, flower and fence and neighbor's shed. For pretty flower pictures, you want the butter.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Top dial to <kbd>A</kbd>. Turn the <kbd>rear dial</kbd> (the little wheel by your thumb) until the f-number on screen is as small as it'll go. Heads-up: zoomed all the way in, the camera won't let you pick f/2.8 — that's normal, the lens just can't open that wide at full zoom. Pick the smallest number it offers.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Same flower, two shots: smallest f-number, then turn the dial the other way to f/8. Compare. The first one looks like a portrait. The second one looks like evidence.</p></div>
+</div>
+
+<div class="lesson" id="l3">
+  <h2><span class="num">3</span>S mode: freezing hummingbird wings</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Shutter speed is how fast the camera blinks. Slow blink = motion smears. Fast blink = a hummingbird's wing frozen mid-beat like it's posing. For anything that moves fast, you want the fastest blink you can get: 1/1000 of a second or faster.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Top dial to <kbd>S</kbd>. Turn the <kbd>rear dial</kbd> until the screen says <kbd>1/1000</kbd> or faster (1/2000 if it's bright out). The camera handles the rest.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>S mode, 1/1000, feeder. Wait for a bird to land or a hummer to visit. Check the wings in the photo — frozen instead of blurry. That's the whole trick, and you just learned it.</p></div>
+</div>
+
+<div class="lesson" id="l4">
+  <h2><span class="num">4</span>ISO: the brightness dial and its grain cost</h2>
+  <div class="sec"><h3>The crayon version</h3><p>ISO is a volume knob for light. Dark porch? Crank it up and the picture gets brighter. The catch: like cranking a cheap speaker, high volume adds hiss. In photos the hiss is called <strong>grain</strong> — tiny speckles all over the picture. Low ISO (100) = clean and silky. High ISO (3200) = bright but sandy. Rule of thumb: use the lowest ISO that still gets the shot.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Press the <kbd>▲</kbd> arrow. A scale pops up. Pick a number. In P, A, or S mode you can also leave it on Auto and let the camera decide — no shame in that.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Same dim corner of the yard, two shots: ISO 100 and ISO 3200. Zoom into both on the screen. See the sand in the second one? Now you know what the knob costs.</p></div>
+</div>
+
+<div class="lesson" id="l5">
+  <h2><span class="num">5</span>Focus modes: AFS, AFC, and manual focus for the moon</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Three kinds of focus for three kinds of subjects. <strong>AFS</strong> = focus once, for things sitting still (a perched dove, a flower). <strong>AFC</strong> = keeps refocusing nonstop, for things moving (a bird in flight). <strong>MF</strong> = you focus by hand, for when the camera is clueless — like the night sky, where autofocus hunts around like it's lost its glasses.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>For AFS/AFC: press <kbd>MENU</kbd>, go to the <kbd>Rec</kbd> menu, find <kbd>AFS/AFF/AFC</kbd>, and pick <kbd>AFS</kbd> for still subjects or <kbd>AFC</kbd> for moving ones. (AFF is the in-between — ignore it for now.) For manual focus: press the <kbd>AF/AF&#9633;/MF</kbd> button on the back of the camera, use the ◄/► arrows to pick <kbd>MF</kbd>, and a focus slider appears — drag it on the touchscreen or nudge it with the arrows.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Tonight, aim at the moon. AF/MF button → <kbd>MF</kbd> → slide the focus all the way to <strong>infinity</strong> (the little mountain icon). Take the shot. If the moon is sharp and the camera didn't hunt once, you just did something autofocus can't.</p></div>
+</div>
+
+<div class="lesson" id="l6">
+  <h2><span class="num">6</span>4K Photo mode: the bird cheat code</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Instead of trying to press the button at the perfect instant, film a burst at 30 pictures per second and pick the perfect one afterward. It's like dealing yourself 30 cards and keeping the ace. The saved picture is 8 megapixels — plenty for Instagram and prints.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Press the <kbd>4K</kbd> button on the top of the camera (also labeled <kbd>Fn1</kbd>). Pick <kbd>4K Burst (S/S)</kbd> — press the shutter once to start filming the burst, press it again to stop. (Best for unpredictable birds: start it before the action, stop after.) Then hit <kbd>playback</kbd>, scroll through the frames, and when you see THE one, press <kbd>MENU/SET</kbd> to save it as a photo. Pro tip from the manual: set the top dial to <kbd>S</kbd> and the shutter to <kbd>1/1000</kbd> or faster first, so every frame is sharp.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>4K Burst (S/S) at the feeder. Start the burst, let a bird land and take off, stop it. Scroll through and find the frame with the wings in the prettiest position. Save it. You just stole a shot no human reflexes could catch.</p></div>
+</div>
+
+<div class="lesson" id="l7">
+  <h2><span class="num">7</span>Post Focus: flower close-ups, tap the sharp part after</h2>
+  <div class="sec"><h3>The crayon version</h3><p>This is 4K Photo's calmer cousin, built for things that don't move — flowers. The camera takes a burst while shifting focus from near to far, and afterward you just tap the part you want sharp. Missed the petal edge? Tap it. Changed your mind? Tap something else. It's focus with an undo button.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Press the <kbd>Post Focus</kbd> button on the top of the camera (also labeled <kbd>Fn2</kbd>). Select <kbd>ON</kbd>, press <kbd>MENU/SET</kbd>. Compose your flower shot, half-press the shutter, then full-press to record. In <kbd>playback</kbd>, touch the spot you want sharpest, then save it. One rule: the flower must hold still — wind is the enemy here. If it's breezy, wait for a calm moment.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>A still flower, close up. Record a Post Focus burst, then in playback tap the very edge of a petal and save it. Zoom in on the result. That crisp edge is the whole lesson.</p></div>
+</div>
+
+<div class="lesson" id="l8">
+  <h2><span class="num">8</span>Burst shooting: birds in flight</h2>
+  <div class="sec"><h3>The crayon version</h3><p>One press, many pictures. The camera fires off a rapid volley and you keep the best. It's the difference between throwing one dart and throwing a handful — one of them is hitting the board.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Press the <kbd>▼</kbd> arrow to open the drive mode menu. Pick the fastest <kbd>burst</kbd> option. For flying birds, pair it with Lesson 5: <kbd>MENU</kbd> → <kbd>Rec</kbd> → <kbd>AFC</kbd>, so the camera keeps refocusing while you hold the button down.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>AFC on, fastest burst on, aim at open sky near the feeder. When a bird crosses, hold the shutter down. Scroll through the volley in playback — somewhere in there is a wings-up beauty.</p></div>
+</div>
+
+<div class="lesson" id="l9">
+  <h2><span class="num">9</span>Self-timer + tripod: shake-free everything at 60x zoom</h2>
+  <div class="sec"><h3>The crayon version</h3><p>At full 60x zoom, your heartbeat is an earthquake. The tiniest tremor turns into a blurry smear. The fix has two parts: a tripod holds the camera still, and the 2-second self-timer means your finger isn't touching the camera when the picture fires. Press, step back, click. Surgeon-steady, every time.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Press the <kbd>▼</kbd> arrow, open drive mode, pick the <kbd>2-second self-timer</kbd>. Screw the camera onto your tripod (or the tabletop stand), frame the shot, press the shutter, hands off.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Zoom all the way in on something across the yard — a feeder, a flower, the neighbor's suspicious squirrel. Take one shot handheld, then the same shot on the tripod with the 2-second timer. Compare. The tripod one will look like it was taken with a different, much more expensive camera.</p><p><strong>The distance rule, learned the hard way:</strong> at full telephoto, don't stand 3 feet from your subject — focus won't lock and everything goes mushy. Step back to <strong>10–15 feet</strong> and let the zoom do the reaching. If focus won't lock, step back, not closer.</p></div>
+</div>
+
+<div class="lesson" id="l10">
+  <h2><span class="num">10</span>Exposure compensation: outsmarting the meter</h2>
+  <div class="sec"><h3>The crayon version</h3><p>The camera's light meter wants everything to be medium gray. Point it at a white egret and it darkens the bird to gray. Point it at a dark grackle and it brightens the bird to gray. Both wrong. Exposure compensation is you telling the meter "you're wrong, fix it": dial <strong>+</strong> (brighter) for white birds, <strong>−</strong> (darker) for dark birds.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p><strong>Press the rear dial in</strong> (click it like a button) — the exposure compensation scale appears. <strong>Rotate the rear dial</strong> to move toward + or −. Press the dial again (or half-press the shutter) to set it. Start with +1 for white birds, −1 for dark ones, and eyeball it from there.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Find something white (a white flower, a dove's belly) and something dark. Shoot both at 0, then nudge +1 for the white one and −1 for the dark one. The corrected shots look like what your eyes actually saw.</p></div>
+</div>
+
+<div class="lesson" id="l11">
+  <h2><span class="num">11</span>White balance: colors that look right</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Light has a color. Sunshine is neutral, shade is blue-ish, porch bulbs are orange-ish. The camera guesses — and under your porch lights it guesses wrong, so everything looks like a pumpkin. White balance is telling the camera what kind of light you're standing in so white looks white again.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Press the <kbd>►</kbd> arrow. Pick the icon that matches your light: sun for sunshine, cloud for shade, lightbulb for porch bulbs. When in doubt, the sun icon is right most of the time in your yard.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Same flower, two shots: one with the sun icon, one with the lightbulb icon, both taken in daylight. The lightbulb one looks seasick-orange. Now you know what that button is for — and when the porch lights are actually on, that "wrong" setting becomes the right one.</p></div>
+</div>
+
+<div class="lesson" id="l12">
+  <h2><span class="num">12</span>The porch workflow: putting it all together</h2>
+  <div class="sec"><h3>The crayon version</h3><p>You now have gears. Here's the daily drive. Your rig: the FZ80 on the tabletop stand, rolled <strong>sideways</strong> (portrait) for 9:16 vertical video of the feeder — that's your bird cam. Flip it <strong>horizontal</strong> (landscape) for flower close-ups and moon shots. One camera, two jobs, one lever flip.</p></div>
+  <div class="sec"><h3>The routine</h3><p>
+    <strong>Feeder watch (vertical video):</strong> roll the camera to portrait, zoom to frame the feeder from 10–15 feet back, hit record. Let it run. Review later, pull stills with 4K Photo (Lesson 6) when something good happens.<br><br>
+    <strong>Flower portraits (horizontal stills):</strong> flip to landscape, A mode (Lesson 2), smallest f-number, Post Focus (Lesson 7) for the can't-miss sharp shot.<br><br>
+    <strong>Zoomed shots:</strong> tripod + 2-second timer (Lesson 9), always. No exceptions at 60x.<br><br>
+    <strong>Tricky light:</strong> white bird? +1 on the rear dial (Lesson 10). Porch bulbs on? Lightbulb white balance (Lesson 11).
+  </p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Run the whole routine in one session. Ten minutes of feeder video in portrait, flip to landscape, one Post Focus flower, one timer-shot at full zoom. Then sit down with a coffee and review. Notice anything? You're not on iA anymore — and the camera didn't bite once.</p></div>
+</div>
+
+<footer>
+  <div class="crayon">🖍️</div>
+  <p><em>Crayon down. You did it, one day at a time.</em></p>
+</footer>
+
+</div>
+</body>
+</html>
