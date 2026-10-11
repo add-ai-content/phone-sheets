@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LosslessCut for Dummies in Crayon</title>
+<style>
+  :root { --ink:#2b2b2b; --paper:#fffdf7; --crayon:#e8590c; --crayon-soft:#fff4e6; --card:#ffffff; --muted:#6b6b6b; --line:#eee3d0; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:-apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height:1.65; font-size:18px; }
+  .wrap { max-width:680px; margin:0 auto; padding:24px 20px 64px; }
+  header.hero { text-align:center; padding:36px 0 12px; }
+  header.hero .crayon { font-size:52px; }
+  h1 { font-size:34px; line-height:1.2; margin:12px 0 8px; }
+  .sub { color:var(--muted); font-size:17px; max-width:560px; margin:0 auto; }
+  .intro { background:var(--crayon-soft); border:2px solid var(--line); border-radius:16px; padding:20px 22px; margin:28px 0; font-size:17px; }
+  .toc { margin:28px 0; padding:0; list-style:none; }
+  .toc li { margin:6px 0; }
+  .toc a { color:var(--crayon); text-decoration:none; font-weight:600; }
+  .lesson { background:var(--card); border:2px solid var(--line); border-radius:16px; padding:22px; margin:26px 0; box-shadow:0 2px 8px rgba(0,0,0,.04); }
+  .lesson h2 { margin:0 0 4px; font-size:24px; }
+  .lesson h2 .num { display:inline-block; background:var(--crayon); color:#fff; border-radius:50%; width:34px; height:34px; text-align:center; line-height:34px; font-size:18px; margin-right:8px; vertical-align:2px; }
+  .sec { margin:16px 0 0; }
+  .sec h3 { font-size:15px; text-transform:uppercase; letter-spacing:.08em; color:var(--crayon); margin:0 0 6px; }
+  .sec p { margin:0; }
+  .btns { background:#f8f5ec; border-left:4px solid var(--crayon); padding:12px 16px; border-radius:0 12px 12px 0; }
+  .btns p { margin:0; }
+  kbd { background:#2b2b2b; color:#fff; border-radius:6px; padding:1px 8px; font-family:inherit; font-size:16px; white-space:nowrap; }
+  .assign { background:#f0f9f0; border:2px dashed #8fbf8f; border-radius:12px; padding:14px 18px; }
+  .assign h3 { color:#2f7d32; }
+  footer { text-align:center; color:var(--muted); margin-top:48px; font-size:16px; }
+  footer .crayon { font-size:40px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="crayon">🖍️</div>
+  <h1>LosslessCut for Dummies in Crayon</h1>
+  <p class="sub">A one-day-at-a-time lesson plan for cutting bird reels on your Windows laptop. Short sentences. Plain words. Zero jargon. One porch assignment per day.</p>
+</header>
+
+<div class="intro">
+  Here's the truth: you've already cut a real reel with this program — the hawk-bath six-cut came out of LosslessCut. You don't suck. But you've been using about 10% of it: open, mark, export, snapshot. The other 90% — merging, rotation fixes, waveforms, the export options — has been sitting there untouched. This plan opens every drawer, one per day. Go at your own pace.
+</div>
+
+<ol class="toc">
+  <li><a href="#l1">1 — Open, play, the timeline</a></li>
+  <li><a href="#l2">2 — Mark a keeper: I, O, and the scissors</a></li>
+  <li><a href="#l3">3 — Many keepers: the segment list</a></li>
+  <li><a href="#l4">4 — What "lossless" actually means</a></li>
+  <li><a href="#l5">5 — Snapshots: the C key and the camera button</a></li>
+  <li><a href="#l6">6 — The ten keys that run the whole program</a></li>
+  <li><a href="#l7">7 — Gluing files together: merge and concatenate</a></li>
+  <li><a href="#l8">8 — The timeline, up close: thumbnails and waveform</a></li>
+  <li><a href="#l9">9 — Fixing rotation without re-encoding</a></li>
+  <li><a href="#l10">10 — The export overview: where files go</a></li>
+  <li><a href="#l11">11 — Gotchas: keyframes, undo, and fighting files</a></li>
+  <li><a href="#l12">12 — The hawk-bath workflow: a whole reel</a></li>
+</ol>
+
+<div class="lesson" id="l1">
+  <h2><span class="num">1</span>Open, play, the timeline</h2>
+  <div class="sec"><h3>The crayon version</h3><p>LosslessCut is a paper cutter for video. It doesn't edit like a movie studio — no tracks, no effects, no hour-long rendering. It opens a video, lets you mark the good bits, and copies them out. That's the whole job, and it's fast because of it.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Drag a video file straight onto the LosslessCut window — or press <kbd>Ctrl+O</kbd> and pick one. <kbd>Space</kbd> plays and pauses. <kbd>,</kbd> and <kbd>.</kbd> step one frame at a time (the arrow keys jump a full second — save those for coarse moves). Roll the <kbd>mouse wheel</kbd> over the timeline to zoom in and out.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Open any bird clip. Play it with <kbd>Space</kbd>. Find one moment where the bird does something good, and park on it with <kbd>,</kbd>. That's your new home base — everything in this plan starts from a parked playhead.</p></div>
+</div>
+
+<div class="lesson" id="l2">
+  <h2><span class="num">2</span>Mark a keeper: I, O, and the scissors</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Cutting means telling the program "keep this stretch." You mark where the keeper starts and where it ends. The marked stretch lights up on the timeline — that's called a <strong>segment</strong>. Then you export, and the segment becomes a new file.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Park where the good bit starts, press <kbd>I</kbd> (for In). Move to where it ends, press <kbd>O</kbd> (for Out). Press <kbd>E</kbd> — an overview pops up — then press <kbd>Export</kbd> again to confirm. The new file lands right next to your original, with the timestamps in its name. Your original is never touched. LosslessCut only ever writes new files.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Cut one 5-second keeper out of a feeder clip: <kbd>I</kbd>, <kbd>O</kbd>, <kbd>E</kbd>, Export. Find the new file sitting next to the original and play it. That's the whole magic trick, and you just did it.</p></div>
+</div>
+
+<div class="lesson" id="l3">
+  <h2><span class="num">3</span>Many keepers: the segment list</h2>
+  <div class="sec"><h3>The crayon version</h3><p>One video, many good bits. Each keeper is its own segment, and they pile up in the <strong>segment list</strong> — the panel on the right side. By default each segment becomes its own file. Or you can glue them all into one file. Your call, at export time.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Press <kbd>+</kbd> for a new segment, then <kbd>I</kbd> / <kbd>O</kbd> again. Click any segment in the right-hand list to jump to it. <kbd>Right-click</kbd> a segment for options (label it, delete it). <kbd>Drag segments up and down</kbd> to reorder them — the order matters when you merge. And the flip trick: mark the <em>boring</em> middle bit, then click the <strong>yin-yang ☯</strong> symbol — it inverts the logic and exports everything <em>except</em> your marks. Perfect for cutting a dead stretch out of a long clip.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Mark three keepers in one clip — press <kbd>+</kbd> between each. Label them in the list (splash, yawn, shake). Export once as separate files, then again with the export mode flipped to <strong>Merge cuts</strong>. Compare: three files versus one glued file.</p></div>
+</div>
+
+<div class="lesson" id="l4">
+  <h2><span class="num">4</span>What "lossless" actually means (crayon edition)</h2>
+  <div class="sec"><h3>The crayon version</h3><p>A normal video editor re-cooks the entire video when you export — like photocopying a photocopy. Slightly worse every time, and slow. LosslessCut doesn't cook anything. It copies the exact video data, byte for byte, and just trims the ends. Same quality in, same quality out. And it finishes in seconds, not minutes.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Nothing to push. Just notice: when you press Export, there's no progress bar of doom. Five seconds and done. That speed <em>is</em> the feature — it means nothing got re-cooked.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Export the same keeper twice and compare the two files frame by frame against the original. Identical picture, every pixel. Now you believe it — and now you know why your reel clips never look degraded.</p></div>
+</div>
+
+<div class="lesson" id="l5">
+  <h2><span class="num">5</span>Snapshots: the C key and the camera button (your reel covers)</h2>
+  <div class="sec"><h3>The crayon version</h3><p>A snapshot saves the exact frame you're looking at as a photo — full resolution, whatever the video's resolution is. This is how you grabbed your reel covers: pause on the frame, press a key, done.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Pause on the frame you want. Nail it with <kbd>,</kbd> and <kbd>.</kbd> — one frame at a time until the bird is sharp and the composition is right. Then press <kbd>C</kbd> (or click the <kbd>camera button</kbd> in the toolbar). The still lands next to the video. If you ever want to change the format, the snapshot settings (JPEG/PNG, quality) are in the settings — the default is fine for Instagram.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Find three cover-worthy frames in a clip — pause, frame-step, <kbd>C</kbd>, repeat. Pick your favorite. That's a reel cover in under two seconds, no screenshot cropping, no quality loss.</p></div>
+</div>
+
+<div class="lesson" id="l6">
+  <h2><span class="num">6</span>The ten keys that run the whole program</h2>
+  <div class="sec"><h3>The crayon version</h3><p>LosslessCut is built for keyboard people. Memorize ten keys and you never need the menus. Tape this list to the laptop lid.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p><kbd>Space</kbd> play/pause · <kbd>,</kbd> / <kbd>.</kbd> frame step · <kbd>←</kbd> / <kbd>→</kbd> one-second jump · <kbd>I</kbd> / <kbd>O</kbd> mark in/out · <kbd>+</kbd> new segment · <kbd>E</kbd> export · <kbd>C</kbd> snapshot · <kbd>Ctrl+O</kbd> open file · <kbd>Ctrl+Z</kbd> undo (<kbd>Ctrl+Y</kbd> redo) · <kbd>mouse wheel</kbd> zoom the timeline. That's the whole program. The help screen lists everything else, but you won't need it most days.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Cut a keeper using <em>only</em> the keyboard — mouse stays parked except for the wheel. Open, find, <kbd>I</kbd>, <kbd>O</kbd>, <kbd>E</kbd>, Export. Time yourself. Under a minute is the goal; under thirty seconds means the keys are in your fingers.</p></div>
+</div>
+
+<div class="lesson" id="l7">
+  <h2><span class="num">7</span>Gluing files together: merge and concatenate</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Got three clips from the same camera and want one file? LosslessCut glues them without re-cooking — the paper-cutter trick in reverse. One rule, and it's strict: the files must be <strong>twins</strong> — same camera, same settings, same codec. Three AKASO clips in a row? Twins. An AKASO clip and an FZ80 clip? Not twins. It'll refuse, and it's right to refuse — the seam would break.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p><kbd>Tools</kbd> menu → <kbd>Merge/concatenate files</kbd>. Add your files, check the order in the list (drag to fix it), export. One file comes out, seam invisible.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Take two short clips from the same camera — two AKASO bubbler clips, say — and merge them into one file. Play the result straight through. If you can't find the join, it worked.</p></div>
+</div>
+
+<div class="lesson" id="l8">
+  <h2><span class="num">8</span>The timeline, up close: thumbnails and waveform</h2>
+  <div class="sec"><h3>The crayon version</h3><p>The timeline has X-ray modes. <strong>Thumbnails</strong> put a filmstrip of tiny pictures above the timeline, so you can <em>see</em> the action without pressing play. <strong>Waveform</strong> draws the audio as wiggles — a splash, a chirp, a wing-thump shows up as a spike. Ears beat eyes for finding action: scrub to the spike, and the bird is doing something.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Look for the toggle buttons above the timeline — switch <kbd>thumbnails</kbd> and <kbd>waveform</kbd> on. Scroll and zoom with the mouse wheel. Park the playhead on a spike and look at the frame. Nine times out of ten, that's your keeper.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Open a bubbler clip, turn on the waveform, and find the three loudest spikes. Mark a keeper on each with <kbd>I</kbd>/<kbd>O</kbd>. Notice how much faster that was than watching the whole clip? The waveform is a bird-activity detector.</p></div>
+</div>
+
+<div class="lesson" id="l9">
+  <h2><span class="num">9</span>Fixing rotation without re-encoding (sideways AKASO footage)</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Some cameras save video "sideways" with a little note attached that says "play me rotated." Most players read the note. Some don't — and then your birdbath is lying on its side. LosslessCut can rewrite the note without touching a single pixel of video. Two seconds, zero quality loss, zero re-cooking.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Open the clip. Find the <kbd>rotation button</kbd> in the toolbar and pick the correct orientation. Export. Done — the new file plays upright everywhere: phone, laptop, Instagram, the whole lot.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Got a sideways AKASO clip? (You know you do.) Open it, fix the rotation flag, export. Play the new file in two different players to prove the fix stuck. This lesson alone is worth the price of admission — which is zero, because the program is free.</p></div>
+</div>
+
+<div class="lesson" id="l10">
+  <h2><span class="num">10</span>The export overview: where files go and what comes out</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Pressing <kbd>E</kbd> doesn't export — it opens <strong>mission control</strong>. Read it instead of clicking through. Four things worth knowing: (1) <strong>Export mode</strong> — <em>Separate files</em> (one per segment) or <em>Merge cuts</em> (all segments glued into one). (2) <strong>Output folder</strong> — default is right next to the original; the <em>Working dir unset</em> button lets you pick a different folder. (3) <strong>Output format</strong> — you can remux, say MKV → MP4, without re-cooking anything. (4) <strong>Tracks</strong> — the Tracks button lets you keep or drop audio, subtitle, and extra tracks.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>Press <kbd>E</kbd> and actually read the overview dialog, top to bottom. Flip one option, export, and look at what changed. Flip it back. Now you know what every switch does, because you tried it.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Export the same segment three ways: (a) separate file next to the original, (b) merged into a folder you choose, (c) remuxed to a different container. Three outputs, one lesson, zero confusion ever again about where your files went.</p></div>
+</div>
+
+<div class="lesson" id="l11">
+  <h2><span class="num">11</span>Gotchas: keyframes, undo, and the files that fight back</h2>
+  <div class="sec"><h3>The crayon version</h3><p>Three things bite everyone, so learn them here instead of at midnight. <strong>(1) Cuts snap to keyframes.</strong> A video file only stores a full picture every so often — those are <em>keyframes</em>; between them are just "what changed" notes. LosslessCut can only start and end on full pictures, so your cut lands on the nearest keyframe — a few frames off from where you marked. For bird clips, invisible. Need frame-exact? Flip the cut mode to <strong>Smart Cut</strong>: it re-cooks only the tiny sliver around the cut and leaves the rest lossless. <strong>(2) Undo only works from the keyboard.</strong> Ctrl+Z and Ctrl+Y — the menu items are broken (known bug, don't fight it). <strong>(3) Weird files fight back.</strong> Some MTS files from cameras misbehave: remux to MP4 first (open it, pick MP4 output, export with no segments marked), then cut the MP4. And the golden rule, always: your original is never modified. Ever.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>After a bad mark, <kbd>Ctrl+Z</kbd>. When precision matters, find the <kbd>cut mode</kbd> in the export options and switch to <kbd>Smart Cut</kbd>.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Mark a cut right in the middle of fast action. Export it with the normal cut mode, then export the same segment with Smart Cut. Compare the first frames of both. See the difference? Now you know exactly which mode to reach for, and when.</p></div>
+</div>
+
+<div class="lesson" id="l12">
+  <h2><span class="num">12</span>The hawk-bath workflow: a whole reel in LosslessCut</h2>
+  <div class="sec"><h3>The crayon version</h3><p>You've done this once — six cuts, one reel. Here's the recipe written down so it's repeatable every time. <strong>(1)</strong> Watch the full clip at 1x — no thumbnails, no shortcuts. Feel the rhythm; the bouncy cuts are a motion problem, and stills can't catch it. <strong>(2)</strong> Mark each keeper with <kbd>I</kbd> / <kbd>O</kbd>, pressing <kbd>+</kbd> for the next. Six segments, say. <strong>(3)</strong> Label them in the segment list — <em>yawn, splash, shake</em> — so you don't lose track. <strong>(4)</strong> Snapshot your cover frames with <kbd>C</kbd> as you go. <strong>(5)</strong> Export mode: <strong>Separate files</strong> — one file per select. <strong>(6)</strong> Those selects are your reel ingredients now; assemble them in your editor, post through Business Suite, done.</p></div>
+  <div class="sec btns"><h3>Push these buttons</h3><p>All of them. You've pressed every key in this plan at least once by now.</p></div>
+  <div class="sec assign"><h3>Porch assignment</h3><p>Take one fresh bird clip and run the whole recipe: watch it through, mark three or more keepers, label them, snapshot one cover frame, export as separate files. Time the whole thing. This is your new ten-minute reel prep — and next time the hawk takes a bath, you'll be ready before the water settles.</p></div>
+</div>
+
+<footer>
+  <div class="crayon">🖍️</div>
+  <p><em>Crayon down. You did it, one day at a time.</em></p>
+  <p style="font-size:.85em">Companion to <a href="losslesscut-happy-path.html">LosslessCut: the happy path</a> · shortcuts verified against LosslessCut docs, Oct 2026</p>
+</footer>
+
+</div>
+</body>
+</html>
