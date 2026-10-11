@@ -60,6 +60,11 @@
     <button data-n="48" class="sel">48</button>
     <button data-n="96">96</button>
   </div>
+  <div class="seg" id="diffSeg">
+    <button data-d="easy">easy</button>
+    <button data-d="medium" class="sel">medium</button>
+    <button data-d="hard">hard</button>
+  </div>
   <button id="newbtn">↻ new puzzle</button>
   <button id="previewToggle">preview</button>
 </div>
@@ -82,7 +87,7 @@ const PHOTOS = [
 const field = document.getElementById('field');
 const clockEl = document.getElementById('clock');
 const bestEl = document.getElementById('best');
-let photo = PHOTOS[0], pieceTarget = 48;
+let photo = PHOTOS[0], pieceTarget = 48, difficulty = 'medium';
 let img = new Image();
 let cols=0, rows=0, s=0, tab=0, boardImg=null;
 let pieces=[], grid=[], groups=new Map(), nextGroup=1, zTop=1;
@@ -102,6 +107,10 @@ document.querySelectorAll('#pieceSeg button').forEach(b=>{
   b.onclick=()=>{ document.querySelectorAll('#pieceSeg button').forEach(e=>e.classList.remove('sel'));
                   b.classList.add('sel'); pieceTarget=+b.dataset.n; newGame(); };
 });
+document.querySelectorAll('#diffSeg button').forEach(b=>{
+  b.onclick=()=>{ document.querySelectorAll('#diffSeg button').forEach(e=>e.classList.remove('sel'));
+                  b.classList.add('sel'); difficulty=b.dataset.d; newGame(); };
+});
 document.getElementById('newbtn').onclick=()=>newGame();
 document.getElementById('again').onclick=()=>{ document.getElementById('win').style.display='none'; newGame(); };
 const previewImg=document.getElementById('preview');
@@ -110,7 +119,7 @@ document.getElementById('previewToggle').onclick=()=>{
 };
 
 /* ---------- best times ---------- */
-function bestKey(){ return photo.id+':'+pieces.length; }
+function bestKey(){ return photo.id+':'+pieces.length+':'+difficulty; }
 function getBest(){ try{ return JSON.parse(localStorage.getItem('porchPuzzlesBest')||'{}')[bestKey()]||null; }catch(e){ return null; } }
 function setBest(sec){
   let all={}; try{ all=JSON.parse(localStorage.getItem('porchPuzzlesBest')||'{}'); }catch(e){}
@@ -121,27 +130,30 @@ function fmt(sec){ sec=Math.floor(sec); return Math.floor(sec/60)+':'+String(sec
 function refreshBest(){ const b=getBest(); bestEl.textContent = b==null ? '—' : fmt(b); }
 
 /* ---------- jigsaw tab edge ---------- */
-function edgePath(ctx, L, out){
+function edgePath(ctx, L, out, hF, wF){
   // straight edge from (0,0) to (L,0); bump toward out*(+y). out in {-1,0,1}
-  // rounder, shallower knob: ~0.15L tall, ~0.36L wide; symmetric about L/2
+  // hF = knob height factor (~0.15), wF = knob width factor (~1.0); symmetric about L/2
   if(!out){ ctx.lineTo(L,0); return; }
-  const d=out, h=L*0.15;
-  ctx.lineTo(L*0.32,0);
-  ctx.bezierCurveTo(L*0.36,0, L*0.38,d*L*0.03, L*0.40,d*L*0.07);
-  ctx.bezierCurveTo(L*0.38,d*L*0.13, L*0.42,d*h, L*0.50,d*h);
-  ctx.bezierCurveTo(L*0.58,d*h, L*0.62,d*L*0.13, L*0.60,d*L*0.07);
-  ctx.bezierCurveTo(L*0.62,d*L*0.03, L*0.64,0, L*0.68,0);
+  const d=out, h=L*hF;
+  const X=f=>L*(0.5+(f-0.5)*wF);   // scale knob width around center
+  ctx.lineTo(X(0.32),0);
+  ctx.bezierCurveTo(X(0.36),0, X(0.38),d*L*0.03, X(0.40),d*L*0.07);
+  ctx.bezierCurveTo(X(0.38),d*L*0.13, X(0.42),d*h, X(0.50),d*h);
+  ctx.bezierCurveTo(X(0.58),d*h, X(0.62),d*L*0.13, X(0.60),d*L*0.07);
+  ctx.bezierCurveTo(X(0.62),d*L*0.03, X(0.64),0, X(0.68),0);
   ctx.lineTo(L,0);
 }
 function piecePath(ctx, e){
-  // e = {top,right,bottom,left} each -1/0/1; +1 means tab sticks OUT of this piece
+  // e = {top,right,bottom,left} each {s:-1|0|1, h, w}; sign convention:
+  // right/bottom: +1 = tab out; top/left: +1 = hole in (shared boundary => complementary)
   const t=tab, S=s;
+  const P=e.top, R=e.right, B=e.bottom, Lf=e.left;
   ctx.beginPath();
   ctx.moveTo(t,t);
-  edgePath(ctx,S,e.top);                            // top, going +x, outward = -y
-  ctx.save(); ctx.translate(t+S,t); ctx.rotate(Math.PI/2); edgePath(ctx,S,-e.right); ctx.restore();
-  ctx.save(); ctx.translate(t+S,t+S); ctx.rotate(Math.PI); edgePath(ctx,S,-e.bottom); ctx.restore();
-  ctx.save(); ctx.translate(t,t+S); ctx.rotate(-Math.PI/2); edgePath(ctx,S,e.left); ctx.restore();
+  edgePath(ctx,S,P.s,P.h,P.w);
+  ctx.save(); ctx.translate(t+S,t); ctx.rotate(Math.PI/2); edgePath(ctx,S,-R.s,R.h,R.w); ctx.restore();
+  ctx.save(); ctx.translate(t+S,t+S); ctx.rotate(Math.PI); edgePath(ctx,S,-B.s,B.h,B.w); ctx.restore();
+  ctx.save(); ctx.translate(t,t+S); ctx.rotate(-Math.PI/2); edgePath(ctx,S,Lf.s,Lf.h,Lf.w); ctx.restore();
   ctx.closePath();
 }
 
@@ -167,10 +179,20 @@ function buildPuzzle(){
   boardImg.width=Math.round(cols*s); boardImg.height=Math.round(rows*s);
   const bctx=boardImg.getContext('2d');
   bctx.drawImage(img,0,0,boardImg.width,boardImg.height);
-  // complementary edges
-  const vEdge=[], hEdge=[]; // vEdge[r][c] = edge between (r,c-1)-(r,c); hEdge[r][c] between (r-1,c)-(r,c)
-  for(let r=0;r<rows;r++){ vEdge[r]=[]; for(let c=0;c<=cols;c++) vEdge[r][c]= (c===0||c===cols)?0:(Math.random()<0.5?1:-1); }
-  for(let r=0;r<=rows;r++){ hEdge[r]=[]; for(let c=0;c<cols;c++) hEdge[r][c]= (r===0||r===rows)?0:(Math.random()<0.5?1:-1); }
+  // complementary edges per difficulty:
+  // easy = dollar-store classic: checkerboard in/out so every piece is 2-in/2-out
+  // medium = random in/out variety; hard = random + wild per-edge knob shapes
+  const mkEdge=(r,c,horiz)=>{
+    const border=(horiz&&(r===0||r===rows))||(!horiz&&(c===0||c===cols));
+    if(border) return {s:0,h:0.15,w:1};
+    // easy = dollar-store classic: every shared edge +1 => each piece 2-in/2-out, uniform orientation
+    if(difficulty==='easy') return {s:1, h:0.15, w:1};
+    if(difficulty==='hard') return {s:Math.random()<0.5?1:-1, h:0.10+Math.random()*0.12, w:0.85+Math.random()*0.3};
+    return {s:Math.random()<0.5?1:-1, h:0.15, w:1};
+  };
+  const vEdge=[], hEdge=[];
+  for(let r=0;r<rows;r++){ vEdge[r]=[]; for(let c=0;c<=cols;c++) vEdge[r][c]=mkEdge(r,c,false); }
+  for(let r=0;r<=rows;r++){ hEdge[r]=[]; for(let c=0;c<cols;c++) hEdge[r][c]=mkEdge(r,c,true); }
   grid=[];
   for(let r=0;r<rows;r++){ grid[r]=[];
     for(let c=0;c<cols;c++){
@@ -188,8 +210,12 @@ function buildPuzzle(){
       pctx.strokeStyle='rgba(0,0,0,.35)'; pctx.lineWidth=1.5; pctx.stroke();
       const p={gx:c, gy:r, el:cv, group:nextGroup++, x:0, y:0};
       cv._piece=p;
-      // scatter
-      p.x=Math.random()*(fw-pw); p.y=Math.random()*(fh-ph);
+      // tidy jittered grid scatter (no pile): one piece per cell
+      const n=cols*rows, gc=Math.max(1,Math.ceil(Math.sqrt(n*fw/fh))), gr=Math.ceil(n/gc);
+      const cw=fw/gc, ch=fh/gr, idx=r*cols+c;
+      const jx=(Math.random()-0.5)*Math.min(cw*0.3,24), jy=(Math.random()-0.5)*Math.min(ch*0.3,24);
+      p.x=Math.max(0,Math.min(fw-pw,(idx%gc)*cw+(cw-pw)/2+jx));
+      p.y=Math.max(0,Math.min(fh-ph,Math.floor(idx/gc)*ch+(ch-ph)/2+jy));
       cv.style.left=p.x+'px'; cv.style.top=p.y+'px'; cv.style.zIndex=zTop++;
       attachHandlers(cv);
       field.appendChild(cv);
@@ -235,7 +261,7 @@ function attachHandlers(cv){
   });
 }
 function trySnap(g){
-  const tol=s*0.28, dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+  const tol=s*0.32, dirs=[[1,0],[-1,0],[0,1],[0,-1]];
   let merged=true;
   while(merged){
     merged=false;
