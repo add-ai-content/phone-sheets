@@ -78,31 +78,41 @@
 </div></div>
 <script>
 "use strict";
-const PHOTOS = [
-  { id:"hawk",       src:"img/hawk.jpg",       label:"hawk splash" },
-  { id:"owl",        src:"img/owl.jpg",        label:"screech owl" },
-  { id:"woodpecker", src:"img/woodpecker.jpg", label:"woodpecker" },
-  { id:"butterfly",  src:"img/butterfly.jpg",  label:"butterfly" },
-];
 const field = document.getElementById('field');
 const clockEl = document.getElementById('clock');
 const bestEl = document.getElementById('best');
-let photo = PHOTOS[0], pieceTarget = 48, difficulty = 'medium';
+const PHOTO_LIMIT = 12;   // max photos pulled from photos.json manifest
+let PHOTOS = [];
+let photo = null, pieceTarget = 48, difficulty = 'medium';
 let img = new Image();
 let cols=0, rows=0, s=0, tab=0, boardImg=null;
 let pieces=[], grid=[], groups=new Map(), nextGroup=1, zTop=1;
 let startTime=0, timerOn=false, timerId=null, moves=0;
 let drag=null;
 
-/* ---------- photo picker ---------- */
+/* ---------- photo picker (from photos.json manifest, up to PHOTO_LIMIT) ---------- */
 const thumbsEl = document.getElementById('thumbs');
-PHOTOS.forEach((p,i)=>{
-  const im=document.createElement('img'); im.src=p.src; im.alt=p.label; im.title=p.label;
-  if(i===0) im.classList.add('sel');
-  im.onclick=()=>{ document.querySelectorAll('.thumbs img').forEach(e=>e.classList.remove('sel'));
-                   im.classList.add('sel'); photo=p; newGame(); };
-  thumbsEl.appendChild(im);
-});
+function buildThumbs(){
+  thumbsEl.innerHTML='';
+  PHOTOS.forEach((p,i)=>{
+    const im=document.createElement('img'); im.src=p.src; im.alt=p.label; im.title=p.label;
+    if(i===0) im.classList.add('sel');
+    im.onclick=()=>{ document.querySelectorAll('.thumbs img').forEach(e=>e.classList.remove('sel'));
+                     im.classList.add('sel'); photo=p; newGame(); };
+    thumbsEl.appendChild(im);
+  });
+}
+async function loadPhotos(){
+  try{
+    const r=await fetch('photos.json',{cache:'no-store'});
+    if(r.ok){ const j=await r.json();
+      if(Array.isArray(j)&&j.length) PHOTOS=j.filter(p=>p&&p.src).slice(0,PHOTO_LIMIT); }
+  }catch(e){ /* offline/file:// -> fallback below */ }
+  if(!PHOTOS.length) PHOTOS=[{id:"hawk",src:"img/hawk.jpg",label:"hawk splash"}];
+  photo=PHOTOS[0];
+  buildThumbs();
+  newGame();
+}
 document.querySelectorAll('#pieceSeg button').forEach(b=>{
   b.onclick=()=>{ document.querySelectorAll('#pieceSeg button').forEach(e=>e.classList.remove('sel'));
                   b.classList.add('sel'); pieceTarget=+b.dataset.n; newGame(); };
@@ -301,7 +311,7 @@ function win(){
   setTimeout(()=>{ document.getElementById('win').style.display='flex'; },350);
 }
 window.addEventListener('resize',()=>{ /* keep pieces where they are */ });
-newGame();
+loadPhotos();
 </script>
 </body>
 </html>
