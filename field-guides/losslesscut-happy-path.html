@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LosslessCut — The Happy Path</title>
+<style>
+  body { font-family: Georgia, 'Times New Roman', serif; max-width: 42em; margin: 2em auto; padding: 0 1.2em; line-height: 1.7; color: #1a1a1a; background: #fdfcf8; }
+  h1 { font-size: 1.5em; line-height: 1.3; }
+  h1 small { display: block; font-size: .55em; font-weight: normal; color: #666; margin-top: .4em; }
+  h2 { font-size: 1.15em; margin-top: 1.8em; }
+  .step { background: #fff; border: 1px solid #e3ddcd; border-radius: 8px; padding: 1em 1.2em; margin: 1em 0; }
+  .step h2 { margin: 0 0 .4em; font-size: 1.1em; }
+  .step p { margin: .5em 0; }
+  kbd { font-family: Consolas, monospace; font-size: .9em; background: #2b2b2b; color: #fff; padding: .15em .55em; border-radius: 4px; white-space: nowrap; }
+  .tip { background: #fff8e1; border-left: 4px solid #e6a817; padding: .7em 1em; margin: 1.2em 0; font-size: .95em; }
+  .gotcha { background: #fdecea; border-left: 4px solid #c0392b; padding: .7em 1em; margin: 1.2em 0; font-size: .95em; }
+  footer { margin-top: 2.5em; font-size: .85em; color: #666; border-top: 1px solid #ddd; padding-top: 1em; }
+</style>
+</head>
+<body>
+
+<h1>LosslessCut: the happy path<small>Field Guide #1 · cut the good bit out of a bird-cam clip, no re-encoding, no fuss</small></h1>
+
+<p>LosslessCut does one job: <strong>cut pieces out of a video without re-encoding it</strong>. No quality loss, no waiting around. Think of it as a paper cutter for video. Here's the whole happy path, start to finish.</p>
+
+<div class="step">
+  <h2>1. Drop the clip in</h2>
+  <p>Drag your video file straight onto the LosslessCut window. Or press <kbd>Ctrl</kbd>+<kbd>O</kbd> and pick it. That's it — it's loaded.</p>
+</div>
+
+<div class="step">
+  <h2>2. Find the good bit</h2>
+  <p>Press <kbd>Space</kbd> to play and pause. Nudge frame by frame with <kbd>,</kbd> and <kbd>.</kbd> — the arrow keys jump a full second, so save those for coarse moves. When the bird does the thing, stop.</p>
+  <p>This is your "scrub and eyeball" step. Take your time — nothing is cut until you say so.</p>
+</div>
+
+<div class="step">
+  <h2>3. Mark the keeper</h2>
+  <p>Park the playhead where the good bit <strong>starts</strong> and press <kbd>I</kbd>. Move to where it <strong>ends</strong> and press <kbd>O</kbd>.</p>
+  <p>The marked stretch lights up on the timeline. That's your segment — the part that survives.</p>
+  <div class="tip"><strong>More than one good bit?</strong> Press <kbd>+</kbd> for a new segment, then <kbd>I</kbd> / <kbd>O</kbd> again. Each segment becomes its own file — unless you flip <strong>Export mode</strong> from <em>Separate files</em> to <em>Merge cuts</em>, which glues them into one.</div>
+</div>
+
+<div class="step">
+  <h2>4. Export it</h2>
+  <p>Press <kbd>E</kbd>. An overview pops up — press <kbd>Export</kbd> again to confirm. The cut file lands next to your original in seconds.</p>
+  <p>Your original is never touched. LosslessCut only ever writes new files.</p>
+</div>
+
+<div class="step">
+  <h2>5. Grab a still (bonus)</h2>
+  <p>See a frame you'd want as a photo or a reel cover? Pause on it and press <kbd>C</kbd> (or the camera button). Snapshot saved, done.</p>
+</div>
+
+<div class="gotcha">
+  <strong>The one gotcha that matters:</strong> normal cuts snap to the nearest <em>keyframe</em>, so your in/out points can land a few frames off from where you marked. For bird clips you won't notice. If you ever need frame-exact precision, switch the cut mode to <strong>Smart Cut</strong> — it re-encodes just the tiny sliver around the cut and leaves the rest lossless.
+  <br><br>
+  (This is also why scrubbing jumps on files with sparse keyframes — the playhead can only land cleanly on keyframes. Same animal, different symptom.)
+</div>
+
+<div class="tip">
+  <strong>Cutting <em>out</em> the boring middle instead?</strong> Mark the boring bit with <kbd>I</kbd> / <kbd>O</kbd>, then click the <strong>yin-yang ☯</strong> symbol. It flips the logic: everything <em>except</em> your marked segments gets exported. Handy for removing a dead stretch from the middle of a clip.
+</div>
+
+<footer>Field Guide #1 · for your triage suite · shortcuts verified against LosslessCut docs, Oct 2026</footer>
+
+</body>
+</html>
