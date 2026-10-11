@@ -30,10 +30,14 @@
   #newbtn:active { transform:scale(.96); }
   #previewToggle { font-size:13px; color:var(--muted); background:none; border:1px solid #ffffff25;
                    border-radius:8px; padding:6px 10px; cursor:pointer; }
-  #field { position:relative; flex:1; overflow:hidden; touch-action:none;
+  #field { position:relative; flex:1; overflow-x:auto; overflow-y:hidden; touch-action:pan-x;
            background:radial-gradient(ellipse at 50% 40%, #243029 0%, var(--bg) 75%); }
   #field canvas.piece { position:absolute; touch-action:none; cursor:grab; filter:drop-shadow(0 2px 3px #000a); }
   #field canvas.piece.drag { cursor:grabbing; filter:drop-shadow(0 6px 10px #000c); }
+  #trayline { position:absolute; left:0; right:0; height:0; border-top:1px dashed #ffffff22;
+              pointer-events:none; }
+  #traylabel { position:absolute; left:10px; font-size:11px; color:var(--muted);
+               pointer-events:none; letter-spacing:.5px; }
   #preview { position:absolute; right:10px; bottom:10px; width:110px; border-radius:8px;
              border:2px solid #ffffff30; display:none; pointer-events:none; }
   #win { position:absolute; inset:0; display:none; align-items:center; justify-content:center;
@@ -68,8 +72,8 @@
   <button id="newbtn">↻ new puzzle</button>
   <button id="previewToggle">preview</button>
 </div>
-<div id="field"><img id="preview" alt=""></div>
-<div id="hint">drag pieces · they snap when close · double-tap a piece to bring it forward</div>
+<div id="field"><img id="preview" alt=""><div id="trayline"></div><div id="traylabel">pieces ↓</div></div>
+<div id="hint">pieces start in the tray below — drag them up to assemble · they snap when close</div>
 <div id="win"><div class="card">
   <h2>Solved! 🎉</h2>
   <p>time: <b id="wintime"></b></p>
@@ -173,6 +177,7 @@ function newGame(){
   document.getElementById('win').style.display='none';
   field.querySelectorAll('canvas.piece').forEach(c=>c.remove());
   pieces=[]; groups=new Map(); nextGroup=1; zTop=1;
+  field.scrollLeft=0;
   img.onload=()=>buildPuzzle();
   img.src=photo.src;
   previewImg.src=photo.src;
@@ -220,18 +225,22 @@ function buildPuzzle(){
       pctx.strokeStyle='rgba(0,0,0,.35)'; pctx.lineWidth=1.5; pctx.stroke();
       const p={gx:c, gy:r, el:cv, group:nextGroup++, x:0, y:0};
       cv._piece=p;
-      // tidy jittered grid scatter (no pile): one piece per cell
-      const n=cols*rows, gc=Math.max(1,Math.ceil(Math.sqrt(n*fw/fh))), gr=Math.ceil(n/gc);
-      const cw=fw/gc, ch=fh/gr, idx=r*cols+c;
-      const jx=(Math.random()-0.5)*Math.min(cw*0.3,24), jy=(Math.random()-0.5)*Math.min(ch*0.3,24);
-      p.x=Math.max(0,Math.min(fw-pw,(idx%gc)*cw+(cw-pw)/2+jx));
-      p.y=Math.max(0,Math.min(fh-ph,Math.floor(idx/gc)*ch+(ch-ph)/2+jy));
+      // tray: single horizontal scrollable row along the bottom, zero overlap
+      const trayH = ph + 30;
+      const idx = r*cols+c;
+      p.x = 12 + idx*(pw+10);
+      p.y = Math.max(0, fh - trayH + 15);
       cv.style.left=p.x+'px'; cv.style.top=p.y+'px'; cv.style.zIndex=zTop++;
       attachHandlers(cv);
       field.appendChild(cv);
       pieces.push(p); grid[r][c]=p; groups.set(p.group,[p]);
     }
   }
+  // tray divider above the piece row
+  const trayTop = ph + 30;
+  document.getElementById('trayline').style.bottom = trayTop+'px';
+  const tlab = document.getElementById('traylabel');
+  tlab.style.bottom = (trayTop-18)+'px';
   refreshBest();
 }
 function positionEl(p){ p.el.style.left=p.x+'px'; p.el.style.top=p.y+'px'; }
