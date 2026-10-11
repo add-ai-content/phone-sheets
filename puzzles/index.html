@@ -123,13 +123,14 @@ function refreshBest(){ const b=getBest(); bestEl.textContent = b==null ? '—' 
 /* ---------- jigsaw tab edge ---------- */
 function edgePath(ctx, L, out){
   // straight edge from (0,0) to (L,0); bump toward out*(+y). out in {-1,0,1}
+  // rounder, shallower knob: ~0.15L tall, ~0.36L wide; symmetric about L/2
   if(!out){ ctx.lineTo(L,0); return; }
-  const d=out, h=L*0.20;
-  ctx.lineTo(L*0.30,0);
-  ctx.bezierCurveTo(L*0.32,0, L*0.345,d*L*0.02, L*0.365,d*L*0.06);
-  ctx.bezierCurveTo(L*0.345,d*L*0.16, L*0.40,d*h, L*0.50,d*h);
-  ctx.bezierCurveTo(L*0.60,d*h, L*0.655,d*L*0.16, L*0.635,d*L*0.06);
-  ctx.bezierCurveTo(L*0.655,d*L*0.02, L*0.68,0, L*0.70,0);
+  const d=out, h=L*0.15;
+  ctx.lineTo(L*0.32,0);
+  ctx.bezierCurveTo(L*0.36,0, L*0.38,d*L*0.03, L*0.40,d*L*0.07);
+  ctx.bezierCurveTo(L*0.38,d*L*0.13, L*0.42,d*h, L*0.50,d*h);
+  ctx.bezierCurveTo(L*0.58,d*h, L*0.62,d*L*0.13, L*0.60,d*L*0.07);
+  ctx.bezierCurveTo(L*0.62,d*L*0.03, L*0.64,0, L*0.68,0);
   ctx.lineTo(L,0);
 }
 function piecePath(ctx, e){
