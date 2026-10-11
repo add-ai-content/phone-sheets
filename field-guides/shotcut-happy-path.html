@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shotcut — The Happy Path</title>
+<style>
+  body { font-family: Georgia, 'Times New Roman', serif; max-width: 42em; margin: 2em auto; padding: 0 1.2em; line-height: 1.7; color: #1a1a1a; background: #fdfcf8; }
+  h1 { font-size: 1.5em; line-height: 1.3; }
+  h1 small { display: block; font-size: .55em; font-weight: normal; color: #666; margin-top: .4em; }
+  .step { background: #fff; border: 1px solid #e3ddcd; border-radius: 8px; padding: 1em 1.2em; margin: 1em 0; }
+  .step h2 { margin: 0 0 .4em; font-size: 1.1em; }
+  .step p { margin: .5em 0; }
+  kbd { font-family: Consolas, monospace; font-size: .9em; background: #2b2b2b; color: #fff; padding: .15em .55em; border-radius: 4px; white-space: nowrap; }
+  .tip { background: #fff8e1; border-left: 4px solid #e6a817; padding: .7em 1em; margin: 1.2em 0; font-size: .95em; }
+  .gotcha { background: #fdecea; border-left: 4px solid #c0392b; padding: .7em 1em; margin: 1.2em 0; font-size: .95em; }
+  footer { margin-top: 2.5em; font-size: .85em; color: #666; border-top: 1px solid #ddd; padding-top: 1em; }
+</style>
+</head>
+<body>
+
+<h1>Shotcut: the happy path<small>Field Guide #2 · turn your picked beats into a reel, start to finish</small></h1>
+
+<p>LosslessCut is the paper cutter — fast, rough, one job. <strong>Shotcut is the workbench</strong> — where beats become a reel. This is the whole path: set the canvas, lay down your clips, keep the good parts, export. Nothing else.</p>
+
+<div class="step">
+  <h2>1. Set the canvas first</h2>
+  <p>Before you touch a single clip: <strong>Settings → Video Mode</strong> → choose the vertical 9:16 HD preset (1080×1920, 30fps). This is the size of your finished reel.</p>
+  <div class="gotcha" style="margin:.8em 0 0;"><strong>Do this first, not later.</strong> Changing the video mode after clips are on the timeline scrambles your layout. Canvas first, clips second — always.</div>
+</div>
+
+<div class="step">
+  <h2>2. Get clips on the timeline</h2>
+  <p>Open your source video (<strong>Open File</strong>, or just drag it in from Double Commander). Drag it down onto the timeline. One long clip is fine — you're about to carve it up.</p>
+  <p>Press <kbd>Space</kbd> to play, <kbd>←</kbd> <kbd>→</kbd> to nudge. Find your first beat.</p>
+</div>
+
+<div class="step">
+  <h2>3. Keep the good, cut the rest</h2>
+  <p>Park the playhead where a beat <strong>starts</strong> and press <kbd>S</kbd> — that splits the clip at the playhead. Move to where the beat <strong>ends</strong>, press <kbd>S</kbd> again. Now the beat is its own piece.</p>
+  <p>Click the junk pieces and press <kbd>Delete</kbd>. Drag the keepers together so there are no gaps. Repeat for beat two, beat three.</p>
+  <div class="tip"><strong>Zoom the timeline</strong> with the slider at the bottom if your beats are short — trying to split a 3-second moment on a zoomed-out timeline is an exercise in frustration.</div>
+</div>
+
+<div class="step">
+  <h2>Bonus: framing with Size &amp; Zoom, then Crop</h2>
+  <p>Need to tighten the framing — cut a distracting edge out, or zero in on the subject? Two filters, in this order:</p>
+  <p><strong>First — fill the canvas.</strong> If your video is smaller than the black frame around it, click the clip on the timeline, open <strong>Filters</strong>, hit <strong>+</strong>, go to <strong>Video</strong>, and pick <strong>Size, Position &amp; Rotate</strong>. Raise the <strong>Zoom</strong> slider until the video fills the canvas edge to edge. No black bars left.</p>
+  <p><strong>Then — crop.</strong> With the clip still selected, hit <strong>+</strong> again and pick <strong>Crop: Rectangle</strong>. A rectangle appears over your video in the preview — drag its corners to frame what you want to keep. Everything outside it gets cut away. The <strong>Left / Top / Right / Bottom</strong> numbers underneath do the same thing precisely, in pixels.</p>
+  <div class="tip"><strong>Why this order:</strong> cropping a video that's floating small inside a big black canvas just gives you a smaller floating video. Zoom fills the frame first, <em>then</em> the crop decides which slice of the scene survives.</div>
+  <div class="tip"><strong>Reel framing trick:</strong> drag the crop rectangle onto the subject, not the middle of the frame — the bird decides the framing, not the geometry.</div>
+</div>
+
+<div class="step">
+  <h2>4. Save the project</h2>
+  <p><kbd>Ctrl</kbd>+<kbd>S</kbd>, give it a name. Shotcut has autosave, but the two seconds this takes have saved many afternoons. Save before you export, every time.</p>
+</div>
+
+<div class="step">
+  <h2>5. Export the reel</h2>
+  <p>Click <strong>Export</strong> in the top toolbar. In the export panel:</p>
+  <p>→ Make sure the resolution reads <strong>1080×1920</strong> (it follows your video mode).<br>
+  → Set the quality to <strong>55%</strong>.<br>
+  → Click <strong>Export File</strong>, name it, and watch the Jobs panel on the right.</p>
+  <div class="gotcha" style="margin:.8em 0 0;"><strong>Learned the hard way:</strong> 70% quality on a 50-second clip produced a 168 MB monster. For Instagram reels, <strong>55–60%</strong> is the sweet spot — looks identical on a phone, fraction of the size. Hardware encoding (QuickSync on your machine) is fine for drafts.</div>
+</div>
+
+<div class="tip">
+  <strong>Putting the watermark on?</strong> That's an ffmpeg job after export, not a Shotcut job — the watermark gets stamped <em>after</em> the final resize, at 80px wide, top-left for reels. One command, done in seconds.
+</div>
+
+<footer>Field Guide #2 · for your triage suite · shortcuts verified against Shotcut docs, Oct 2026</footer>
+
+</body>
+</html>
