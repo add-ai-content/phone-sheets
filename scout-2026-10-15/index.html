@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-10-15</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-10-15";
+const CARDS = [{"n": 1, "title": "UTA Glass Pumpkin Patch & Live Glassblowing", "type": "happening", "town": "Arlington", "drive": "25", "when": "Fri Oct 16, 10am-2pm (also Sat Oct 17)", "why": "Watch live glassblowing and browse student/faculty glass pumpkins at UTA's Studio Arts Center - a free Friends & Family Weekend fundraiser.", "stretch": false, "maybe_review": false, "kind": "glass art", "when_or_hours": "Fri Oct 16, 10am-2pm (also Sat Oct 17)", "startDate": "2026-10-16", "dueDate": "2026-10-16", "oneShot": true, "band": "core", "notes": "Free. Studio Arts Center, UT Arlington, Arlington."}, {"n": 2, "title": "NTX Universe Card Show", "type": "happening", "town": "Dallas", "drive": "45", "when": "Fri Oct 16 - Sun Oct 18", "why": "The TX Card Shows series' biggest Dallas weekend - sports, Pokemon and TCG tables downtown for set-filler and bargain-box hunting.", "stretch": false, "maybe_review": false, "kind": "card show", "when_or_hours": "Fri Oct 16 - Sun Oct 18", "startDate": "2026-10-16", "dueDate": "2026-10-16", "oneShot": true, "band": "adjacent", "notes": "Downtown Dallas. Check txcardshows.com for daily hours and tickets before going."}, {"n": 3, "title": "29th Annual Butterfly Flutterby", "type": "happening", "town": "Grapevine", "drive": "20", "when": "Sat Oct 17, 10am-2pm", "why": "Free monarch-migration celebration at Grapevine Botanical Gardens: live butterfly releases at 11am, 11:45am, 12:30pm and 1:30pm, costume contest and crafts. Right in your monarch lane.", "stretch": false, "maybe_review": false, "kind": "monarch / nature", "when_or_hours": "Sat Oct 17, 10am-2pm", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "core", "notes": "Free. Grapevine Botanical Gardens at Heritage Park, 411 Ball St, Grapevine."}, {"n": 4, "title": "Catrina Festival at Sundance Square", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Oct 17, noon-11pm (daytime is the sweet spot)", "why": "Fort Worth's big Dia de los Muertos Catrina festival in Sundance Square Plaza - artisan market, food trucks, folklorico and mariachi through the day; go early, skip the late night.", "stretch": false, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sat Oct 17, noon-11pm (daytime is the sweet spot)", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "core", "notes": "Free, public. Sundance Square Plaza, Fort Worth. Mini Catrina contest 2pm, main contest 5pm."}, {"n": 5, "title": "Fort Worth Zine Fest", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Oct 17, noon-6pm", "why": "The revived Zine Fest at Southside Preservation Hall: 36 local zinesters, free bookbinding / riso / collage workshops and film screenings - browsy, arty, low-key.", "stretch": true, "maybe_review": false, "kind": "art / books", "when_or_hours": "Sat Oct 17, noon-6pm", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "stretch", "notes": "Free. Southside Preservation Hall, 1519 Lipscomb St, Fort Worth."}, {"n": 6, "title": "Vinyl Record Show", "type": "happening", "town": "Grapevine", "drive": "20", "when": "Sat Oct 17, 8am-6pm", "why": "A full day of crates to dig at Grapevine Convention Center - records, music collectibles and hidden treasures, close to home.", "stretch": false, "maybe_review": false, "kind": "record show", "when_or_hours": "Sat Oct 17, 8am-6pm", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "core", "notes": "General admission $10 per FW Moms calendar listing. Grapevine Convention Center."}, {"n": 7, "title": "4th Annual North Texas Hot Sauce Festival", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Oct 17, 11am-7pm", "why": "Only Texas hot sauce, only at Martin House Brewing: 35-40+ small-batch makers to taste, plus food trucks, live music and a pepper-eating contest. Free admission.", "stretch": false, "maybe_review": false, "kind": "food festival", "when_or_hours": "Sat Oct 17, 11am-7pm", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "core", "notes": "Free admission; $20 wristband with souvenir cup + pours is optional. Martin House Brewing, 220 S Sylvania Ave, Fort Worth."}, {"n": 8, "title": "Huffhines Harvest Fest", "type": "happening", "town": "Richardson", "drive": "50", "when": "Sat Oct 17, 10am-6pm (also Sun 10am-5pm)", "why": "50th anniversary of Richardson's big arts-and-crafts harvest fest in Huffhines Park - curated marketplace, two music stages, pumpkin decorating and a scarecrow village.", "stretch": true, "maybe_review": false, "kind": "fall festival", "when_or_hours": "Sat Oct 17, 10am-6pm (also Sun 10am-5pm)", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "stretch", "notes": "Free admission. Huffhines Park, 1500 Apollo Rd, Richardson. Saturday also has the Pawtoberfest dog add-on - the main fest is the draw."}, {"n": 9, "title": "Monarch Fest at Acton Nature Center", "type": "happening", "town": "Granbury", "drive": "55", "when": "Sat Oct 17, 10am-2pm", "why": "Monarch celebration out at Acton Nature Center in Granbury - pairs naturally with the Granbury market card below for one Granbury day trip.", "stretch": true, "maybe_review": false, "kind": "nature / monarch", "when_or_hours": "Sat Oct 17, 10am-2pm", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "stretch", "notes": "Acton Nature Center, 6900 Smoky Hill Ct, Granbury. Listed in the Hood County Oct 10-18 events roundup."}, {"n": 10, "title": "Granbury Farm and Artisan Market", "type": "happening", "town": "Granbury", "drive": "50", "when": "Sat Oct 17, 9am-2pm", "why": "Saturday market at Hewlett Park with 60+ local vendors - the browsing half of a Granbury day, same morning as Monarch Fest across town.", "stretch": false, "maybe_review": false, "kind": "market", "when_or_hours": "Sat Oct 17, 9am-2pm", "startDate": "2026-10-17", "dueDate": "2026-10-17", "oneShot": true, "band": "adjacent", "notes": "Hewlett Park, 650 E Pearl St, Granbury."}, {"n": 11, "title": "Dallas Soul Food Festival", "type": "happening", "town": "Dallas", "drive": "40", "when": "Sun Oct 18, noon-6pm", "why": "Free-admission Sunday food fest at Lofty Spaces with 30+ vendors - fried chicken and fish, oxtails, barbecue, candied yams, turkey legs and funnel cakes, plus vegan options.", "stretch": false, "maybe_review": false, "kind": "food festival", "when_or_hours": "Sun Oct 18, noon-6pm", "startDate": "2026-10-18", "dueDate": "2026-10-18", "oneShot": true, "band": "core", "notes": "Free admission, food for purchase. Lofty Spaces, 816 Montgomery St, Dallas."}, {"n": 12, "title": "Flipstone Vintage Market", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sun Oct 18, noon-6pm", "why": "Sunday vintage browsing in Fort Worth - the flea / vintage-market lane you tend to approve over staged programs.", "stretch": false, "maybe_review": false, "kind": "vintage market", "when_or_hours": "Sun Oct 18, noon-6pm", "startDate": "2026-10-18", "dueDate": "2026-10-18", "oneShot": true, "band": "core", "notes": "Free, vendors. Listed on Eventeny for Fort Worth, Sun Oct 18 noon-6pm - confirm venue on the listing before going."}, {"n": 13, "title": "A Book Buzz: Grown-Up Book Fair", "type": "happening", "town": "Lewisville", "drive": "35", "when": "Sun Oct 18, noon-4pm", "why": "A book fair for grown-ups in Lewisville: local authors, small businesses and bookish vendors, with snacks and cocktails - a new town and a new format.", "stretch": true, "maybe_review": false, "kind": "book fair", "when_or_hours": "Sun Oct 18, noon-4pm", "startDate": "2026-10-18", "dueDate": "2026-10-18", "oneShot": true, "band": "stretch", "notes": "Buffalo Hirsch, 206 W Main St, Lewisville."}, {"n": 14, "title": "Romanian Food Festival", "type": "happening", "town": "Colleyville", "drive": "15", "when": "Sat Oct 24, 11am-10pm (fest runs Oct 23-25)", "why": "20th anniversary edition, 15 minutes away: home-cooked Romanian food (mici, sarmale, ciorba, pastries), folk dancing and a crafts marketplace at St Mary's in Colleyville. A cuisine stretch that is barely a drive.", "stretch": true, "maybe_review": false, "kind": "cultural food festival", "when_or_hours": "Sat Oct 24, 11am-10pm (fest runs Oct 23-25)", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "stretch", "notes": "St Mary's Romanian Orthodox Church, 3801 Glade Rd, Colleyville. Admission is a small donation ($5-10 listings vary); free parking at Heritage schools."}, {"n": 15, "title": "Denton's Day of the Dead Festival", "type": "happening", "town": "Denton", "drive": "45", "when": "Sat Oct 24, 11am-9pm", "why": "Downtown Denton's signature fall fest: Coffin Races at noon, mariachi on two stages, art and food all day, and a twilight lantern parade at 7pm. Go for the daytime core of it.", "stretch": true, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sat Oct 24, 11am-9pm", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "stretch", "notes": "Free general admission. Downtown Denton, 110 W Hickory St. Festival weekend runs Oct 22-25; Saturday is the main day."}, {"n": 16, "title": "ArtsGoggle", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Oct 24, noon-10pm (daytime recommended)", "why": "Fort Worth's largest local-art festival takes over 21 blocks of Magnolia Ave: 1,000+ visual artists, ~50 music performances and open doors all through the Near Southside. Free, with a free trolley.", "stretch": false, "maybe_review": false, "kind": "art festival", "when_or_hours": "Sat Oct 24, noon-10pm (daytime recommended)", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "Free. Magnolia Ave between 8th Ave and S Main St, Fort Worth. Big crowds expected (organizers cite 80k+) - early afternoon is calmest."}, {"n": 17, "title": "Fort Worth Antiquarian Book Fair", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Oct 24, 10am-5pm (also Sun 10am-3pm)", "why": "Rare, vintage and collectible books at the Masonic Temple - slow browsing for collectors and local-history hunters.", "stretch": false, "maybe_review": false, "kind": "book fair", "when_or_hours": "Sat Oct 24, 10am-5pm (also Sun 10am-3pm)", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "Masonic Temple of Fort Worth, 1100 Henderson St, Fort Worth."}, {"n": 18, "title": "Nash Farm Fall Round-Up", "type": "happening", "town": "Grapevine", "drive": "20", "when": "Sat Oct 24, 10am-2pm", "why": "26th annual free fall round-up at Historic Nash Farm: 19th-century farm-skills demos, heritage crafts, farm animals and chuck-wagon cooking.", "stretch": false, "maybe_review": false, "kind": "heritage farm", "when_or_hours": "Sat Oct 24, 10am-2pm", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "Free admission, concessions for purchase. Nash Farm, 626 Ball St, Grapevine. Parking at Cannon Elementary / Botanical Garden with free shuttle."}, {"n": 19, "title": "SiNaCa Studios Fall Market & Pumpkin Patch", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Oct 24, noon-10pm (also Fri 3-9pm)", "why": "Glass pumpkins and handcrafted work from local artists at SiNaCa Studios' fall market, with glassmaking demos on Saturday - it runs alongside ArtsGoggle in the Near Southside.", "stretch": false, "maybe_review": false, "kind": "glass art market", "when_or_hours": "Sat Oct 24, noon-10pm (also Fri 3-9pm)", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "Free and open to the public. SiNaCa Studios, Fort Worth Near Southside."}, {"n": 20, "title": "Oktoberfest Dallas", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat Oct 24, 10am-10pm (daytime recommended)", "why": "One-day Oktoberfest at Flag Pole Hill Park by White Rock Lake: beer, festival food, kids' zone and live music, with Pat Green headlining at 8:30pm - the daytime fest is the outing.", "stretch": false, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sat Oct 24, 10am-10pm (daytime recommended)", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "adjacent", "notes": "Flag Pole Hill Park, 8100 Doran Circle, Dallas. Kid Zone closes 6pm."}, {"n": 21, "title": "Boo at the Zoo", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Oct 24, 10am-5pm (runs Oct 23-25)", "why": "The Fort Worth Zoo's daytime Halloween weekend: treat stations, themed entertainment and animal shows mixed into a normal zoo day - not a scare event.", "stretch": false, "maybe_review": false, "kind": "zoo / Halloween", "when_or_hours": "Sat Oct 24, 10am-5pm (runs Oct 23-25)", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "Included with regular zoo admission or membership. Fort Worth Zoo, 1989 Colonial Pkwy, Fort Worth."}, {"n": 22, "title": "Heritage Urban Farm Pumpkin Patch", "type": "happening", "town": "Weatherford", "drive": "45", "when": "Sat Oct 24, 10am-6pm (weekends through Oct 25)", "why": "Working-farm pumpkin patch outside Weatherford: hayrides, petting zoo, games and photo spots, $5-7 admission - a Parker County farm day while the season lasts.", "stretch": false, "maybe_review": false, "kind": "pumpkin patch / farm", "when_or_hours": "Sat Oct 24, 10am-6pm (weekends through Oct 25)", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "adjacent", "notes": "Heritage Urban Farm, 1439 Old Airport Rd, Weatherford. Season runs weekends Sep 26 - Oct 25; Sundays noon-6pm."}, {"n": 23, "title": "Fangs & Fables Market", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sun Oct 25, noon-5pm", "why": "A bookish pop-up market at Birdie's Social Club: local authors and bookish vendors with a supernatural / dark-romance theme, plus music, food and photo ops.", "stretch": false, "maybe_review": false, "kind": "bookish market", "when_or_hours": "Sun Oct 25, noon-5pm", "startDate": "2026-10-25", "dueDate": "2026-10-25", "oneShot": true, "band": "core", "notes": "Birdie's Social Club, 2735 W 5th St, Fort Worth."}, {"n": 24, "title": "Pumpkin Patch at First Christian Church", "type": "happening", "town": "Arlington", "drive": "25", "when": "Sun Oct 25, 11am-dusk (patch runs daily Oct 12-30)", "why": "The simple, traditional church pumpkin patch: pumpkins and gourds, photo spots and games, free admission - you only pay for pumpkins you take home.", "stretch": false, "maybe_review": false, "kind": "pumpkin patch", "when_or_hours": "Sun Oct 25, 11am-dusk (patch runs daily Oct 12-30)", "startDate": "2026-10-25", "dueDate": "2026-10-25", "oneShot": true, "band": "core", "notes": "First Christian Church, 910 S Collins St, Arlington. Runs daily Oct 12-30, generally 11am until dusk - Sunday is just the suggested visit day."}, {"n": 25, "title": "Leave the Leaves: Grapevine Garden Club Talk", "type": "happening", "town": "Grapevine", "drive": "20", "when": "Tue Oct 27 (time/venue on the club calendar)", "why": "A Texas Master Naturalist's talk on leaving fall leaves to support fireflies and backyard biodiversity - a weekday garden-club edition of your yard lane.", "stretch": false, "maybe_review": false, "kind": "garden talk", "when_or_hours": "Tue Oct 27 (time/venue on the club calendar)", "startDate": "2026-10-27", "dueDate": "2026-10-27", "oneShot": true, "band": "core", "notes": "Grapevine Garden Club general meeting, Tue Oct 27. Check grapevinegardenclub.org calendar for time and location before going."}, {"n": 26, "title": "Timber Creek Sky Dancer Craft Show", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Oct 31, 9am-4pm", "why": "Annual craft show at Timber Creek High School in far north Fort Worth - a big indoor browsing stop for unique and handmade finds on Halloween morning.", "stretch": false, "maybe_review": false, "kind": "craft show", "when_or_hours": "Sat Oct 31, 9am-4pm", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "core", "notes": "Timber Creek High School, 12350 Timberland Blvd, Fort Worth. Hours per FW Moms calendar listing."}, {"n": 27, "title": "Lenora Rolla Heritage Center Museum", "type": "place", "town": "Fort Worth", "drive": "30", "when": "Mon-Fri 10am-3pm", "why": "Small museum in the historic Boone House telling Tarrant County Black history through artifacts, photos and documents - a piece of Fort Worth history most locals have never visited.", "stretch": false, "maybe_review": false, "kind": "local history museum", "when_or_hours": "Mon-Fri 10am-3pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "1020 E Humbolt St, Fort Worth. Run by the Tarrant County Black Historical & Genealogical Society - check the society site for tour / appointment details."}, {"n": 28, "title": "Ball-Eddleman-McFarland House", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Wed & Fri 11am-3pm; Sun 1-3:15pm", "why": "Fort Worth's premier Queen Anne Victorian, built in 1899 - a short, elegant historic-house visit on Penn Street, open only a few afternoons a week.", "stretch": true, "maybe_review": false, "kind": "historic house museum", "when_or_hours": "Wed & Fri 11am-3pm; Sun 1-3:15pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "1110 Penn St, Fort Worth. Historic Fort Worth - confirm tour times on historicfortworth.org."}, {"n": 29, "title": "Stockyards Museum", "type": "place", "town": "Fort Worth", "drive": "20", "when": "Mon & Wed-Sat 10am-5pm; Sun noon-5pm", "why": "Tiny, cheap and charming: Stockyards artifacts and memorabilia inside the Livestock Exchange Building, including the famous 1908 Palace Theater light bulb.", "stretch": false, "maybe_review": false, "kind": "history museum", "when_or_hours": "Mon & Wed-Sat 10am-5pm; Sun noon-5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "131 E Exchange Ave, Fort Worth. Adult admission $2 per museum listings."}, {"n": 30, "title": "Cattle Raisers Museum", "type": "place", "town": "Fort Worth", "drive": "30", "when": "Tue-Sat 10am-5pm; Sun noon-5pm", "why": "Ranching-heritage museum inside the Fort Worth Museum of Science and History - cattle drives, brands and the business of Texas ranching, all indoors.", "stretch": false, "maybe_review": false, "kind": "ranching museum", "when_or_hours": "Tue-Sat 10am-5pm; Sun noon-5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "1600 Gendy St, Fort Worth, inside the Fort Worth Museum of Science and History."}, {"n": 31, "title": "Farmers Branch Historical Park", "type": "place", "town": "Farmers Branch", "drive": "35", "when": "Mon-Fri 8am-6pm; Sat-Sun noon-6pm", "why": "Free 27-acre open-air museum: a dozen-plus restored buildings from the 1856 Gilbert House onward, an antique rose garden, and easy picnic-and-stroll grounds.", "stretch": true, "maybe_review": false, "kind": "open-air history museum", "when_or_hours": "Mon-Fri 8am-6pm; Sat-Sun noon-6pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "2540 Farmers Branch Ln, Farmers Branch. Free admission."}, {"n": 32, "title": "Vetro Glassblowing Studio & Gallery", "type": "place", "town": "Grapevine", "drive": "20", "when": "Tue-Sat 10am-6pm", "why": "Watch glassblowers at work in Grapevine's historic district and browse the gallery - in October their help-create glass pumpkin sessions run Fridays and Saturdays by reservation.", "stretch": false, "maybe_review": false, "kind": "glass art studio", "when_or_hours": "Tue-Sat 10am-6pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "701 S Main St Ste 103, Grapevine. Regular hours Tue-Sat 10am-6pm in season."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
