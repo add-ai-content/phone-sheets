@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-10-18</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-10-18";
+const CARDS = [{"n": 1, "title": "BRIT Reads: The Forbidden Garden", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Mon Oct 19, 12-1pm", "why": "BRIT's lunchtime book club takes on Simon Parkin's 'The Forbidden Garden' at the BRIT Library - a quiet, bookish hour in the Botanic Garden complex.", "stretch": false, "maybe_review": false, "kind": "book club", "when_or_hours": "Mon Oct 19, 12-1pm", "startDate": "2026-10-19", "dueDate": "2026-10-19", "oneShot": true, "band": "core", "notes": "Free. BRIT Library, Fort Worth Botanic Garden, 1700 University Dr, Fort Worth. Per fwbg.org adult education calendar."}, {"n": 2, "title": "Red Steagall Cowboy Gathering & Western Swing Festival", "type": "happening", "town": "Fort Worth", "drive": "20", "when": "Sat Oct 24, daytime (fest runs Oct 23-25)", "why": "The Stockyards' big cowboy weekend: ranch rodeo, chuckwagon cook-off you can tour, cowboy poetry and Western swing - go for the daytime heritage core.", "stretch": false, "maybe_review": false, "kind": "western heritage festival", "when_or_hours": "Sat Oct 24, daytime (fest runs Oct 23-25)", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "Fort Worth Stockyards / Cowtown Coliseum, Fort Worth. Dates Oct 23-25, 2026 per fortworth.com and redsteagallcowboygathering.com. Some events ticketed."}, {"n": 3, "title": "Día de los Muertos Festival & Exhibition — Latino Cultural Center", "type": "happening", "town": "Dallas", "drive": "40", "when": "Sat Oct 24, 11am-4pm (exhibition Oct 20-Nov 6)", "why": "Dallas's Latino Cultural Center festival day: community ofrendas, sugar-skull crafts, artisan vendors and dance on the plaza - the exhibition of altars runs through Nov 6.", "stretch": false, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sat Oct 24, 11am-4pm (exhibition Oct 20-Nov 6)", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "Free. Latino Cultural Center, 2600 Live Oak St, Dallas. Per Visit Dallas and DFWChild listings."}, {"n": 4, "title": "Garland Día de los Muertos", "type": "happening", "town": "Garland", "drive": "50", "when": "Sat Oct 24, 2-8pm", "why": "Downtown Garland Square's free Día celebration: performances, altar displays, food trucks and an artisan market - a new town for Scout, in daylight hours.", "stretch": true, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sat Oct 24, 2-8pm", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "stretch", "notes": "Free. Downtown Garland Square, 520 W State St, Garland. Per DFWChild listing."}, {"n": 5, "title": "Animal Connection Pumpkin Patch at Fritz Park", "type": "happening", "town": "Irving", "drive": "35", "when": "Sat Oct 24, 10am-5pm (weekends through Oct 31)", "why": "Irving's first-annual Fritz Park pumpkin patch: petting zoo, pig races, hay maze and $10 pumpkins (part benefits Irving Animal Services) - a new town and a low-key farm morning.", "stretch": true, "maybe_review": false, "kind": "pumpkin patch / farm", "when_or_hours": "Sat Oct 24, 10am-5pm (weekends through Oct 31)", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "adjacent", "notes": "$6 non-residents / $4 Irving residents, under 2 free. Fritz Park, 312 E Vilbig St, Irving. Weekends Oct 3-31, Sat 10am-5pm, Sun noon-5pm."}, {"n": 6, "title": "Wildlife Watchers — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sun Oct 25, 9am & 11am", "why": "A naturalist-led session on how to find and identify wildlife at the Refuge - binocular skills in your home birding lane. Pre-registration required.", "stretch": false, "maybe_review": false, "kind": "nature program", "when_or_hours": "Sun Oct 25, 9am & 11am", "startDate": "2026-10-25", "dueDate": "2026-10-25", "oneShot": true, "band": "core", "notes": "$5 with paid admission / members $3. Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Per FWNC October 2026 program calendar."}, {"n": 7, "title": "A Monarch's Journey — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sun Oct 25, 10am & 1pm", "why": "Peak migration timing: learn the monarch's Mexico round-trip and adaptations with a naturalist at the Refuge, right as they funnel through North Texas.", "stretch": false, "maybe_review": false, "kind": "nature / monarch", "when_or_hours": "Sun Oct 25, 10am & 1pm", "startDate": "2026-10-25", "dueDate": "2026-10-25", "oneShot": true, "band": "core", "notes": "$5 with paid admission / members $3. Pre-registration required. Fort Worth Nature Center & Refuge. Per FWNC October 2026 program calendar."}, {"n": 8, "title": "Sanger Sellabration & Safe Spook", "type": "happening", "town": "Sanger", "drive": "55", "when": "Sat Oct 31, 9am-5pm", "why": "The 48th annual Sellabration takes over downtown Sanger's square: craft and food vendors to browse, cake walks, costume contest and Safe Spook trick-or-treating - a genuine new-town stretch.", "stretch": true, "maybe_review": false, "kind": "small-town festival / market", "when_or_hours": "Sat Oct 31, 9am-5pm", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "stretch", "notes": "Free. Downtown Sanger, 304 Bolivar St, Sanger. Per Sanger Area Chamber of Commerce."}, {"n": 9, "title": "Día de los Muertos en Fort Worth", "type": "happening", "town": "Fort Worth", "drive": "20", "when": "Sat Oct 31, 10am parade, festival 11:30am-5pm", "why": "The 23rd annual Northside celebration: morning parade up North Main, then a free festival at Marine Park with mariachi, ballet folklórico, artists and food.", "stretch": false, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sat Oct 31, 10am parade, festival 11:30am-5pm", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "core", "notes": "Free. Marine Park, 303 NW 20th St, Fort Worth. Organized by Artes de la Rosa. Per DFWChild and Cliburn listings."}, {"n": 10, "title": "Enchanted Fall Festival — Bonsai Lady & Silly Willie's", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Oct 31, 10am-4pm", "why": "A first-year fall fest at a working bonsai nursery: 800+ bonsai, food trucks, local vendors, a pie-eating contest and a bonsai scavenger hunt - a venue type Scout has never dealt.", "stretch": true, "maybe_review": false, "kind": "garden / bonsai festival", "when_or_hours": "Sat Oct 31, 10am-4pm", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "stretch", "notes": "Free admission. Bonsai Lady & Silly Willie's Bonsai & More, Fort Worth (South Hulen area). Per Eventbrite / organizer listings."}, {"n": 11, "title": "Halloween Spooktacular Family Concert", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Oct 31, 10am activities, 11am concert", "why": "Chamber Music Society of Fort Worth at the Modern: wand-making and a costume parade from 10am, then a one-hour costumed orchestra playing Sorcerer's Apprentice, Danse Macabre and Harry Potter music.", "stretch": false, "maybe_review": false, "kind": "family concert", "when_or_hours": "Sat Oct 31, 10am activities, 11am concert", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "core", "notes": "Adults $15, kids 2+ $10, family ticket $35 (per Modern listing). Modern Art Museum of Fort Worth, 3200 Darnell St."}, {"n": 12, "title": "Legend of the Goatman — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Oct 31, 10am & 1pm", "why": "A Halloween hike on Greer Island with a naturalist, telling the Lake Worth Goatman legend in the habitat where it started - costumes welcome.", "stretch": false, "maybe_review": false, "kind": "nature hike / local legend", "when_or_hours": "Sat Oct 31, 10am & 1pm", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "core", "notes": "$5 with paid admission / members $3. Pre-registration required. Fort Worth Nature Center & Refuge. Per FWNC October 2026 program calendar."}, {"n": 13, "title": "Early Birds — Fort Worth Nature Center Nov 1", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sun Nov 1, 8:30-10:30am", "why": "Sunday-morning naturalist bird walk at the Refuge: see what migrants are moving through and what is taking up winter residence.", "stretch": false, "maybe_review": false, "kind": "bird walk", "when_or_hours": "Sun Nov 1, 8:30-10:30am", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "core", "notes": "$5 with paid admission / members $3. Pre-registration required. Fort Worth Nature Center & Refuge. Per FWNC November 2026 program calendar."}, {"n": 14, "title": "Día de los Muertos Procession at Fort Worth Botanic Garden", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sun Nov 1, activities noon-5pm, procession 3:30pm", "why": "Half-price Garden admission all day, a main altar and displays from noon, and a colorful 3:30pm procession through the Garden to honor loved ones.", "stretch": false, "maybe_review": false, "kind": "cultural festival / garden", "when_or_hours": "Sun Nov 1, activities noon-5pm, procession 3:30pm", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "core", "notes": "Half-price admission ($7 adults per DFWChild). Fort Worth Botanic Garden, 3220 Botanic Garden Blvd. Per fwbg.org events calendar."}, {"n": 15, "title": "Día de los Muertos at La Gran Plaza", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sun Nov 1, 1-6:30pm", "why": "La Gran Plaza's free Day of the Dead celebration: mariachi and live performance, community tributes and a festive market atmosphere in Fort Worth's Latino shopping landmark.", "stretch": false, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sun Nov 1, 1-6:30pm", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "core", "notes": "Free. La Gran Plaza de Fort Worth, 4200 South Freeway, Fort Worth. Per 2026 Día roundups."}, {"n": 16, "title": "Dallas Record & CD Collector's Show", "type": "happening", "town": "Richardson", "drive": "50", "when": "Sun Nov 1, 10am-4pm", "why": "A full day of crates to dig - vinyl, CDs and music collectibles at Richardson Civic Center. A new show type for Scout, in the bargain-hunting lane.", "stretch": true, "maybe_review": false, "kind": "record show", "when_or_hours": "Sun Nov 1, 10am-4pm", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "stretch", "notes": "Admission $5 (under 12 free) per organizer listings. Richardson Civic Center, 411 W Arapaho Rd, Richardson."}, {"n": 17, "title": "Dallas Card Fest", "type": "happening", "town": "Dallas", "drive": "50", "when": "Sun Nov 1, 11am-5pm (fest runs Oct 31-Nov 1)", "why": "Sports and TCG card show at Dallas College Richland Campus: buy, sell and trade with regional vendors - set-filler hunting close to the season's end.", "stretch": false, "maybe_review": false, "kind": "card show", "when_or_hours": "Sun Nov 1, 11am-5pm (fest runs Oct 31-Nov 1)", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "adjacent", "notes": "Dallas College Richland Campus, 12800 Abrams Rd, Dallas. Per organizer listing; confirm daily hours before going."}, {"n": 18, "title": "Día de los Muertos in a Small Town — Acton", "type": "happening", "town": "Granbury", "drive": "55", "when": "Sun Nov 1, 2:30-5pm", "why": "Acton's small-town Día celebration at Acton Methodist Church: a kids' parade, mariachi, folklórico dancers, face painting and a community altar - the Granbury day-trip version.", "stretch": true, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sun Nov 1, 2:30-5pm", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "stretch", "notes": "Free, outdoors (indoors if rain). Acton Methodist Church, 3433 Fall Creek Hwy, Acton / Granbury. Per Hood County News calendar."}, {"n": 19, "title": "National Bison Day Hayride — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Nov 7, 9am", "why": "Horizon pick: ride out with Refuge staff on National Bison Day, help feed the bison herd and learn why the animals matter to the Refuge. Registration required.", "stretch": false, "maybe_review": false, "kind": "nature / wildlife", "when_or_hours": "Sat Nov 7, 9am", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "$15, ages 3+. Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Per DFWChild fall guide."}, {"n": 20, "title": "Boho Harvest Market", "type": "happening", "town": "Grapevine", "drive": "20", "when": "Sat Nov 7, 10am-4pm (also Sun Nov 8)", "why": "Horizon pick: 50+ curated local vendors in a 15,000 sq ft indoor venue in downtown Grapevine - handmade goods, art, candles and jewelry, with food trucks and coffee outside.", "stretch": false, "maybe_review": false, "kind": "market", "when_or_hours": "Sat Nov 7, 10am-4pm (also Sun Nov 8)", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Free admission. The REC of Grapevine, 1175 Municipal Way, Grapevine. Per thebohomarket.com."}, {"n": 21, "title": "Wylie Arts Festival", "type": "happening", "town": "Wylie", "drive": "60", "when": "Sat Nov 7, 9am-5pm", "why": "Horizon stretch to a new town: 200+ artisan booths, fair food and a Festival of Lights parade at dusk in historic downtown Wylie - go for the daytime market core.", "stretch": true, "maybe_review": false, "kind": "arts festival / market", "when_or_hours": "Sat Nov 7, 9am-5pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "stretch", "notes": "Free admission. Olde City Park / downtown Wylie, 112 N Ballard Ave. Per City of Wylie."}, {"n": 22, "title": "Christmas Bird Count Workshop — Heard Museum", "type": "happening", "town": "McKinney", "drive": "60", "when": "Sun Nov 8, 1-3pm", "why": "Horizon pick: a Heard workshop prepping you for the Christmas Bird Count (Dec 14-Jan 5) - bird ID, counting structure and citizen-science assignments, in your exact lane.", "stretch": true, "maybe_review": false, "kind": "birding workshop", "when_or_hours": "Sun Nov 8, 1-3pm", "startDate": "2026-11-08", "dueDate": "2026-11-08", "oneShot": true, "band": "stretch", "notes": "$25 non-members / $20 members (per Heard and Visit McKinney listings; McKinney Parks listing shows free, same URL - verify at heardmuseum.org/events). Heard Natural Science Museum, 1 Nature Place, McKinney."}, {"n": 23, "title": "Keller Card Show", "type": "happening", "town": "Keller", "drive": "15", "when": "Sun Nov 15, 11am-6pm", "why": "Horizon pick, 15 minutes away: a Sunday of sports cards and TCG at the Keller Lions Club - NFL, NBA, MLB, NHL plus Pokémon and Magic tables for bargain-box hunting.", "stretch": false, "maybe_review": false, "kind": "card show", "when_or_hours": "Sun Nov 15, 11am-6pm", "startDate": "2026-11-15", "dueDate": "2026-11-15", "oneShot": true, "band": "core", "notes": "Keller Lions Club, 532 Keller Parkway, Keller. Per kellercardshow.tscheckout.com."}, {"n": 24, "title": "Doss Heritage and Culture Center", "type": "place", "town": "Weatherford", "drive": "45", "when": "Tue-Sat 10am-5pm; Thu until 8pm", "why": "Free Parker County history museum: early settlements, cattle drives, Native American life and Mary Martin & Larry Hagman exhibits, plus Pioneer Cabin Park outside.", "stretch": false, "maybe_review": false, "kind": "local history museum", "when_or_hours": "Tue-Sat 10am-5pm; Thu until 8pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "Free admission ($5 guided tour). 1400 Texas Dr, Weatherford. Per dosscenter.org."}, {"n": 25, "title": "Thistle Hill Mansion", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Guided tours - see notes", "why": "Fort Worth's 1904 Georgian Revival mansion on Pennsylvania Ave, built for cattle baron W.T. Waggoner's daughter - docent tours by reservation through Historic Fort Worth, plus public Christmas tours in December.", "stretch": true, "maybe_review": false, "kind": "historic house museum", "when_or_hours": "Guided tours - see notes", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "1509 Pennsylvania Ave, Fort Worth. Tours by reservation via Historic Fort Worth (historicfortworth.org); mansion also opens for special events."}, {"n": 26, "title": "Elkhorn Village & Western Heritage Museum", "type": "place", "town": "Mineral Wells", "drive": "60", "when": "Fri-Sun 10am-5pm", "why": "A recreated Old West town in Mineral Wells - jail, saloon and blacksmith shop, 40+ Western film/TV mannequins and weekend chuckwagon cooking. A genuine edge-of-range stretch town.", "stretch": true, "maybe_review": false, "kind": "western heritage museum", "when_or_hours": "Fri-Sun 10am-5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "705 W Hubbard St, Mineral Wells; village is outdoors behind Crazy Water. Per the museum's Facebook listing - call ahead to confirm weekend hours."}, {"n": 27, "title": "West Side Cafe", "type": "place", "town": "Fort Worth", "drive": "35", "when": "Daily 7am-3pm", "why": "Local-favorite old-school diner on Camp Bowie West, breakfast and lunch only: huge buttermilk pancakes, chicken fried steak and chicken & dumplings - the historic-daytime-diner lane that keeps landing.", "stretch": false, "maybe_review": false, "kind": "diner", "when_or_hours": "Daily 7am-3pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "7950 Camp Bowie W Blvd, Fort Worth. Daily 7am-3pm per the cafe and review listings."}, {"n": 28, "title": "Dairy-Ette", "type": "place", "town": "Dallas", "drive": "50", "when": "Mon-Thu 11am-6pm; Fri-Sat until 9pm; closed Sun (hours vary by listing)", "why": "East Dallas drive-in institution since 1956: carhop service, burgers and housemade root beer in frosted mugs - a famous, top-rated retro stop worth the drive.", "stretch": false, "maybe_review": false, "kind": "drive-in diner", "when_or_hours": "Mon-Thu 11am-6pm; Fri-Sat until 9pm; closed Sun (hours vary by listing)", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "9785 Ferguson Rd, Dallas. Since 1956 per Dallas listings; confirm hours on dairyette.shop before going - listings vary."}, {"n": 29, "title": "Azle Historical Museum", "type": "place", "town": "Azle", "drive": "35", "when": "Saturdays 10am-2pm", "why": "A small-town stretch: Azle's history museum on Main Street, open Saturday mornings only - an easy add to a Parker County Saturday. Call ahead, hours are volunteer-run.", "stretch": true, "maybe_review": false, "kind": "local history museum", "when_or_hours": "Saturdays 10am-2pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "124 W Main St, Azle. Saturdays 10am-2pm per the museum's listing; volunteer-run, confirm before going."}, {"n": 30, "title": "Photography's First Century — Kimbell Art Museum", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Tue-Sun, museum hours (exhibition Oct 4-Jan 17)", "why": "The Kimbell's first-ever photography exhibition: 150+ masterworks from the Bibliothèque nationale de France, from 1840s daguerreotypes to modernism - a photography show squarely in your lane, on view all fall.", "stretch": false, "maybe_review": false, "kind": "art museum exhibition", "when_or_hours": "Tue-Sun, museum hours (exhibition Oct 4-Jan 17)", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "Kimbell Art Museum, Renzo Piano Pavilion, 3333 Camp Bowie Blvd, Fort Worth. Oct 4, 2026-Jan 17, 2027 per kimbellart.org."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
