@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-10-22</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-10-22";
+const CARDS = [{"n": 1, "title": "Collect-A-Con Dallas", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat-Sun Oct 24-25", "why": "Nation's largest trading-card and pop-culture convention at Kay Bailey Hutchison Convention Center — 1,000+ tables of sports cards, TCG, comics and vintage toys, plus on-site grading.", "stretch": false, "maybe_review": false, "kind": "card show", "when_or_hours": "Sat-Sun Oct 24-25, 2026", "startDate": "2026-10-24", "dueDate": "2026-10-25", "oneShot": false, "band": "adjacent", "notes": "Kay Bailey Hutchison Convention Center, Dallas. Sports cards, Pokemon/TCG, comics, vintage toys."}, {"n": 2, "title": "Keller Lions Club Fall Carnival 2026", "type": "happening", "town": "Keller", "drive": "15", "when": "Thu-Sun Oct 22-25", "why": "Classic hometown fall carnival right in Keller — rides, games and fair food, running all weekend so you can pick a quiet daytime window.", "stretch": false, "maybe_review": false, "kind": "carnival", "when_or_hours": "Thu-Sun Oct 22-25, 2026", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "Keller Lions Club, Keller. Carnival runs Oct 22-25."}, {"n": 3, "title": "Christ's Haven for Children Fall Festival & Open House", "type": "happening", "town": "Keller", "drive": "20", "when": "Sat Oct 24, 10am-1pm", "why": "Free fall festival and open house — trunk-or-treat, pony rides, kid zone and home tours at this Keller children's home.", "stretch": false, "maybe_review": false, "kind": "fall festival", "when_or_hours": "Sat Oct 24, 10am-1pm", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "4200 Keller Haslet Rd, Keller. Free admission; RSVP requested."}, {"n": 4, "title": "Clark Gardens Costume Contest", "type": "happening", "town": "Weatherford", "drive": "55", "when": "Sat Oct 24, 1pm", "why": "Costume contest (pet, pet-and-human, and human-only) inside Clark Gardens' pumpkin patch — garden stroll plus fall photo spots.", "stretch": false, "maybe_review": false, "kind": "garden event", "when_or_hours": "Sat Oct 24, 1pm; day-of registration closes 11:45am", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "stretch", "notes": "Clark Gardens, 567 Maddux Rd, Weatherford. Garden admission applies."}, {"n": 5, "title": "Frida Fest at Craft House", "type": "happening", "town": "Granbury", "drive": "55", "when": "Sat Oct 24, 12pm", "why": "Frida Kahlo and Dia de los Muertos celebration with a specialty craft menu — bold colors, flowers and hands-on making in Granbury.", "stretch": true, "maybe_review": false, "kind": "craft festival", "when_or_hours": "Sat Oct 24, 12pm", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "stretch", "notes": "Craft House, 205 Kings Plaza Suite 100, Granbury."}, {"n": 6, "title": "Sunday Morning Bird Walk — Trinity River Audubon Center", "type": "happening", "town": "Dallas", "drive": "50", "when": "Sun Oct 25, 9-10am", "why": "Guided Sunday morning bird walk on TRAC's trails — fall migrants and resident songbirds, beginner-friendly pace.", "stretch": false, "maybe_review": false, "kind": "bird walk", "when_or_hours": "Sun Oct 25, 9-10am", "startDate": "2026-10-25", "dueDate": "2026-10-25", "oneShot": true, "band": "adjacent", "notes": "Trinity River Audubon Center, Dallas."}, {"n": 7, "title": "Keller Church of Christ Fall Festival", "type": "happening", "town": "Keller", "drive": "15", "when": "Sat Oct 24, 3-5pm", "why": "Free Old Town Keller fall festival — petting zoo, inflatables, trunk-or-treat and free food, short and close to home.", "stretch": false, "maybe_review": false, "kind": "fall festival", "when_or_hours": "Sat Oct 24, 3-5pm", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "205 S Elm St, Old Town Keller. Free."}, {"n": 8, "title": "12th Annual Spooktacular Fall Festival", "type": "happening", "town": "Fort Worth", "drive": "20", "when": "Sat Oct 24, 10am", "why": "Medical City Alliance's 12th Spooktacular — trick-or-treating, hourly costume contests, face painting, games and free food; bring a children's book to donate.", "stretch": false, "maybe_review": false, "kind": "fall festival", "when_or_hours": "Sat Oct 24, 2026", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "core", "notes": "3101 N Tarrant Pkwy, Fort Worth (Alliance). Admission: a child's storybook donation."}, {"n": 9, "title": "Murphy Middle School Fall Festival", "type": "happening", "town": "Murphy", "drive": "55", "when": "Sat Oct 24, 2-7pm", "why": "New-town stretch: free school fall festival in Murphy with vendor booths, games, bounce houses and performances — browsing, not a staged program.", "stretch": true, "maybe_review": false, "kind": "fall festival", "when_or_hours": "Sat Oct 24, 2-7pm", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "stretch", "notes": "Murphy Middle School, 620 N Murphy Rd, Murphy. Free admission."}, {"n": 10, "title": "Pumpkins on the Prairie Market", "type": "happening", "town": "Frisco", "drive": "50", "when": "Sat Oct 24", "why": "Vendor market day inside Frisco's Pumpkins on the Prairie patch at Grace Avenue UMC — local makers plus the patch itself.", "stretch": false, "maybe_review": false, "kind": "market", "when_or_hours": "Sat Oct 24, 2026", "startDate": "2026-10-24", "dueDate": "2026-10-24", "oneShot": true, "band": "adjacent", "notes": "Grace Avenue UMC, Main St, Frisco. Free."}, {"n": 11, "title": "Caminata de Aves — Trinity River Audubon Center", "type": "happening", "town": "Dallas", "drive": "50", "when": "Sat Oct 31, 9-10:30am", "why": "Spanish-language guided bird walk (caminata de aves) at TRAC — same great trails, a different lens on fall migration.", "stretch": false, "maybe_review": false, "kind": "bird walk", "when_or_hours": "Sat Oct 31, 9-10:30am", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "adjacent", "notes": "Trinity River Audubon Center, Dallas."}, {"n": 12, "title": "Celebración de Vida y Cultura — Artes de la Rosa", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Oct 31, parade 10am, festival 11:30am-5pm", "why": "Fort Worth's longtime Dia de los Muertos parade up North Main to Marine Park, then a free festival with mariachi, ballet folklorico, opera, artists and food vendors.", "stretch": false, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sat Oct 31, parade 10-11:30am; festival to 5pm", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "core", "notes": "Marine Park / North Main St, Fort Worth. Free."}, {"n": 13, "title": "Dallas Día de los Muertos Parade & Festival", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat Oct 31, 4-10pm, parade 7pm", "why": "Seventh annual Dallas Dia festival at City Hall Plaza — floats, lowriders, painted ponies, stage performers and elaborate catrina costumes. Daytime start; parade is at 7pm.", "stretch": false, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sat Oct 31, 4-10pm; parade 7pm", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "adjacent", "notes": "Dallas City Hall, 1500 Marilla St. Free admission."}, {"n": 14, "title": "Stage Fright: A Halloween Family Festival", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat Oct 31", "why": "Free Halloween family festival at Sammons Park — stick-or-treat with Dallas PD units, costume contest, DJ dance party and petting zoo.", "stretch": false, "maybe_review": false, "kind": "halloween festival", "when_or_hours": "Sat Oct 31, 2026", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "adjacent", "notes": "Sammons Park, Dallas. Free; RSVP requested."}, {"n": 15, "title": "Third Annual Día de los Muertos Celebration — La Cabrona", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sun Nov 1, 11am-5pm", "why": "Street-closed Dia festival in the Artisan Circle / Crockett St area — Cultura Markets vendors, mariachi, street tacos and elote, and a roaming Catrina. Free to attend.", "stretch": false, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sun Nov 1, 11am-5pm", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "core", "notes": "La Cabrona Cocina Mexicana, 2933 Crockett St, Fort Worth. Free, free parking."}, {"n": 16, "title": "Día de los Muertos at Clark Gardens", "type": "happening", "town": "Weatherford", "drive": "55", "when": "Sun Nov 1", "why": "Members' Dia gathering at Clark Gardens — music, art, activities and remembrance in the gardens. RSVP by Oct 26 noted on the garden's listing.", "stretch": false, "maybe_review": false, "kind": "garden event", "when_or_hours": "Sun Nov 1, 2026", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "stretch", "notes": "Clark Gardens, 567 Maddux Rd, Weatherford. Members invited; RSVP by Oct 26."}, {"n": 17, "title": "Dallas Card Show", "type": "happening", "town": "Allen", "drive": "55", "when": "Thu-Sun Nov 5-8", "why": "The big Allen card show at the Marriott Dallas Allen Hotel & Convention Center — sports cards, TCG and memorabilia across four days.", "stretch": true, "maybe_review": false, "kind": "card show", "when_or_hours": "Thu-Sun Nov 5-8, 2026", "startDate": "2026-11-05", "dueDate": "2026-11-08", "oneShot": false, "band": "stretch", "notes": "Marriott Dallas Allen Hotel & Convention Center, Allen."}, {"n": 18, "title": "Festival at the Switchyard", "type": "happening", "town": "Carrollton", "drive": "35", "when": "Sat Nov 7", "why": "Carrollton's free downtown railroad festival — all-day concerts (Toad the Wet Sprocket, Eve 6, Wheatus), free rides and games on the historic square.", "stretch": true, "maybe_review": false, "kind": "festival", "when_or_hours": "Sat Nov 7, 2026", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Historic Downtown Carrollton. Free admission, parking, rides and concerts."}, {"n": 19, "title": "Fall Japanese Festival — Fort Worth Botanic Garden", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat-Sun Nov 7-8, 9am-5pm", "why": "Taiko drumming, tea ceremonies, music, vendors and food trucks in the Japanese Garden at peak fall maple color. Members free.", "stretch": false, "maybe_review": false, "kind": "garden festival", "when_or_hours": "Sat-Sun Nov 7-8, 9am-5pm", "startDate": "2026-11-07", "dueDate": "2026-11-08", "oneShot": false, "band": "core", "notes": "Fort Worth Botanic Garden, 3220 Botanic Garden Blvd."}, {"n": 20, "title": "First Saturday Bird Walk — Audubon Dallas", "type": "happening", "town": "Irving", "drive": "30", "when": "Sat Nov 7, 8-10am", "why": "Free Audubon Dallas first-Saturday bird walk at John F. Burke Nature Preserve — a quiet preserve walk close to home.", "stretch": false, "maybe_review": false, "kind": "bird walk", "when_or_hours": "Sat Nov 7, 8-10am", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "John F. Burke Nature Preserve (Audubon Dallas listing). Free."}, {"n": 21, "title": "CANland Fall Festival 2026", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sat Nov 7, 1-4pm", "why": "Free inclusive fall festival at Movement City Church — interactive stations, live performance and community resources, built for kids of all abilities.", "stretch": false, "maybe_review": false, "kind": "fall festival", "when_or_hours": "Sat Nov 7, 1-4pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Movement City Church, 5301 Altamesa Blvd, Fort Worth. Free."}, {"n": 22, "title": "Elmwood Fall Festival and Art Market", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat Nov 7, 11am-3pm", "why": "Oak Cliff neighborhood block-party art market in downtown Elmwood — live music, food, drinks and local makers, small-scale and browsable.", "stretch": true, "maybe_review": false, "kind": "art market", "when_or_hours": "Sat Nov 7, 11am-3pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "adjacent", "notes": "Downtown Elmwood, Oak Cliff, Dallas. Free."}, {"n": 23, "title": "Cleburne Railroad Museum", "type": "place", "town": "Cleburne", "drive": "45", "when": "Tue-Sat 11am-4pm", "why": "Free railroad museum with 2,000+ artifacts and an HO-scale model train room, steps from the Layland Museum you already liked — Cleburne was a Santa Fe railroad town.", "stretch": false, "maybe_review": false, "kind": "museum", "when_or_hours": "Tue-Sat 11am-4pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "206 N Main St, Cleburne. Free admission."}, {"n": 24, "title": "Clark Gardens Botanical Park", "type": "place", "town": "Weatherford", "drive": "55", "when": "Mon-Sat 8am-5pm, Sun 10am-5pm", "why": "50-acre botanical park west of Weatherford — waterfalls, lakes, peacocks, a G-scale model train and wheelchair-accessible trails. $10 adults.", "stretch": true, "maybe_review": false, "kind": "garden", "when_or_hours": "Mon-Sat 8am-5pm, Sun 10am-5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "567 Maddux Rd, Weatherford. Admission $10 adults."}, {"n": 25, "title": "Acton Nature Center", "type": "place", "town": "Granbury", "drive": "55", "when": "Daily 6am-8pm", "why": "Free 74-acre Hood County preserve — bird blind, butterfly and hummingbird garden, and 5+ miles of prairie and woodland trails near Granbury.", "stretch": true, "maybe_review": false, "kind": "nature preserve", "when_or_hours": "Daily 6am-8pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "6900 Smoky Hill Ct, Granbury / Acton. Free, open 365 days."}, {"n": 26, "title": "Fort Worth Museum of Science and History", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Tue-Sat 10am-5pm, Sun noon-5pm", "why": "Cultural District staple — DinoLabs fossil dig, planetarium / Omni dome shows and hands-on science and Texas history exhibits.", "stretch": false, "maybe_review": false, "kind": "museum", "when_or_hours": "Tue-Sat 10am-5pm, Sun noon-5pm, closed Mon", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "1600 Gendy St, Fort Worth."}, {"n": 27, "title": "Modern Art Museum of Fort Worth", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Tue-Sun; free Fridays, half-price Sundays", "why": "Tadao Ando building, reflecting pond and outdoor sculpture — a calm Cultural District browse, with Cafe Modern for brunch. Free admission Fridays per fall guides.", "stretch": false, "maybe_review": false, "kind": "museum", "when_or_hours": "Tue-Sun; free Fridays, half-price Sundays", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "3200 Darnell St, Fort Worth (Cultural District)."}, {"n": 28, "title": "Holland Lake Park", "type": "place", "town": "Weatherford", "drive": "45", "when": "Daily 6am-10pm", "why": "Weatherford park with a large pond, hiking trails and historic log cabins to explore — an easy add to a Weatherford garden day.", "stretch": false, "maybe_review": false, "kind": "park", "when_or_hours": "Daily 6am-10pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "1419 Holland Lake Dr, Weatherford."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
