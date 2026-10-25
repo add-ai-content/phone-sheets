@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-10-25</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-10-25";
+const CARDS = [{"n": 1, "title": "Diwali Festival of Lights — Kaleidoscope Park", "type": "happening", "town": "Frisco", "drive": "50", "when": "Sun Nov 1, 3:30pm start", "why": "Frisco's Festival of Lights at Kaleidoscope Park — culture, music, dance and a drone show, hosted by DFW Gujarati Samaj. Starts mid-afternoon; registration required via friscodiwali.org.", "stretch": true, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sun Nov 1, 3:30–10pm", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "adjacent", "notes": "Kaleidoscope Park, 6635 Warren Pkwy, Frisco. Registration mandatory (friscodiwali.org). Runs into the evening; the daytime front half is the sweet spot."}, {"n": 2, "title": "Crown Hill Día de los Muertos Celebración", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sun Nov 1 exhibition 1–4pm; Mon Nov 2 main celebración 5:30–8pm", "why": "12th annual Hughes Family Tribute Center celebración at historic Crown Hill Memorial Park — Mayan dance by Grupo Pakal, folklórico, mariachi, Teatro Dallas and a regional art exhibition. Free.", "stretch": false, "maybe_review": false, "kind": "cultural festival", "when_or_hours": "Sun Nov 1, 1–4pm (exhibition); Mon Nov 2, 5:30–8pm (performances)", "startDate": "2026-11-01", "dueDate": "2026-11-02", "oneShot": false, "band": "adjacent", "notes": "Crown Hill Memorial Park and Mausoleum, Webb Chapel Rd, Dallas. Free admission. Art exhibition also open Sat Oct 31, 1–4pm."}, {"n": 3, "title": "FOODEESFEST Grand Prairie", "type": "happening", "town": "Grand Prairie", "drive": "30", "when": "Fri–Sun Nov 6–8", "why": "40+ food trucks plus craft vendors take over Grand Prairie Premium Outlets for three days — a browse-and-graze festival, no program to sit through.", "stretch": false, "maybe_review": false, "kind": "food festival", "when_or_hours": "Fri–Sun Nov 6–8, 2026", "startDate": "2026-11-06", "dueDate": "2026-11-08", "oneShot": false, "band": "core", "notes": "Grand Prairie Premium Outlets, 2950 W Interstate 20, Grand Prairie."}, {"n": 4, "title": "Grapevine Veterans Day Parade", "type": "happening", "town": "Grapevine", "drive": "20", "when": "Sat Nov 7, 10am", "why": "Veterans Day parade down Historic Main Street with a Veterans Fair behind the Town Square Gazebo afterward — small-town, morning, done by lunch.", "stretch": false, "maybe_review": false, "kind": "parade", "when_or_hours": "Sat Nov 7, 10am", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Historic Main Street, Grapevine. Free."}, {"n": 5, "title": "Chalk the Park", "type": "happening", "town": "Frisco", "drive": "50", "when": "Sat Nov 7 — artwork complete by 3pm, on display all day", "why": "Free chalk-art festival at Kaleidoscope Park: professional and local artists turn the pathways into a temporary open-air gallery. Vote in the People's Choice, then the winners are announced at the evening concert.", "stretch": true, "maybe_review": false, "kind": "art festival", "when_or_hours": "Sat Nov 7, 2026; art on display Nov 5–7, complete by 3pm Sat", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "adjacent", "notes": "Kaleidoscope Park, 6635 Warren Pkwy, Frisco. Free. City of Frisco listing: artwork on display November 5–7."}, {"n": 6, "title": "The Fort Worth Renaissance and Fine Art Festival", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat–Sun Nov 7–8, from 11am", "why": "New two-day fine-art festival on Stanley Avenue — fine art, maker demonstrations and performances in a single walkable stretch. Free per festival listings.", "stretch": false, "maybe_review": false, "kind": "art festival", "when_or_hours": "Sat–Sun Nov 7–8, from 11am", "startDate": "2026-11-07", "dueDate": "2026-11-08", "oneShot": false, "band": "core", "notes": "2836 Stanley Ave, Fort Worth."}, {"n": 7, "title": "The Big Smoke Show BBQ Competition & Festival", "type": "happening", "town": "Crowley", "drive": "35", "when": "Sat Nov 7, 1–9pm", "why": "IBCA-sanctioned BBQ championship in downtown Crowley — competing pitmasters, food vendors, artisan stalls, live music and lucha libre on Main Street. Ticketed, from about $13.", "stretch": false, "maybe_review": false, "kind": "bbq festival", "when_or_hours": "Sat Nov 7, 1–9pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Crowley Crossing, 201 E Main St, Crowley. Ticketed event (city of Crowley listing)."}, {"n": 8, "title": "Disney's Frozen: The Broadway Musical — Casa Mañana", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Nov 7 – Sun Nov 15; weekend matinees 2pm", "why": "Casa Mañana's regional production of the Broadway musical in its theatre-in-the-round — the 2pm Saturday and Sunday matinees keep it a daytime outing. Tickets from $39.", "stretch": true, "maybe_review": false, "kind": "theatre", "when_or_hours": "Nov 7–15, 2026; Sat Nov 7 & Sun Nov 8 matinees 2pm", "startDate": "2026-11-07", "dueDate": "2026-11-15", "oneShot": false, "band": "core", "notes": "Casa Mañana Theatre, Fort Worth (Cultural District). Run dates per Casa Mañana's Oct 21, 2026 press release."}, {"n": 9, "title": "Ruby Creek Family Farm Fall Festival", "type": "happening", "town": "Aurora", "drive": "40", "when": "Fri–Sun through Nov 15", "why": "Working family farm in Aurora, same family for almost a century — pumpkin patch, corn maze, farm animals and a covered hayride out to hand-feed the longhorn herd. $15 covers 20+ attractions; hayride $3.", "stretch": true, "maybe_review": false, "kind": "farm festival", "when_or_hours": "Fri, Sat & Sun, Oct 9 – Nov 15, 2026", "startDate": "2026-10-30", "dueDate": "2026-11-15", "oneShot": false, "band": "adjacent", "notes": "Ruby Creek Family Farm, Aurora, TX. Admission $15, under 2 free, parking free."}, {"n": 10, "title": "Tarrant County Veterans Day Parade", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Wed Nov 11, 11am", "why": "The 2026 parade — theme 'Saluting America: 250 Years of Veterans in Service' — steps off downtown at 11am behind a Marine F/A-18 flyover, with bands, JROTC units and veteran organizations. Free.", "stretch": false, "maybe_review": false, "kind": "parade", "when_or_hours": "Wed Nov 11, opening ceremony 10:30am, parade 11am–12:30pm", "startDate": "2026-11-11", "dueDate": "2026-11-11", "oneShot": true, "band": "core", "notes": "Downtown Fort Worth, from Panther Island Pavilion. Free. fw2026parade.org."}, {"n": 11, "title": "NTX TCG Show — Lewisville", "type": "happening", "town": "Lewisville", "drive": "35", "when": "Sat–Sun Nov 14–15", "why": "NTX TCG's biggest all-TCG show yet: 800+ vendor tables across both floors of NTX Arena — Pokémon, One Piece, Dragon Ball, Lorcana, Yu-Gi-Oh!, with on-site pre-grading. Free parking.", "stretch": true, "maybe_review": false, "kind": "card show", "when_or_hours": "Sat–Sun Nov 14–15, 2026", "startDate": "2026-11-14", "dueDate": "2026-11-15", "oneShot": false, "band": "core", "notes": "NTX Arena, Lewisville. Kids 5 and under free; VIP early entry available."}, {"n": 12, "title": "Bureau of Engraving & Printing Money Factory Tour", "type": "place", "town": "Fort Worth", "drive": "20", "when": "Tue–Fri 8:30am–3:30pm", "why": "Watch more than half the nation's currency being printed from the enclosed walkway above the production floor at the Western Currency Facility — free self-guided tour, film and two floors of exhibits. Last tour 2:30pm; no phones or cameras inside.", "stretch": false, "maybe_review": false, "kind": "tour", "when_or_hours": "Tue–Fri 8:30am–3:30pm, last tour 2:30pm; closed weekends and federal holidays", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "9100 Blue Mound Rd, Fort Worth. Free. bep.gov visitor center page."}, {"n": 13, "title": "Vintage Flying Museum", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Fri 10am–5pm, Sat 9am–5pm, Sun noon–5pm", "why": "Working hangar museum at Meacham Airport — 30+ airworthy vintage aircraft, an active restoration hangar, CAF and Greatest Generation Aircraft under one roof. $12 adults.", "stretch": false, "maybe_review": false, "kind": "aviation museum", "when_or_hours": "Fri 10am–5pm, Sat 9am–5pm, Sun 12–5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "505 NW 38th St, Fort Worth (Meacham International Airport)."}, {"n": 14, "title": "American Airlines C.R. Smith Museum", "type": "place", "town": "Fort Worth", "drive": "20", "when": "Thu 10am–2pm, Fri–Sat 10am–4pm", "why": "American Airlines' own museum on Hwy 360 — step aboard the restored 1940 DC-3 Flagship Knoxville, try the MD-80 cockpit tour and the baggage-loader challenge. Short hours, so it pairs well with a DFW plane-spotting stop.", "stretch": false, "maybe_review": false, "kind": "aviation museum", "when_or_hours": "Thu 10am–2pm, Fri–Sat 10am–4pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "4601 Hwy 360, Fort Worth. Admission $9 per museum listings."}, {"n": 15, "title": "Arlington Museum of Art", "type": "place", "town": "Arlington", "drive": "25", "when": "Tue–Sat 10am–5pm, Sun 1–5pm", "why": "The museum's new Entertainment District home is running 'Arlington 150: Stories of a Legacy' — 150 years of Arlington art and history built with 75+ organizations. $10, runs through Feb 28.", "stretch": false, "maybe_review": false, "kind": "art museum", "when_or_hours": "Tue–Sat 10am–5pm, Sun 1–5pm, closed Mon", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "1200 Ballpark Way, Arlington. Current exhibition opened Oct 17, 2026."}, {"n": 16, "title": "Spiral Diner & Bakery", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Tue–Thu 9am–9pm, Fri–Sat 8am–10pm, Sun 8am–8pm", "why": "Stretch pick: Fort Worth's all-vegan diner since 2002, on Magnolia Ave — full diner menu (burgers, Frito pie, cinnamon-roll pancakes) plus a bakery case and Fri–Sun fresh donuts. Daytime-friendly hours.", "stretch": true, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Tue–Thu 9am–9pm, Fri–Sat 8am–10pm, Sun 8am–8pm; closed Mon", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "1314 W Magnolia Ave, Fort Worth. Clear reason: Texas' best-known vegan diner, a cuisine stretch."}, {"n": 17, "title": "Elm Fork Nature Preserve", "type": "place", "town": "Carrollton", "drive": "30", "when": "Daily, dawn to dusk", "why": "40 acres of never-clear-cut woodland in McInnish Park — a one-mile soft-surface loop to a 14-acre pond known for herons, egrets, hawks and both local owls. Free; note the preserve is no-pets.", "stretch": false, "maybe_review": false, "kind": "nature preserve", "when_or_hours": "Daily, 30 min before sunrise to 30 min after sunset", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "2335 Sandy Lake Rd, Carrollton (inside McInnish Sports Complex). Free."}, {"n": 18, "title": "Dallas Farmers Market", "type": "place", "town": "Dallas", "drive": "40", "when": "The Shed: Sat 9am–5pm, Sun 10am–5pm; Market hall daily 10am–7pm", "why": "Dallas's farmers market since 1941 — the open-air Shed fills with 100+ Texas farmers, ranchers and makers on weekends, and the indoor Market food hall runs daily. One flagship market, not a stack of small ones.", "stretch": false, "maybe_review": false, "kind": "market", "when_or_hours": "The Shed Sat 9am–5pm, Sun 10am–5pm; The Market daily 10am–7pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "920 S Harwood St, Dallas. Free admission, rain or shine."}, {"n": 19, "title": "The Sixth Floor Museum at Dealey Plaza", "type": "place", "town": "Dallas", "drive": "40", "when": "Wed–Sun 10am–5pm", "why": "'John F. Kennedy and the Memory of a Nation' in the former Texas School Book Depository — the recreated sniper's perch overlooking Dealey Plaza, with timed-entry tickets worth booking ahead.", "stretch": false, "maybe_review": false, "kind": "history museum", "when_or_hours": "Wed–Sun 10am–5pm, closed Mon–Tue", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "411 Elm St, Dallas. Timed entry; advance online tickets recommended."}, {"n": 20, "title": "Dallas Heritage Village", "type": "place", "town": "Dallas", "drive": "45", "when": "Tue–Sat 10am–4pm, Sun noon–4pm", "why": "38 historic buildings (1840–1910) gathered at Old City Park — a Victorian Main Street, railroad depot, farmstead with livestock and the pre-Civil War Millermore home, one block south of the Farmers Market. $10.", "stretch": false, "maybe_review": false, "kind": "history museum", "when_or_hours": "Tue–Sat 10am–4pm, Sun 12–4pm, closed Mon", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "1515 S Harwood St, Dallas."}, {"n": 21, "title": "African American Museum of Dallas", "type": "place", "town": "Dallas", "drive": "45", "when": "Tue–Fri 11am–5pm, Sat 10am–5pm", "why": "The only museum of its kind in the Southwest — one of the largest African American folk-art collections in the US, four galleries at Fair Park, and admission is free. The Mandela exhibition runs through Nov 1.", "stretch": false, "maybe_review": false, "kind": "museum", "when_or_hours": "Tue–Fri 11am–5pm, Sat 10am–5pm; closed Sun–Mon", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "3536 Grand Ave, Dallas (Fair Park). Free admission and free self-parking."}, {"n": 22, "title": "Crow Museum of Asian Art", "type": "place", "town": "Dallas", "drive": "40", "when": "Tue–Sun 11am–5pm", "why": "Free Arts District museum devoted entirely to Asian art — China, Japan, Korea, India and Southeast Asia galleries plus a quiet sculpture garden. A new bamboo-art exhibition opens Nov 7.", "stretch": false, "maybe_review": false, "kind": "art museum", "when_or_hours": "Tue–Sun 11am–5pm, closed Mon", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "2010 Flora St, Dallas (Arts District). Free; $7 suggested donation."}, {"n": 23, "title": "George W. Bush Presidential Center", "type": "place", "town": "Dallas", "drive": "40", "when": "Mon–Sat 9am–5pm, Sun noon–5pm", "why": "Presidential museum on the SMU campus — full-size Oval Office replica, the 9/11 exhibit and a 15-acre native Texas park outside. Timely hook: admission is free for everyone on Veterans Day, Wed Nov 11.", "stretch": false, "maybe_review": false, "kind": "history museum", "when_or_hours": "Mon–Sat 9am–5pm, Sun 12–5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "2943 SMU Blvd, Dallas. Free admission day Wed Nov 11, 2026 per bushcenter.org."}, {"n": 24, "title": "El Fenix", "type": "place", "town": "Dallas", "drive": "40", "when": "Daily 11am–10pm (Fri–Sat til 11pm)", "why": "Clear reason: founded 1918 and credited as the originator of Tex-Mex — Dallas's oldest restaurant, still at its 1965 McKinney Ave flagship. Lunch-friendly, no booking needed.", "stretch": false, "maybe_review": false, "kind": "restaurant", "when_or_hours": "Daily 11am–10pm; Fri–Sat 11am–11pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "1601 McKinney Ave, Dallas (downtown flagship)."}, {"n": 25, "title": "Jimmy's Food Store", "type": "place", "town": "Dallas", "drive": "45", "when": "Mon–Sat 9am–7pm", "why": "Clear reason: the DiCarlo family's Italian market and deli since 1966 — housemade sausage, meatballs and lasagna, all-Italian wine room, and a sandwich counter regulars call the best in DFW. Closed Sundays.", "stretch": false, "maybe_review": false, "kind": "deli / market", "when_or_hours": "Mon–Sat 9am–7pm, closed Sun; sandwich counter 10am–6:30pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "4901 Bryan St, Dallas. Mostly takeout; small outdoor table."}, {"n": 26, "title": "Heritage Farmstead Museum", "type": "place", "town": "Plano", "drive": "45", "when": "Thu–Sat 10am–2pm", "why": "4.5-acre living-history farm in the middle of Plano — the 1891 Farrell-Wilson House, 15 historic buildings, livestock and $2 wagon rides. Grounds $5, house tour $5.", "stretch": false, "maybe_review": false, "kind": "history museum", "when_or_hours": "Thu–Sat 10am–2pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "1900 W 15th St, Plano. Note: the museum lists a special-event closure Oct 24–31; regular hours resume after."}, {"n": 27, "title": "Interurban Railway Museum", "type": "place", "town": "Plano", "drive": "45", "when": "Tue–Fri 11am–4pm, Sat 1–5pm", "why": "Free museum in the last surviving Texas Electric Railway substation — tour Railway Post Office Car #360, try the hands-on electricity exhibits and the working O-scale layout, in Haggard Park by the DART station.", "stretch": false, "maybe_review": false, "kind": "museum", "when_or_hours": "Tue–Fri 11am–4pm, Sat 1–5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "901 E 15th St, Plano. Free; small donation suggested."}, {"n": 28, "title": "John Bunker Sands Wetland Center", "type": "place", "town": "Combine", "drive": "60", "when": "Tue–Fri 8am–4pm, Sat 7am–4pm", "why": "Stretch pick: a 2,000-acre constructed wetland southeast of Dallas with a boardwalk out into the habitat, observation deck and first-Saturday guided bird tours — bald eagles and winter waterfowl season is starting. $5.", "stretch": true, "maybe_review": false, "kind": "nature center", "when_or_hours": "Tue–Fri 8am–4pm, Sat 7am–4pm; closed Sun–Mon", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "655 Martin Ln, Combine, TX. Follow the center's own directions — map apps can misroute."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
