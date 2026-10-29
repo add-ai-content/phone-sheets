@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-10-29</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-10-29";
+const CARDS = [{"n": 1, "title": "Snakes Are Not Spooky — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sat Oct 31, 9am, 10am & 11am sessions", "why": "Halloween morning at the Nature Center: a naturalist makes the case that snakes aren't spooky — meet them up close and learn what they actually do for the refuge. Pre-registration required, $5 with admission.", "stretch": false, "maybe_review": false, "kind": "nature program", "when_or_hours": "Sat Oct 31, sessions 9am, 10am, 11am", "startDate": "2026-10-31", "dueDate": "2026-10-31", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Pre-register via City of Fort Worth ActiveCommunities; $5 with paid admission, members $3."}, {"n": 2, "title": "Fruits of Prescribed Burns — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sun Nov 1, 9am & 1pm", "why": "Walk the refuge with a naturalist and see what a prescribed burn leaves behind — the tools, the regrowth, and the birds and plants that move in after fire. Pre-registration required, $5 with admission.", "stretch": false, "maybe_review": false, "kind": "nature walk", "when_or_hours": "Sun Nov 1, 9am & 1pm", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Pre-register via ActiveCommunities (activities 54197/54198); $5 with paid admission, members $3."}, {"n": 3, "title": "DFW Card Show — Southlake", "type": "happening", "town": "Southlake", "drive": "20", "when": "Sun Nov 1, 10am–5pm", "why": "Sports cards, Pokémon and TCG at The Westin Dallas Southlake — dealers buying, selling and trading, and you're welcome to bring cards to trade or sell to vendors. Admission runs $3–$5 at most DFW Card Show stops, kids free.", "stretch": false, "maybe_review": false, "kind": "card show", "when_or_hours": "Sun Nov 1, 10am–5pm", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "core", "notes": "The Westin Dallas Southlake, 1200 E State Hwy 114, Southlake. dfwcardshows.com."}, {"n": 4, "title": "DMA Free First Sundays: Access for All", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sun Nov 1, 11am–5pm", "why": "The Dallas Museum of Art is free on the first Sunday of the month, special exhibitions included — plus Open Studio (noon–4pm) and a docent-led Collection Highlights tour (2–3pm). 5,000 years of art, no ticket cost.", "stretch": false, "maybe_review": false, "kind": "museum day", "when_or_hours": "Sun Nov 1, 11am–5pm; Open Studio noon–4pm", "startDate": "2026-11-01", "dueDate": "2026-11-01", "oneShot": true, "band": "adjacent", "notes": "Dallas Museum of Art, 1717 N Harwood St, Dallas. Free via Art Bridges Access for All."}, {"n": 5, "title": "Sunrise Photography — Fort Worth Nature Center — Nov 6", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Fri Nov 6, 6:15am", "why": "Photograph the refuge in the moments before sunrise with the Nature Center crew — bring your camera (the FZ80 counts) and submit up to 10 shots afterward. Free with paid admission, pre-registration required.", "stretch": false, "maybe_review": false, "kind": "photography", "when_or_hours": "Fri Nov 6, 6:15am", "startDate": "2026-11-06", "dueDate": "2026-11-06", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Pre-register (activity 54256); free with paid admission."}, {"n": 6, "title": "Greek Food Festival of Dallas", "type": "happening", "town": "Dallas", "drive": "50", "when": "Fri–Sun Nov 6–8, Fri/Sat 11am–10pm, Sun 11am–5pm", "why": "Nearly seven decades running at Holy Trinity: homemade Greek dishes and pastries, cooking demos, folk dancing, church tours and a marketplace full of imports. Go for lunch and graze — gyros, souvlaki, baklava cheesecake, loukoumades.", "stretch": true, "maybe_review": false, "kind": "food festival", "when_or_hours": "Fri Nov 6 & Sat Nov 7, 11am–10pm; Sun Nov 8, 11am–5pm", "startDate": "2026-11-06", "dueDate": "2026-11-08", "oneShot": false, "band": "adjacent", "notes": "Holy Trinity Greek Orthodox Church, 13555 Hillcrest Rd, Dallas. General admission $11; kids 10 & under free; military/teachers/first responders free with ID."}, {"n": 7, "title": "First Saturday: Pollinator Paradise — Blackland Prairie Raptor Center", "type": "happening", "town": "Lucas", "drive": "55", "when": "Sat Nov 7, 9am–noon", "why": "The raptor center's one public morning a month, and November's theme is pollinators: a live raptor program with the ambassador birds up close, prairie walks, and how to attract backyard wildlife and certify your own backyard station. Right in your wheelhouse — birds plus the garden.", "stretch": true, "maybe_review": false, "kind": "raptors / pollinators", "when_or_hours": "Sat Nov 7, 9am–noon", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "adjacent", "notes": "Blackland Prairie Raptor Center, Brockdale Park, 1625 Brockdale Park Rd, Lucas/Allen. Tickets via bpraptorcenter.org support the center."}, {"n": 8, "title": "Trinity High School Craft Fair", "type": "happening", "town": "Euless", "drive": "15", "when": "Sat Nov 7, 9am–5pm", "why": "Big school craft fair five minutes-ish away in Euless — handmade and homegrown vendors all day, free entry. Easy browsing stop, no commitment.", "stretch": false, "maybe_review": false, "kind": "craft fair", "when_or_hours": "Sat Nov 7, 9am–5pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Trinity High School, 500 N Industrial Blvd, Euless. Free admission (DFW Craft Shows listing)."}, {"n": 9, "title": "Hometown Christmas Craft Show", "type": "happening", "town": "Midlothian", "drive": "45", "when": "Sat Nov 7, 9am–4pm", "why": "New town on the board: Midlothian's hometown Christmas craft show at the conference center — early holiday browsing without the December crush. $5 entry.", "stretch": true, "maybe_review": false, "kind": "craft fair", "when_or_hours": "Sat Nov 7, 9am–4pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "adjacent", "notes": "Midlothian Conference Center, 1 Community Circle Dr, Midlothian. $5 admission."}, {"n": 10, "title": "The Lake Granbury Holiday Market", "type": "happening", "town": "Granbury", "drive": "55", "when": "Sat Nov 7, 10am–5pm", "why": "Indoor-and-outdoor holiday market on the lake side of a town you already like — artisan vendors all day, and the square is right there if you want to make a day of it.", "stretch": false, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Sat Nov 7, 10am–5pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "adjacent", "notes": "Lake Granbury area, Granbury (DFW Craft Shows featured listing, 10am–5pm)."}, {"n": 11, "title": "Backyard Composting Class — Colleyville Public Library", "type": "happening", "town": "Colleyville", "drive": "15", "when": "Sat Nov 7, 11:30am–12:30pm", "why": "Free one-hour class at Colleyville Library: turn kitchen scraps, coffee grounds and leaves into garden gold — starting a pile from scratch, maintaining it, and using the finished compost. Squarely a gardener's hour. Register online or at 817-503-1155.", "stretch": false, "maybe_review": false, "kind": "garden class", "when_or_hours": "Sat Nov 7, 11:30am–12:30pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Colleyville Public Library, upstairs meeting room. Free; registration via the city library."}, {"n": 12, "title": "Chefs For Farmers Food & Wine Festival", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat–Sun Nov 7–8", "why": "Dallas's big chef-and-farmer weekend at Old City Park: a strolling feast of the city's standout restaurant talent cooking with Texas farm produce. Ticketed and foodie-serious — the one big staged festival in this deck, included because the food is the point.", "stretch": false, "maybe_review": false, "kind": "food festival", "when_or_hours": "Sat–Sun Nov 7–8 (Main Event, Old City Park)", "startDate": "2026-11-07", "dueDate": "2026-11-08", "oneShot": false, "band": "adjacent", "notes": "Old City Park, Dallas. Ticketed; see chefsforfarmers.com for Main Event session times and prices."}, {"n": 13, "title": "Forest Fungi — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sun Nov 8, 10am & 1pm", "why": "Search the forest floor with a naturalist for mushrooms and other fungi and learn how they keep the woods healthy — prime fall-forest subject matter for the camera, too. Pre-registration required, $5 with admission.", "stretch": false, "maybe_review": false, "kind": "nature walk", "when_or_hours": "Sun Nov 8, 10am & 1pm", "startDate": "2026-11-08", "dueDate": "2026-11-08", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Pre-register via ActiveCommunities (activities 54138/54139); $5 with paid admission, members $3."}, {"n": 14, "title": "Texas Veterans Day Parade — Arlington", "type": "happening", "town": "Arlington", "drive": "25", "when": "Wed Nov 11, services area from 2pm, parade 5:30pm", "why": "Third annual Texas Veterans Day Parade in Arlington's Entertainment District — veterans, military units, marching bands and static equipment displays, with a free Veteran Services Area open from 2pm and a drone show right after the parade. This year's theme marks the nation's 250th.", "stretch": false, "maybe_review": false, "kind": "parade", "when_or_hours": "Wed Nov 11, Veteran Services Area 2–7pm; parade 5:30pm", "startDate": "2026-11-11", "dueDate": "2026-11-11", "oneShot": true, "band": "core", "notes": "Arlington Entertainment District. Parade steps off 5:30pm; services area 2–7pm. The daytime services/displays half is the low-key part."}, {"n": 15, "title": "Holiday at the Arboretum — Opening Day", "type": "happening", "town": "Dallas", "drive": "50", "when": "Wed Nov 11, daytime 9am–4pm (season runs Nov 11–Jan 3)", "why": "Opening day of Holiday at the Arboretum — and it's the final farewell year for the famous 12 Days of Christmas gazebos after more than a decade. Daytime admission gets the gardens and gazebos without the night crowds; evenings run 5–10pm if you ever want the lights version.", "stretch": false, "maybe_review": false, "kind": "garden exhibit", "when_or_hours": "Opens Wed Nov 11; daytime 9am–4pm, Holiday at Night 5–10pm, through Jan 3", "startDate": "2026-11-11", "dueDate": "2026-11-11", "oneShot": false, "band": "adjacent", "notes": "Dallas Arboretum, 8525 Garland Rd, Dallas. Daytime adults about $22–$26; buy online in advance."}, {"n": 16, "title": "FWAS General Meeting — Soaring Over the Suburbs: Mississippi Kites", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Thu Nov 12, evening program", "why": "Fort Worth Audubon Society's November meeting: Dr. Ben Skipper of Angelo State on Mississippi Kites in Texas — the raptors that nest in suburban trees and hawk insects over neighborhoods like yours. Evening program (that's why it's at the back of the deck), but the topic is pure backyard.", "stretch": false, "maybe_review": false, "kind": "bird talk", "when_or_hours": "Thu Nov 12, evening (FWAS general meeting)", "startDate": "2026-11-12", "dueDate": "2026-11-12", "oneShot": true, "band": "core", "notes": "New meeting room for 2026–27: Room 124, Medical Education & Training Building (Montgomery St & Bunting Ave), UNT Health Fort Worth; use Parking Lot 19. fwas.org."}, {"n": 17, "title": "Settlement to City Museums", "type": "place", "town": "Grapevine", "drive": "20", "when": "Fri–Sun 10am–4pm, free", "why": "A cluster of small free museums at Ted R. Ware Plaza: the Grapevine Historical Museum in the replica ice house, the Cotton Ginner's Museum, the Donald Schoolhouse and the Keeling House — early Grapevine farm, family and industry life, volunteer-led and unhurried.", "stretch": false, "maybe_review": false, "kind": "local history museum", "when_or_hours": "Fri–Sun 10am–4pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "206 W Hudgins St, Grapevine. Admission free. GrapevineMuseums.com."}, {"n": 18, "title": "Coppell Nature Park & Biodiversity Education Center", "type": "place", "town": "Coppell", "drive": "30", "when": "Park daily dawn–dusk; education center Tue–Sat 9am–noon", "why": "66 hidden acres inside Wagon Wheel Park: five-plus miles of shaded forest, prairie and creek trails, a birding deck, and a small free education center with hands-on wildlife exhibits. Reviewers keep calling it the walk in the woods you forget is in the city.", "stretch": false, "maybe_review": false, "kind": "nature park", "when_or_hours": "Park daily dawn–dusk (listed 6am–10pm); Biodiversity Education Center Tue–Sat 9am–noon", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "367 Freeport Pkwy, Coppell. Free admission; trails are mulch — strollers not allowed in the nature park itself."}, {"n": 19, "title": "Nasher Sculpture Center", "type": "place", "town": "Dallas", "drive": "45", "when": "Tue–Sun 11am–5pm", "why": "Renzo Piano's roofless museum in the Arts District: 300+ modern masterpieces — Calder, Giacometti, Matisse, Picasso, Rodin — split between light-filled galleries and a 1.4-acre sculpture garden. Calm, small and very walkable.", "stretch": false, "maybe_review": false, "kind": "art museum", "when_or_hours": "Tue–Sun 11am–5pm (first Saturday of the month opens 10am)", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "2001 Flora St, Dallas. Adults $10, seniors $7 (per the center's published info)."}, {"n": 20, "title": "Meadows Museum", "type": "place", "town": "Dallas", "drive": "45", "when": "Tue–Sat 10am–5pm, Thu til 9pm, Sun 1–5pm", "why": "SMU's 'small Prado for Texas' — one of the largest Spanish art collections outside Spain, El Greco to Picasso, plus an outdoor sculpture plaza. $12 adults, $10 seniors, and free on Thursday evenings after 5pm.", "stretch": false, "maybe_review": false, "kind": "art museum", "when_or_hours": "Tue–Sat 10am–5pm; Thu 10am–9pm; Sun 1–5pm; closed Mon", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "5900 Bishop Blvd, Dallas (SMU campus). Free parking in the museum garage."}, {"n": 21, "title": "Meow Wolf Grapevine — The Real Unreal", "type": "place", "town": "Grapevine", "drive": "20", "when": "Daily from 10am", "why": "A different animal entirely: 70+ immersive, psychedelic rooms inside Grapevine Mills — secret passages, a missing-kid storyline, and art you climb through. Daytime entry from 10am; general admission starts around $35. Filed as a stretch because it's a new type of outing for the board.", "stretch": true, "maybe_review": false, "kind": "immersive art", "when_or_hours": "Mon–Wed 10am–9pm; Thu–Sat 10am–10pm; Sun 10am–9pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "3000 Grapevine Mills Pkwy, Suite 253, Grapevine. Timed tickets online; can get crowded — weekday mornings are quietest."}, {"n": 22, "title": "Famous Mineral Water Company", "type": "place", "town": "Mineral Wells", "drive": "58", "when": "Mon–Fri 9am–5:30pm, Sat 9am–5pm", "why": "The original Crazy Water well, bottling since 1913 and the only mineral well still operating in Mineral Wells: taste the numbered waters free, get a mineral-water soda or float at the pavilion, and stock up by the bottle or case. Pairs with a look at the Baker Hotel a few blocks away.", "stretch": true, "maybe_review": false, "kind": "historic food/drink stop", "when_or_hours": "Mon–Fri 9am–5:30pm; Sat 9am–5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "209 NW 6th St, Mineral Wells. drinkcrazywater.com."}, {"n": 23, "title": "Texas Recycles Day — Heard Museum", "type": "happening", "town": "McKinney", "drive": "55", "when": "Fri–Sun Nov 13–15, museum hours", "why": "Bring one plastic bottle or single-use bag and admission to the Heard is free all weekend — 289 acres of sanctuary trails, the indoor museum, and Dinosaurs Live! in its fall run. The cheapest possible first (or return) Heard day.", "stretch": false, "maybe_review": false, "kind": "nature / museum day", "when_or_hours": "Fri–Sun Nov 13–15 (Heard hours: Fri/Sat 9am–5pm, Sun 1–5pm)", "startDate": "2026-11-13", "dueDate": "2026-11-15", "oneShot": false, "band": "adjacent", "notes": "Heard Natural Science Museum & Wildlife Sanctuary, 1 Nature Place, McKinney. Free with a clean, dry recyclable item per visitor; regular admission otherwise."}, {"n": 24, "title": "Fall for the Birds + Final Native Plant Sale — Dogwood Canyon", "type": "happening", "town": "Cedar Hill", "drive": "40", "when": "Sat Nov 14, 9am–2pm", "why": "Dogwood Canyon's last native plant sale of the year — remaining fall inventory — wrapped in bird-friendly programming and conservation activities at the canyon. Plants for the pollinator beds plus a canyon walk in one trip.", "stretch": false, "maybe_review": false, "kind": "native plant sale", "when_or_hours": "Sat Nov 14, 9am–2pm", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "Dogwood Canyon Audubon Center, 1206 W FM 1382, Cedar Hill. Selection is remaining fall inventory, so early is better."}, {"n": 25, "title": "Veteran's Ruck March — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sat Nov 14, 9–11am", "why": "A Veterans Day-weekend trail march at the refuge honoring those who 'carried the weight' — lace up, pack up, and move with a purpose. $5 with admission; free for veterans and military personnel. Pre-registration required.", "stretch": false, "maybe_review": false, "kind": "guided hike", "when_or_hours": "Sat Nov 14, 9–11am", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Pre-register via ActiveCommunities (activity 54203)."}, {"n": 26, "title": "Art & Science Nature Sketching — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sat Nov 14, 10am–noon", "why": "Art teacher and illustrator Owen Curtsinger leads a nature-sketching workshop — slow down, draw a plant or animal, learn scientific illustration. Supplies provided (bring your own sketchbook if you like). $10 with admission, pre-registration required.", "stretch": false, "maybe_review": false, "kind": "workshop", "when_or_hours": "Sat Nov 14, 10am–noon", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Pre-register via ActiveCommunities (activity 54204); $10 with paid admission, members $5."}, {"n": 27, "title": "Sunday Morning Bird Walk — Trinity River Audubon Center — Nov 22", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sun Nov 22, 9–10am", "why": "The late-November edition of TRAC's Sunday bird walk in the Great Trinity Forest — bottomland hardwood, wetland and prairie trails at peak fall-migration tail and early winter arrivals. A horizon card: three-plus weeks out, there if you want a bird walk on the calendar.", "stretch": false, "maybe_review": false, "kind": "bird walk", "when_or_hours": "Sun Nov 22, 9–10am", "startDate": "2026-11-22", "dueDate": "2026-11-22", "oneShot": true, "band": "adjacent", "notes": "Trinity River Audubon Center, 6500 Great Trinity Forest Way, Dallas."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
