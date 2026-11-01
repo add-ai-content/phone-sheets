@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-11-01</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-11-01";
+const CARDS = [{"n": 1, "title": "The Craft Guild Fall Show & Sale", "type": "happening", "town": "Carrollton", "drive": "35", "when": "Thu Nov 5 – Sun Nov 8", "why": "Free four-day show and sale from the Craft Guild of Dallas: handcrafted jewelry, glass, pottery, fiber arts, painting and woodwork from local artists — real browsing, not a staged program.", "stretch": false, "maybe_review": false, "kind": "craft show", "when_or_hours": "Thu Nov 5 – Sun Nov 8, 2026", "startDate": "2026-11-05", "dueDate": "2026-11-08", "oneShot": false, "band": "adjacent", "notes": "The Craft Guild of Dallas, 3410 Midcourt Rd Suite 115, Carrollton. Free admission (DFW Craft Shows listing). Opens Thu evening; daytime Fri–Sun."}, {"n": 2, "title": "Heritage Annual Craft and Antique Fair", "type": "happening", "town": "Irving", "drive": "25", "when": "Fri–Sat Nov 6–7, 9am–3pm", "why": "Third year for this indoor fall craft and antique fair at Irving's Heritage Senior Center — crafts plus antiques in one browse, in a town that hasn't been on the board in a while.", "stretch": false, "maybe_review": false, "kind": "craft & antique fair", "when_or_hours": "Fri Nov 6 – Sat Nov 7, 9am–3pm", "startDate": "2026-11-06", "dueDate": "2026-11-07", "oneShot": false, "band": "core", "notes": "Heritage Senior Center, 200 S Jefferson St, Irving (DFW Craft Shows listing)."}, {"n": 3, "title": "National Bison Day: Reliance on Bison — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sat Nov 7, 10am–2pm (drop-in)", "why": "The non-hayride half of National Bison Day at the refuge: drop in at the Hardwicke Center to learn from Log Cabin Village's Albert Nungaray how our ancestors relied on the bison — free with admission — plus a 1pm Meet the Bison Manager session ($20, pre-register) on what goes on behind the fences.", "stretch": false, "maybe_review": false, "kind": "nature program", "when_or_hours": "Sat Nov 7, Reliance on Bison 10am–2pm; Bison Manager 1pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Reliance on Bison FREE with paid admission; Bison Manager activity 54168, $20 with admission / members $15. Source: FWNC Nov 2026 program calendar."}, {"n": 4, "title": "Veterans Day Walk — Reverchon Park", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat Nov 7, 8:30–11:30am", "why": "Carry The Load's free Veterans Day Walk along the Katy Trail from Reverchon Park — a morning walk with a purpose, honoring veterans ahead of the holiday, on one of Dallas's best trails.", "stretch": false, "maybe_review": false, "kind": "veterans walk", "when_or_hours": "Sat Nov 7, 8:30–11:30am", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "adjacent", "notes": "Reverchon Park, 3505 Maple Ave, Dallas. Free; hosted by Carry The Load (Visit Dallas listing)."}, {"n": 5, "title": "Southlake Carroll PTO Craft Fair", "type": "happening", "town": "Southlake", "drive": "20", "when": "Sat–Sun Nov 7–8", "why": "Big one close to home: 170+ vendors at Carroll Senior High School for the PTO craft fair benefiting Project Graduation — gifts, home decor, ornaments, specialty foods, all indoors.", "stretch": false, "maybe_review": false, "kind": "craft fair", "when_or_hours": "Sat–Sun Nov 7–8, 2026", "startDate": "2026-11-07", "dueDate": "2026-11-08", "oneShot": false, "band": "core", "notes": "Carroll Senior High School, 1501 W Southlake Blvd, Southlake. Holiday market with over 170 vendors benefiting Project Graduation (Christmas-events listing; check the fair's Facebook page for day-of hours)."}, {"n": 6, "title": "Market in the Meadow", "type": "happening", "town": "Dallas", "drive": "50", "when": "Sat Nov 7, 9am–5pm & Sun Nov 8, 11am–4pm", "why": "38th annual Market in the Meadow at Forest Meadow Middle School — a long-running Dallas artisan and vendor market in a neighborhood you haven't scouted yet. A horizon pick: new part of Dallas, established show.", "stretch": true, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Sat Nov 7, 9am–5pm; Sun Nov 8, 11am–4pm", "startDate": "2026-11-07", "dueDate": "2026-11-08", "oneShot": false, "band": "adjacent", "notes": "Forest Meadow Middle School, 9373 Whitehurst Dr, Dallas. Hosted by the Forest Meadow Middle School PTA."}, {"n": 7, "title": "Leaf Prints — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sun Nov 8, 10am & 11am", "why": "Fall leaves are falling at the refuge: a short naturalist talk on why leaves fall, then a make-and-take leaf-print craft to bring home. $5 with admission, pre-registration required.", "stretch": false, "maybe_review": false, "kind": "nature program", "when_or_hours": "Sun Nov 8, sessions 10am & 11am", "startDate": "2026-11-08", "dueDate": "2026-11-08", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Activities 54201/54202; $5 with paid admission, members $3."}, {"n": 8, "title": "Celebrate the Holidays with Printmaking — Dallas Arboretum", "type": "happening", "town": "Dallas", "drive": "50", "when": "Sun Nov 8, 1–4pm", "why": "An afternoon printmaking class in the Arboretum's Green Classroom — express your creativity and make handmade holiday gifts while the gardens are still in their fall run.", "stretch": false, "maybe_review": false, "kind": "art class", "when_or_hours": "Sun Nov 8, 1–4pm", "startDate": "2026-11-08", "dueDate": "2026-11-08", "oneShot": true, "band": "adjacent", "notes": "Dallas Arboretum, Green Classroom, 8525 Garland Rd, Dallas (Arboretum calendar). Garden admission applies."}, {"n": 9, "title": "Free Admission Day: Veterans Day — Fort Worth Botanic Garden", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Wed Nov 11, all day", "why": "Veterans Day in the Garden is free for every visitor — no tickets or reservations needed. Wander the Japanese Garden and Rose Garden on a quiet weekday and let the day be as reflective or social as you like.", "stretch": false, "maybe_review": false, "kind": "garden free day", "when_or_hours": "Wed Nov 11, regular garden hours, free admission", "startDate": "2026-11-11", "dueDate": "2026-11-11", "oneShot": true, "band": "core", "notes": "Fort Worth Botanic Garden, 3220 Botanic Garden Blvd, Fort Worth. Free general admission all day Nov 11 (fwbg.org)."}, {"n": 10, "title": "Veterans Day Ceremony & Patriotic Picnic — Richland Hills", "type": "happening", "town": "Richland Hills", "drive": "5", "when": "Wed Nov 11, 11am–1pm", "why": "The closest Veterans Day observance there is: honor local veterans at the Veterans Memorial by City Hall, ceremony at 11am followed by a patriotic picnic at the Link Plaza pavilion. Five minutes from the house.", "stretch": false, "maybe_review": false, "kind": "veterans ceremony", "when_or_hours": "Wed Nov 11, 11am–1pm", "startDate": "2026-11-11", "dueDate": "2026-11-11", "oneShot": true, "band": "core", "notes": "Veterans Memorial (adjacent to City Hall) and The Link Plaza, Richland Hills. Moves inside The Link if weather turns."}, {"n": 11, "title": "Creative Explorations: Paper Marbling — Fort Worth Botanic Garden", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Thu Nov 12", "why": "This month's Creative Explorations session at BRIT is paper marbling — float the pigments, pull the print, take home marbled paper for cards and gifts. A quiet, hands-on art morning in the Garden.", "stretch": false, "maybe_review": false, "kind": "art workshop", "when_or_hours": "Thu Nov 12, 2026 (session time on fwbg.org)", "startDate": "2026-11-12", "dueDate": "2026-11-12", "oneShot": true, "band": "core", "notes": "Botanical Research Institute of Texas, 3220 Botanic Garden Blvd, Fort Worth. Registration via fwbg.org."}, {"n": 12, "title": "Fort Worth Greek Festival", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Fri–Sun Nov 13–15, Fri/Sat 10am–10pm, Sun 11am–3pm", "why": "The 58th annual Fort Worth Greek Festival at St. Demetrios: homemade Greek food and pastries, live music, folk dancing, church tours and a marketplace — free admission, and the daytime hours are the sweet spot. Fort Worth's version, distinct from the Dallas one earlier this fall.", "stretch": false, "maybe_review": false, "kind": "food festival", "when_or_hours": "Fri Nov 13 & Sat Nov 14, 10am–10pm; Sun Nov 15, 11am–3pm", "startDate": "2026-11-13", "dueDate": "2026-11-15", "oneShot": false, "band": "core", "notes": "St. Demetrios Greek Orthodox Church, 2020 NW 21st St, Fort Worth. Free admission. fortworthgreekfestival.com."}, {"n": 13, "title": "H-E-B Texas Recycles Day: Free Admission — Fort Worth Botanic Garden", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Fri–Sun Nov 13–15", "why": "Bring one single-use plastic bag or plastic bottle per guest and Garden admission is free all weekend, thanks to H-E-B — an easy excuse for a fall walk through the Rose Garden and Japanese Garden.", "stretch": false, "maybe_review": false, "kind": "garden free days", "when_or_hours": "Fri–Sun Nov 13–15, regular garden hours, free with a recyclable item", "startDate": "2026-11-13", "dueDate": "2026-11-15", "oneShot": false, "band": "core", "notes": "Fort Worth Botanic Garden, 3220 Botanic Garden Blvd, Fort Worth. One clean plastic bag or bottle per guest (fwbg.org)."}, {"n": 14, "title": "ICE! featuring Harry Potter — Opening Weekend", "type": "happening", "town": "Grapevine", "drive": "25", "when": "Opens Fri Nov 13 (runs through Jan 3)", "why": "A first for Gaylord Texan: the whole ICE! walk-through is Harry Potter this year — Hogsmeade Station, the Great Hall and Hogwarts carved from two million pounds of ice, kept at 9 degrees with loaner parkas, plus two-story ice slides. Timed tickets; opening weekend is the least-crowded window it'll ever have.", "stretch": true, "maybe_review": false, "kind": "ice exhibit", "when_or_hours": "Opens Fri Nov 13, 2026; daily through Jan 3, 2027, timed entry", "startDate": "2026-11-13", "dueDate": "2027-01-03", "oneShot": false, "band": "adjacent", "notes": "Gaylord Texan Resort, 1501 Gaylord Trail, Grapevine. Advance online timed tickets; general admission roughly $33–$57 by date, kids 3 & under free; parking extra."}, {"n": 15, "title": "Trees! Trees! Trees! — Hillside Park", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Nov 14, 9am", "why": "Celebrate Texas Arbor Day Month in Hillside Park: a City of Fort Worth Nature & Narrative program on the benefits of urban trees, proper planting and care, and how to grow a greener Texas — right in a gardener's lane.", "stretch": false, "maybe_review": false, "kind": "garden / tree program", "when_or_hours": "Sat Nov 14, 9am", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "Hillside Park, 1201 E Maddox Ave, Fort Worth. City of Fort Worth Nature & Narrative Education Series."}, {"n": 16, "title": "Emmanuel Presbyterian Church Craft Fair", "type": "happening", "town": "Bedford", "drive": "15", "when": "Sat Nov 14, 9am–3pm", "why": "Handmade items from local vendors, fifteen minutes away in Bedford — a small, easy Saturday browse for early holiday gifts, no big-fair crush.", "stretch": false, "maybe_review": false, "kind": "craft fair", "when_or_hours": "Sat Nov 14, 9am–3pm", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "Emmanuel Presbyterian Church, Bedford (DFW Craft Shows listing, 9am–3pm)."}, {"n": 17, "title": "LWBC Craft/Vendor Fair", "type": "happening", "town": "Lake Worth", "drive": "30", "when": "Sat Nov 14", "why": "Lake Worth is a new town on the Scout board: a one-day craft and vendor fair pitched as getting all your holiday shopping done in one place before the madness. Small-town browse, lake right there if you want to extend the trip.", "stretch": true, "maybe_review": false, "kind": "craft fair", "when_or_hours": "Sat Nov 14, 2026", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "adjacent", "notes": "Lake Worth, TX (DFW Craft Shows listing for Nov 14; check the listing for venue hours)."}, {"n": 18, "title": "First Baptist Church Craft Market — Boyd", "type": "happening", "town": "Boyd", "drive": "45", "when": "Sat Nov 14", "why": "Second year for Boyd's First Baptist craft market — vendors of all kinds in a small Wise County town that hasn't appeared on Scout yet. The drive out is half the outing.", "stretch": true, "maybe_review": false, "kind": "craft market", "when_or_hours": "Sat Nov 14, 2026", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "adjacent", "notes": "First Baptist Church, 140 N FM 730, Boyd (DFW Craft Shows listing)."}, {"n": 19, "title": "Blurred Beauty: Bokeh in Photography — Fort Worth Botanic Garden", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Nov 14", "why": "A photography session in the Garden built around bokeh — that soft, blurred background that makes a bird or a bloom pop. Bring the FZ80 and learn the technique in the place you'd use it.", "stretch": false, "maybe_review": false, "kind": "photography class", "when_or_hours": "Sat Nov 14, 2026 (session time on fwbg.org)", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "Fort Worth Botanic Garden, 3220 Botanic Garden Blvd, Fort Worth. Registration via fwbg.org."}, {"n": 20, "title": "Recycle Day & Upcycle Market — Dallas Farmers Market", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat–Sun Nov 14–15", "why": "National Recycling Day weekend at the Dallas Farmers Market: an Upcycle Market of vendors specializing in upcycled goods, vintage finds and closet cleanouts — treasure-hunting with a second-life theme, inside the regular market.", "stretch": false, "maybe_review": false, "kind": "vintage / upcycle market", "when_or_hours": "Sat–Sun Nov 14–15, 2026", "startDate": "2026-11-14", "dueDate": "2026-11-15", "oneShot": false, "band": "adjacent", "notes": "Dallas Farmers Market, 920 S Harwood St, Dallas (market event calendar)."}, {"n": 21, "title": "The Collectors Takeover — Arlington", "type": "happening", "town": "Arlington", "drive": "25", "when": "Fri–Sun Nov 13–15", "why": "A big-game collectibles weekend built around Cowboys vs 49ers: some 650 vendor tables of sports cards, autographs, memorabilia, sealed wax, Pokemon and high-end slabs at the Arlington Convention Center. Not a basic card show — a takeover.", "stretch": false, "maybe_review": false, "kind": "collectibles show", "when_or_hours": "Fri–Sun Nov 13–15, 2026", "startDate": "2026-11-13", "dueDate": "2026-11-15", "oneShot": false, "band": "core", "notes": "Arlington Convention Center, 1601 E Randol Mill Rd, Arlington. thecollectorstakeover.com."}, {"n": 22, "title": "Keller Card Show — Nov 15", "type": "happening", "town": "Keller", "drive": "15", "when": "Sun Nov 15, 11am–5pm", "why": "The November edition of the Keller card show: 100 tables of sports cards, Pokemon and TCG at the Keller Lions Club, free admission, vendors in from 9am. Bring cards to trade or sell if you like.", "stretch": false, "maybe_review": false, "kind": "card show", "when_or_hours": "Sun Nov 15, 11am–5pm", "startDate": "2026-11-15", "dueDate": "2026-11-15", "oneShot": true, "band": "core", "notes": "Keller Lions Club, 532 Keller Pkwy, Keller. Free admission, 100 tables."}, {"n": 23, "title": "Downtown Denton Mac and Cheese Fest", "type": "happening", "town": "Denton", "drive": "40", "when": "Sun Nov 15, from 11:30am", "why": "Downtown Denton does a whole festival around mac and cheese at Oak St. Drafthouse — a new cuisine-type card for the board, in a town whose market you passed but whose food scene you haven't tried this way.", "stretch": true, "maybe_review": false, "kind": "food festival", "when_or_hours": "Sun Nov 15, from 11:30am", "startDate": "2026-11-15", "dueDate": "2026-11-15", "oneShot": true, "band": "adjacent", "notes": "Oak St. Drafthouse and Cocktail Parlor, 308 E Oak St, Denton. Ticketed (listed $28.52–$81.88)."}, {"n": 24, "title": "Refuge Bus Tour — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sun Nov 15, 10am & 1pm", "why": "Hop on the Nature Center tour bus with a naturalist and ride the refuge — Greer Island, the Boardwalk and places in between — without walking the whole thing. $10 with admission, pre-registration required.", "stretch": false, "maybe_review": false, "kind": "guided tour", "when_or_hours": "Sun Nov 15, 10am & 1pm", "startDate": "2026-11-15", "dueDate": "2026-11-15", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Activities 54209/54210; $10 with paid admission, members $5."}, {"n": 25, "title": "Intro to iNaturalist — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sun Nov 15, 10am–noon", "why": "A Cross Timbers Master Naturalist walks you through iNaturalist, the citizen-science app for logging the flora and fauna around you — free with admission, and a tool that fits the backyard habit exactly.", "stretch": false, "maybe_review": false, "kind": "nature class", "when_or_hours": "Sun Nov 15, 10am–noon", "startDate": "2026-11-15", "dueDate": "2026-11-15", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. Activity 54205; FREE with paid admission, pre-registration required."}, {"n": 26, "title": "Top O' Hill Terrace", "type": "place", "town": "Arlington", "drive": "25", "when": "Tours by appointment (about 2 hours)", "why": "'Vegas before Vegas': the Prohibition-era tea room on the Bankhead Highway that secretly ran a casino, brothel and escape tunnels, drew gangsters and Hollywood, got raided by Texas Rangers in 1947 — and is now, of all things, a Baptist university. The 2-hour guided tour (about a $10 donation) is rated one of the best history tours in North Texas.", "stretch": false, "maybe_review": false, "kind": "historic site tour", "when_or_hours": "Tours by appointment; about 2 hours", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "3001 W Division St, Arlington, on the Arlington Baptist University campus. Book via topohillterrace.com."}, {"n": 27, "title": "International Bowling Museum & Hall of Fame", "type": "place", "town": "Arlington", "drive": "25", "when": "Tue–Sat 9:30am–5pm", "why": "Five thousand years of bowling in 18,000 square feet inside the International Bowling Campus: ancient Egyptian pins to modern Hall of Famers, interactive exhibits and a miniature bowling game to try. A venue type Scout has never dealt. Adults $9.50.", "stretch": false, "maybe_review": false, "kind": "sports museum", "when_or_hours": "Tue–Sat 9:30am–5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "621 Six Flags Dr, Arlington. Adults $9.50, seniors/children $7.50, under 4 free; free parking. bowlingmuseum.com."}, {"n": 28, "title": "Fielder House Museum", "type": "place", "town": "Arlington", "drive": "25", "when": "Tue–Sat noon–3:30pm", "why": "Arlington's 1914 prairie-style Fielder House, now the Arlington Historical Society's museum: a turn-of-the-century barbershop and general store, 200+ early local photographs, and rotating galleries — all under big live oaks on the old Hilltop farm.", "stretch": false, "maybe_review": false, "kind": "local history museum", "when_or_hours": "Tue–Sat noon–3:30pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "1616 W Abram St, Arlington. Arlington Historical Society, 817-460-4001."}, {"n": 29, "title": "Knapp Heritage Park", "type": "place", "town": "Arlington", "drive": "25", "when": "Sat–Sun 1–4pm", "why": "A little pioneer settlement in downtown Arlington holding three of the city's oldest structures — log cabins and a one-room schoolhouse from the mid-1800s, run by the Historical Society and open weekend afternoons. Pairs naturally with the Fielder House, two miles away.", "stretch": false, "maybe_review": false, "kind": "heritage park", "when_or_hours": "Sat–Sun 1–4pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "201 W Front St, Arlington. Managed by Arlington Historical Society / Fielder Museum."}, {"n": 30, "title": "Georgia's Farmers Market", "type": "place", "town": "Plano", "drive": "55", "when": "Mon–Sat 9am–6pm, Sun 9am–3pm", "why": "A family-run farmers market in the heart of downtown Plano, open daily — produce and market goods without waiting for a Saturday market day. Plano was a horizon town that landed before; this is its always-open version.", "stretch": true, "maybe_review": false, "kind": "farmers market", "when_or_hours": "Mon–Sat 9am–6pm; Sun 9am–3pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "916 E 15th St, Plano."}, {"n": 31, "title": "Saturday Morning Bird Walk — Trinity River Audubon Center", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat Nov 21, 7:30–9am", "why": "The Saturday edition of TRAC's bird walk in the Great Trinity Forest — bottomland hardwood, wetland and prairie at the peak of late-fall arrivals. A horizon card, three weeks out, for a bird walk on a Saturday instead of the usual Sunday.", "stretch": true, "maybe_review": false, "kind": "bird walk", "when_or_hours": "Sat Nov 21, 7:30–9am", "startDate": "2026-11-21", "dueDate": "2026-11-21", "oneShot": true, "band": "adjacent", "notes": "Trinity River Audubon Center, 6500 Great Trinity Forest Way, Dallas (Audubon events listing)."}, {"n": 32, "title": "Texas Discovery Gardens 90th Birthday Bash", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat Nov 28, noon–6pm", "why": "Texas Discovery Gardens turns 90 at Fair Park: a butterfly release at noon, critter encounters, Plant Bingo, a scavenger hunt, pot painting and planting, and the Sammons Butterfly House and garden trains all day. Free for members; regular admission for everyone else, with 10 activity coupons included.", "stretch": true, "maybe_review": false, "kind": "garden celebration", "when_or_hours": "Sat Nov 28, noon–6pm", "startDate": "2026-11-28", "dueDate": "2026-11-28", "oneShot": true, "band": "adjacent", "notes": "Texas Discovery Gardens at Fair Park, 3601 Martin Luther King Jr Blvd, Dallas. Free for TDG members; regular admission otherwise."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
