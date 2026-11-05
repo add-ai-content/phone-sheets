@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-11-05</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-11-05";
+const CARDS = [{"n": 1, "title": "Texas Coin Show", "type": "happening", "town": "Grapevine", "drive": "20", "when": "Fri Nov 6, 2–6pm; Sat 9am–6pm; Sun 9am–3pm", "why": "About 70 dealers at the Grapevine Convention Center with coins, paper currency and collectibles to browse, buy, sell and trade — an indoor collectors' outing, a new twist on the card-show habit.", "stretch": true, "maybe_review": false, "kind": "coin show", "when_or_hours": "Fri Nov 6, 2–6pm; Sat Nov 7, 9am–6pm; Sun Nov 8, 9am–3pm", "startDate": "2026-11-06", "dueDate": "2026-11-08", "oneShot": false, "band": "core", "notes": "Grapevine Convention Center, 1209 S Main St, Grapevine. Admission $5 Fri/Sat, $2 Sun. Sources: Grapevine CVB listing via grapevinetexasusa.com; Community Impact roundup, Nov 4, 2026."}, {"n": 2, "title": "Fall Movies in the Park", "type": "happening", "town": "North Richland Hills", "drive": "10", "when": "Fri Nov 6, 6–9pm (movie ~7pm)", "why": "Free movie night right here in NRH: gates open 6pm at Green Valley Park, The Big Green on the big screen around 7pm, with pre-movie soccer activities and concessions. The one evening card in the deck — and it's over by 9.", "stretch": false, "maybe_review": false, "kind": "movie night", "when_or_hours": "Fri Nov 6, gates 6pm, movie ~7pm", "startDate": "2026-11-06", "dueDate": "2026-11-06", "oneShot": true, "band": "core", "notes": "Green Valley Park, 7701 Smithfield Road, North Richland Hills. Free movie and parking; bring blankets or lawn chairs. Source: City of NRH event information via DFW weekend shortlist, Nov 4, 2026."}, {"n": 3, "title": "Flannel Fest", "type": "happening", "town": "Keller", "drive": "15", "when": "Sat Nov 7, 10am–8pm", "why": "Keller's new family fall festival at Bear Creek Park: live music, a cornhole tournament, vendors and a kids zone, hosted free by Keller Parks & Recreation. Close to home and all daytime-into-early-evening.", "stretch": false, "maybe_review": false, "kind": "fall festival", "when_or_hours": "Sat Nov 7, 10am–8pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Bear Creek Park, Keller. Free event hosted by Keller Parks & Recreation. Sources: City of Keller events via AllEvents Keller weekend listing; DFW weekend shortlist, Nov 4, 2026."}, {"n": 4, "title": "Grand Cowgirl Parade and Museum Celebration", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Nov 7, parade at noon", "why": "A free parade steps off at noon in the Cultural District for the National Cowgirl Museum's expansion celebration — new galleries and a Miranda Lambert exhibit inside, museum admission free to $10 if you want to go in after.", "stretch": false, "maybe_review": false, "kind": "parade / museum", "when_or_hours": "Sat Nov 7, parade 12pm; museum celebration same day", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "National Cowgirl Museum and Hall of Fame, 1720 Gendy Street, Fort Worth. Source: DFW weekend shortlist, Nov 4, 2026 (museum information via cowgirl.net)."}, {"n": 5, "title": "2026 Phoenix Festival", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Nov 7, from 10am", "why": "Fall festival on Evans Avenue Plaza in Fort Worth's Near Southside — a community festival in a part of Fort Worth Scout hasn't dealt before, on a plaza built for exactly this.", "stretch": false, "maybe_review": false, "kind": "festival", "when_or_hours": "Sat Nov 7, from 10am", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Evans Avenue Plaza, 1050 Evans Avenue, Fort Worth. Sources: AllEvents Fort Worth festivals listing; StayHappening Fort Worth, updated Nov 4, 2026."}, {"n": 6, "title": "Oakmont Park Prairie Restoration Workday", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sat Nov 7, 9–11am", "why": "The Fort Worth chapter of the Native Prairies Association holds its last Oakmont Park Prairie workday of 2026 — two morning hours on a remnant Fort Worth prairie, with a picnic lunch after (11am–noon). Hands-on nature, not a staged program.", "stretch": false, "maybe_review": false, "kind": "prairie workday", "when_or_hours": "Sat Nov 7, 9–11am, picnic lunch 11am–noon", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Oakmont Park Prairie, Fort Worth. Source: FW-NPAT fall newsletter (mailchi.mp), crawled Nov 5, 2026."}, {"n": 7, "title": "North Texas Kindness Festival", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat Nov 7, 10am–4pm", "why": "Free, all-ages festival opening North Texas Kindness Week (Nov 7–14): live performances across outdoor stages, food trucks, makers, nonprofits and a family zone on Annette Strauss Square in the Dallas Arts District.", "stretch": true, "maybe_review": false, "kind": "festival", "when_or_hours": "Sat Nov 7, 10am–4pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Annette Strauss Square, AT&T Performing Arts Center, 2403 Flora St, Dallas. Presented by The Thanks-Giving Foundation. Sources: thanksgiving.org Kindness2026 Festival Guide; Downtown Dallas events listing."}, {"n": 8, "title": "Lake Granbury Holiday Market", "type": "happening", "town": "Granbury", "drive": "55", "when": "Sat Nov 7, 10am–5pm", "why": "Holiday market inside and out at the Lake Granbury Conference Center on Pearl Street — free admission, Santa photos 1–4pm, and a shuttle over to the Granbury Grand Prix festivities on the historic square the same day.", "stretch": false, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Sat Nov 7, 10am–5pm; Santa photos 1–4pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "adjacent", "notes": "Lake Granbury Conference Center, E Pearl St, Granbury. Free admission. Source: CCMarkets4Days Lake Granbury Market listing, Oct 19, 2026."}, {"n": 9, "title": "The Big Dill Pickle Festival", "type": "happening", "town": "Arlington", "drive": "25", "when": "Sat Nov 7, 12–8pm", "why": "The World's Largest Pickle Party lands at Globe Life Field and Texas Live!: pickle-themed food, 20+ pickle vendors, unlimited sampling, carnival games — and Snooki crowned America's Pickle Queen. Silly, specific, and very much a one-day-only thing.", "stretch": true, "maybe_review": false, "kind": "food festival", "when_or_hours": "Sat Nov 7, 12–8pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Texas Live! and the plaza of Globe Life Field, 734 Stadium Dr, Arlington. Ticketed event (bigdill.com/texas). Sources: City of Arlington news article, Oct 23, 2026; arlington.org event listing."}, {"n": 10, "title": "In-Sync Exotics Fall Festival & Pumpkin Toss", "type": "happening", "town": "Wylie", "drive": "55", "when": "Sat Nov 7, 11am–2pm", "why": "Fall festival at a nonprofit big-cat sanctuary in Wylie — a new town for Scout. The annual Pumpkin Toss for the rescued tigers and lions, plus vendors, music and games; proceeds support the rescue center.", "stretch": true, "maybe_review": false, "kind": "wildlife festival", "when_or_hours": "Sat Nov 7, 11am–2pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "adjacent", "notes": "In-Sync Exotics Wildlife Rescue & Educational Center, 3430 Skyview Dr, Wylie. Sources: Wylie Chamber calendar via Lavon North Texas Week Ahead, Nov 1, 2026; Mommy Poppins DFW weekend guide, Nov 3, 2026."}, {"n": 11, "title": "St. Martin de Porres Fall Festival and Holiday Market", "type": "happening", "town": "Prosper", "drive": "55", "when": "Sat–Sun Nov 7–8 (festival runs Nov 5–8)", "why": "A four-day parish fall festival in Prosper — another new town — with carnival rides, games, food, live music and an auction, plus a holiday market / craft fair in the school gym on Saturday and Sunday.", "stretch": true, "maybe_review": false, "kind": "fall festival / holiday market", "when_or_hours": "Sat Nov 7, 10am–6pm; Sun Nov 8 (festival Nov 5–8)", "startDate": "2026-11-07", "dueDate": "2026-11-08", "oneShot": false, "band": "adjacent", "notes": "St. Martin de Porres, 4000 W University Dr, Prosper. Source: DFW Craft Shows event listing, updated Oct 19, 2026."}, {"n": 12, "title": "First Methodist Bridgeport Fall Festival", "type": "happening", "town": "Bridgeport", "drive": "50", "when": "Sat Nov 7, 2–5:30pm", "why": "A small-town church fall festival in Bridgeport — a town Scout has never dealt: bounce houses, food, candy and games on a Saturday afternoon. Pairs with a Wise County drive you already like.", "stretch": true, "maybe_review": false, "kind": "fall festival", "when_or_hours": "Sat Nov 7, 2–5:30pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "adjacent", "notes": "First Methodist Bridgeport, 608 17th Street, Bridgeport, TX 76426. Source: firstmethodistbridgeport.org fall festival page."}, {"n": 13, "title": "40th Annual Ryan High School Craft Show", "type": "happening", "town": "Denton", "drive": "40", "when": "Sat Nov 7, 9:30am–4pm", "why": "The 40th year of Ryan High's PTSA craft show in Denton: antiques and collectibles, crafts, fine art and homegrown products, $2 admission. A long-running show, not a first-year experiment.", "stretch": false, "maybe_review": false, "kind": "craft show", "when_or_hours": "Sat Nov 7, 9:30am–4pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Ryan High School, 5101 E McKinney Street, Denton. Admission $2. Sources: FestivalNet Denton listing, updated Oct 15, 2026; AllEvents Denton exhibitions listing."}, {"n": 14, "title": "TwinPop Fall Anime Festival", "type": "happening", "town": "Denton", "drive": "40", "when": "Sat Nov 7, 10am–7:30pm; Sun Nov 8, 12–5:30pm", "why": "A different flavor for the deck: an anime fall festival at Golden Triangle Mall with a local artists' alley, a cosplay contest and trading-card vendors — browsing energy, collectibles included.", "stretch": true, "maybe_review": false, "kind": "anime festival", "when_or_hours": "Sat Nov 7, 10am–7:30pm; Sun Nov 8, 12–5:30pm", "startDate": "2026-11-07", "dueDate": "2026-11-08", "oneShot": false, "band": "core", "notes": "Golden Triangle Mall, Denton. Source: AllEvents Denton weekend listing, Nov 6–8, 2026."}, {"n": 15, "title": "22nd Annual Craft Fair — St. John Cumberland Presbyterian", "type": "happening", "town": "Arlington", "drive": "30", "when": "Sat Nov 7, from 9:30am", "why": "Year 22 of this Arlington church craft fair — the kind of established, browse-at-your-own-pace show that has landed before, in a church hall on Pleasant Ridge Road.", "stretch": false, "maybe_review": false, "kind": "craft fair", "when_or_hours": "Sat Nov 7, from 9:30am", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "St. John Cumberland Presbyterian Church of Arlington, 6007 W Pleasant Ridge Rd, Arlington. Source: AllEvents Arlington craft events listing."}, {"n": 16, "title": "Burnout at The Bull Classic Car Show", "type": "happening", "town": "Grapevine", "drive": "20", "when": "Sat Nov 7, 9am–12pm", "why": "A morning-only classic car show in the Bohemian Bull parking lot on Northwest Highway — three easy hours, done by noon, five minutes further to Grapevine's Main Street if the morning's going well.", "stretch": false, "maybe_review": false, "kind": "car show", "when_or_hours": "Sat Nov 7, 9am–12pm", "startDate": "2026-11-07", "dueDate": "2026-11-07", "oneShot": true, "band": "core", "notes": "Bohemian Bull Grapevine, 1112 W Northwest Hwy, Grapevine. Source: AllEvents Grapevine weekend listing, Nov 6–8, 2026."}, {"n": 17, "title": "SSG Alex Viola Memorial Car Show", "type": "happening", "town": "Keller", "drive": "15", "when": "Sun Nov 8, from 10am", "why": "The concluding edition of Keller's memorial car show at Town Hall — 350+ classic cars last year — honoring Staff Sgt. Alex Viola and raising funds for the Special Operations Warrior Foundation and the Green Beret Foundation, chasing $1 million in cumulative donations.", "stretch": false, "maybe_review": false, "kind": "car show", "when_or_hours": "Sun Nov 8, from 10am", "startDate": "2026-11-08", "dueDate": "2026-11-08", "oneShot": true, "band": "core", "notes": "Keller Town Hall, 1100 Bear Creek Pkwy, Keller. Sources: SSG Alex Viola Foundation (ssgalexviola.org); CarCruiseFinder Tarrant County listing; AllEvents Keller weekend listing."}, {"n": 18, "title": "Ladies Auxiliary of St. Joseph Craft & Vendor Fair", "type": "happening", "town": "Arlington", "drive": "30", "when": "Sun Nov 8, 9am–3:30pm", "why": "First annual craft and vendor fair in the St. Joseph parish hall — unique crafts, gifts and goods from parishioners and local vendors, supporting the Ladies Auxiliary & Knights of Columbus college scholarship fund. A Sunday option that isn't a market rerun.", "stretch": false, "maybe_review": false, "kind": "craft fair", "when_or_hours": "Sun Nov 8, 9am–3:30pm", "startDate": "2026-11-08", "dueDate": "2026-11-08", "oneShot": true, "band": "core", "notes": "St. Joseph Roman Catholic Parish Hall, 1927 SW Green Oaks Blvd, Arlington. Source: DFW Craft Shows event listing, updated Oct 14, 2026."}, {"n": 19, "title": "Cool Beans Brunch Market", "type": "happening", "town": "Denton", "drive": "40", "when": "Sun Nov 8, from 11am", "why": "A Sunday brunch pop-up market on Fry Street: local makers, artists and vintage, with good food and patio vibes at Cool Beans. Free, casual, and built for browsing.", "stretch": false, "maybe_review": false, "kind": "market", "when_or_hours": "Sun Nov 8, from 11am", "startDate": "2026-11-08", "dueDate": "2026-11-08", "oneShot": true, "band": "core", "notes": "Cool Beans, 1210 West Hickory Street, Denton. Free. Source: AllEvents Denton weekend listing, Nov 6–8, 2026."}, {"n": 20, "title": "Fort Worth Nature Center BioBlitz: Reclamation Prairie", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sat Nov 14, 9am–12pm (meet 8:45am)", "why": "A morning BioBlitz with the Fort Worth Native Prairies chapter: walk the reclamation prairie across from the boardwalk documenting what lives there on iNaturalist, led by Jeff Quayle and Suzanne Tuttle. Your kind of field morning — bring the camera.", "stretch": false, "maybe_review": false, "kind": "nature / bioblitz", "when_or_hours": "Sat Nov 14, 9am–12pm; meet 8:45am at Boardwalk Parking", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Road, Fort Worth; meet at Boardwalk Parking. Registration and NPAT waiver via the FW-NPAT newsletter link. Source: FW-NPAT fall newsletter, crawled Nov 5, 2026."}, {"n": 21, "title": "Granbury Square Plaza Holiday Market", "type": "happening", "town": "Granbury", "drive": "55", "when": "Sat Nov 14, 10am–6pm", "why": "Holiday shopping on Granbury's historic square: handmade goods, artisans, boutiques, specialty vendors, food and live music around the Square Plaza. Free and open to the public — the Granbury day-trip cluster again, a week later and in holiday mode.", "stretch": false, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Sat Nov 14, 10am–6pm", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "adjacent", "notes": "Granbury Square Plaza, 201 E Pearl St, Granbury. Free admission; rain, shine or wind. Source: Eventbrite listing by CCMarkets4Days."}, {"n": 22, "title": "The CozySeason Holiday Market", "type": "happening", "town": "Dallas", "drive": "50", "when": "Sat Nov 14, 10am–6pm; Sun Nov 15, 10am–5pm", "why": "A makers gathering on Grand Avenue in Dallas: 60+ curated independent makers — candles, ceramics, knits, jewelry, art and small-batch food — plus live making demos and short workshops. Free for shoppers; the holiday-season kickoff version of browsing.", "stretch": false, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Sat Nov 14, 10am–6pm; Sun Nov 15, 10am–5pm", "startDate": "2026-11-14", "dueDate": "2026-11-15", "oneShot": false, "band": "adjacent", "notes": "3809 Grand Avenue, Dallas, TX 75210. Free admission. Source: Eventbrite listing, The CozySeason Holiday Market — A Makers Gathering in Dallas."}, {"n": 23, "title": "Snowflake Bazaar", "type": "happening", "town": "Plano", "drive": "50", "when": "Sat Nov 14, 10am–5pm; Sun Nov 15, 10am–3pm", "why": "Plano West Senior High's long-running holiday bazaar: 125+ vendors with handmade goods, holiday merchandise, baked treats, gifts and décor, supporting the Plano West band. Big, indoor, and all browsing.", "stretch": false, "maybe_review": false, "kind": "holiday bazaar", "when_or_hours": "Sat Nov 14, 10am–5pm; Sun Nov 15, 10am–3pm", "startDate": "2026-11-14", "dueDate": "2026-11-15", "oneShot": false, "band": "adjacent", "notes": "Plano West Senior High School, 5601 W Parker Rd, Plano, TX 75093. Source: DFW Craft Shows Snowflake Bazaar listing, updated Oct 14, 2026."}, {"n": 24, "title": "Summit Craft Fest", "type": "happening", "town": "Arlington", "drive": "30", "when": "Sat Nov 14, 9am–4pm", "why": "Summit High School's Craft Fest is producer-only: vendors may sell only what they grew, produced or crafted themselves — no resale filler. Run by the Summit Band Boosters in Arlington.", "stretch": false, "maybe_review": false, "kind": "craft fair", "when_or_hours": "Sat Nov 14, 9am–4pm", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "Summit High School, 1071 Turner Warnell Rd, Arlington, TX 76001. Source: Summit Band Boosters, summitband.org/craftfest."}, {"n": 25, "title": "Drawing in the Garden: BRIT Pond", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Nov 14, 1–3pm", "why": "Sketch the BRIT Pond, log circle and oaks at the Fort Worth Botanic Garden with instructor Erika Duque Scully — registration includes garden admission for the day, so the afternoon can stretch into a garden walk after class.", "stretch": false, "maybe_review": false, "kind": "art class", "when_or_hours": "Sat Nov 14, 1–3pm; register by Nov 11", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "BRIT Pond, Fort Worth Botanic Garden, 3220 Botanic Garden Blvd, Fort Worth. $35 adult / $30 member adult. Source: fwbg.org Drawing in the Garden event page."}, {"n": 26, "title": "Pumpkin Spice Market", "type": "happening", "town": "Denton", "drive": "40", "when": "Sat Nov 14, from 10am", "why": "A fall market on University Drive in Denton — one more Denton browse in a town that's treated Scout well, timed for peak pumpkin-spice season rather than Halloween leftovers.", "stretch": false, "maybe_review": false, "kind": "market", "when_or_hours": "Sat Nov 14, from 10am", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "210 W University Dr, Denton. Source: AllEvents Denton fall festivals listing."}, {"n": 27, "title": "Cattlemen's Steak House", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Daily from 11am (Sun from noon)", "why": "The original Stockyards steakhouse, serving since 1947 at 2458 N Main — the clear-reason restaurant rule in action: a Fort Worth institution a short walk from the cattle drive, with lunch hours that make it a daytime outing, not just a dinner splurge.", "stretch": false, "maybe_review": false, "kind": "steakhouse", "when_or_hours": "Mon–Thu 11am–10pm; Fri–Sat from 11am; Sun 12–9pm (check site for late hours)", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "Cattlemen's Steak House, 2458 N Main St, Fort Worth (Stockyards). Established 1947. Sources: cattlemenssteakhouse.com visit page; Fort Worth steakhouse history roundup, Nov 2026."}, {"n": 28, "title": "Irving Archives and Museum", "type": "place", "town": "Irving", "drive": "35", "when": "Wed–Sat 10am–4pm; Sun 12–4pm", "why": "Irving's local-history museum: the permanent 'Irving Story' exhibit traces the city from frontier days to a modern hub, and it houses the first Smithsonian Spark!Lab in Texas. Adults $7 — a cheap, quiet history stop in a town Scout rarely deals.", "stretch": false, "maybe_review": false, "kind": "history museum", "when_or_hours": "Wed–Sat 10am–4pm; Sun 12–4pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "Irving Archives and Museum, 801 W Irving Blvd, Irving. Adults $7. Source: Irving Archives and Museum place listing (irvingarchivesandmuseum.com)."}, {"n": 29, "title": "National Multicultural Western Heritage Museum", "type": "place", "town": "Fort Worth", "drive": "30", "when": "Mon–Sat 11am–4pm", "why": "The Cowboys of Color museum: artifacts and stories of the multicultural cowboys, buffalo soldiers and frontier pioneers the standard Western histories leave out, plus its Hall of Fame. A local-history museum with a genuinely different angle.", "stretch": false, "maybe_review": false, "kind": "history museum", "when_or_hours": "Mon–Sat 11am–4pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "National Multicultural Western Heritage Museum, 2201 Dottie Lynn Pkwy Suite 115, Fort Worth. Adults $15, seniors 65+ $12 per the museum's own About page (nmwhm.org)."}, {"n": 30, "title": "JN Long Cultural Arts Center", "type": "place", "town": "Cleburne", "drive": "55", "when": "Tue–Fri 10am–4pm; Sat 10am–2pm", "why": "A historic 1915 school in Cleburne turned cultural hub: two rotating art galleries, the Texas Woodcarvers Guild Museum and a Model Train Museum celebrating Cleburne's railroad past — free admission, and an easy pair with the Layland Museum you already approved nearby.", "stretch": false, "maybe_review": false, "kind": "arts center / museum", "when_or_hours": "Tue–Fri 10am–4pm; Sat 10am–2pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "JN Long Cultural Arts Center, 425 Granbury St, Cleburne. Free admission. Source: JN Long Cultural Arts Center place listing (jnlongculturalarts.org)."}, {"n": 31, "title": "Gone With the Wind Museum", "type": "place", "town": "Cleburne", "drive": "55", "when": "Thu–Sat 10am–5pm", "why": "The 'Gone With the Wind Remembered' museum and gift shop in Cleburne — a nonprofit collection built around the film and novel. A quirky, specific little museum: either it's exactly your kind of obscure find, or a clean pass teaches Scout something.", "stretch": false, "maybe_review": false, "kind": "museum", "when_or_hours": "Thu–Sat 10am–5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "Gone With the Wind Museum, 305 E 2nd St, Cleburne. Source: Gone With the Wind Museum place listing (gwtwremembered.com)."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
