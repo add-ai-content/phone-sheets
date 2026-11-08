@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-11-08</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-11-08";
+const CARDS = [{"n": 1, "title": "6th Annual Cowtown Birthplace of Western Swing Festival", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Thu Nov 12 – Sun Nov 15 (finale Sun to 4:30pm)", "why": "Four days of western swing from legends like Jody Nix, Jake Hooker and Billy Mata at historic National Hall, famous for one of the best dance floors in Texas — daytime sets, plus a Friday Stockyards tour day.", "stretch": false, "maybe_review": false, "kind": "music festival", "when_or_hours": "Thu Nov 12 – Sun Nov 15 (finale Sun to 4:30pm)", "startDate": "2026-11-12", "dueDate": "2026-11-12", "oneShot": false, "band": "core", "notes": "Historic National Hall, 3316 Roberts Cut-Off Rd, Fort Worth. Tickets on sale via organizer. Sources: birthplaceofwesternswing.com event page; Visit Fort Worth listing."}, {"n": 2, "title": "Dallas Craft & Makers Festival 2026", "type": "happening", "town": "Dallas", "drive": "45", "when": "Fri Nov 13 – Sun Nov 15", "why": "A full weekend of handmade browsing at Kiest Park — local makers, crafts and gifts, an easy big-park setting instead of a mall.", "stretch": false, "maybe_review": false, "kind": "craft festival", "when_or_hours": "Fri Nov 13 – Sun Nov 15", "startDate": "2026-11-13", "dueDate": "2026-11-13", "oneShot": false, "band": "adjacent", "notes": "Kiest Park, Dallas. Source: The Craft Map holiday fair roundup for Dallas, Nov 2026."}, {"n": 3, "title": "Shady Oaks Baptist Church Craft Fair", "type": "happening", "town": "Hurst", "drive": "10", "when": "Sat Nov 14, from 9am", "why": "A neighborhood church craft fair ten minutes from home — the small, browsable kind that has landed well before, on the biggest craft-fair Saturday of the season.", "stretch": false, "maybe_review": false, "kind": "craft fair", "when_or_hours": "Sat Nov 14, from 9am", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "Shady Oaks Baptist Church, 1336 Cavender Dr, Hurst. Source: AllEvents Hurst November 2026 listing."}, {"n": 4, "title": "Catholic Daughters Holiday Market", "type": "happening", "town": "Coppell", "drive": "25", "when": "Sat Nov 14, 9am–3pm", "why": "St. Ann's annual holiday market in Coppell: handcrafted gifts, holiday decor and baked goods, with proceeds funding graduating seniors' scholarships. Free admission.", "stretch": false, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Sat Nov 14, 9am–3pm", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "St. Ann Catholic Church, Coppell. Source: DFW Catholics weekly roundup, published Nov 7, 2026."}, {"n": 5, "title": "Clariden School Fall Fest", "type": "happening", "town": "Southlake", "drive": "20", "when": "Sat Nov 14, 12:30–5pm", "why": "Free fall festival and open house on a ranch-road campus in Southlake — vendor market, festival games and a relaxed afternoon start time.", "stretch": false, "maybe_review": false, "kind": "fall festival", "when_or_hours": "Sat Nov 14, 12:30–5pm", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "The Clariden School, 100 Clariden Ranch Rd, Southlake. Free, all welcome. Source: Grassy Knees DFW listing."}, {"n": 6, "title": "NTX TCG Card Show — November 2026", "type": "happening", "town": "Lewisville", "drive": "30", "when": "Sat Nov 14 – Sun Nov 15", "why": "The Lewisville card show's November edition at NTX Arena: TCG, sports cards and comics from DFW dealers — browsing tables, honest pricing, no big-show crush.", "stretch": false, "maybe_review": false, "kind": "card show", "when_or_hours": "Sat Nov 14 – Sun Nov 15", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": false, "band": "core", "notes": "NTX Arena, 2401 S Stemmons Fwy, Ste 4000, Lewisville. Source: Very Good Collectibles TX show schedule."}, {"n": 7, "title": "Get Lit: Grown-Up Book Fair @ Reunion Tower", "type": "happening", "town": "Dallas", "drive": "40", "when": "Sat Nov 14", "why": "A grown-up take on the school book fair — authors and bookish vendors at Reunion Tower. A novel one-off: part nostalgia trip, part book hunt, with the tower view thrown in.", "stretch": true, "maybe_review": false, "kind": "book fair", "when_or_hours": "Sat Nov 14", "startDate": "2026-11-14", "dueDate": "2026-11-14", "oneShot": true, "band": "core", "notes": "Reunion Tower, Dallas. Source: The Craft Map Dallas holiday fairs listing, Nov 14, 2026."}, {"n": 8, "title": "Fort Worth Fall Festival", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sun Nov 15, from 1pm", "why": "A laid-back Sunday-afternoon fall festival at Martin House Brewing on Sylvania Ave — a small, free, brewery-yard version of the season instead of a mega-fest.", "stretch": false, "maybe_review": false, "kind": "fall festival", "when_or_hours": "Sun Nov 15, from 1pm", "startDate": "2026-11-15", "dueDate": "2026-11-15", "oneShot": true, "band": "core", "notes": "Martin House Brewing Company, 220 S Sylvania Ave #209, Fort Worth. Free listing. Source: Eventbrite Fort Worth fall festival listings."}, {"n": 9, "title": "Spirit of Mexico Rodeo — Matinee", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sun Nov 15, 1:30pm", "why": "The Sunday matinee performance in the Stockyards (121 E Exchange) — rodeo pageantry in daylight hours, done well before evening, in the historic coliseum district.", "stretch": false, "maybe_review": false, "kind": "rodeo", "when_or_hours": "Sun Nov 15, 1:30pm", "startDate": "2026-11-15", "dueDate": "2026-11-15", "oneShot": true, "band": "core", "notes": "121 E Exchange Ave, Fort Worth (Stockyards). Matinee 1:30pm; an evening performance also runs. Source: AllEvents Fort Worth heritage listings."}, {"n": 10, "title": "Wetland Canoe Trails at the Heard Museum", "type": "happening", "town": "McKinney", "drive": "55", "when": "Sun Nov 15, 1–4pm", "why": "A three-hour guided paddle through the Heard sanctuary's wetlands in McKinney — waterfowl, herons and fall color from water level. A genuine stretch outing: new town, new way of seeing a familiar sanctuary.", "stretch": true, "maybe_review": false, "kind": "canoe paddle", "when_or_hours": "Sun Nov 15, 1–4pm", "startDate": "2026-11-15", "dueDate": "2026-11-15", "oneShot": true, "band": "adjacent", "notes": "Heard Natural Science Museum & Wildlife Sanctuary, 1 Nature Pl, McKinney. Sessions also Nov 29. Source: Heard Museum program listings via Grassy Knees."}, {"n": 11, "title": "49th Annual Chi Omega Christmas Market", "type": "happening", "town": "Dallas", "drive": "35", "when": "Thu Nov 19 – Sun Nov 22 (general admission Fri 1–8pm, Sat 9am–5pm, Sun 10am–3pm)", "why": "Dallas's big traditional holiday market — 49th year, hundreds of merchants on the World Trade Center's 11th floor, and the proceeds go to local nonprofits and scholarships. Ticketed; go Friday afternoon or Sunday for thinner crowds.", "stretch": false, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Thu Nov 19 – Sun Nov 22 (general admission Fri 1–8pm, Sat 9am–5pm, Sun 10am–3pm)", "startDate": "2026-11-20", "dueDate": "2026-11-20", "oneShot": false, "band": "core", "notes": "Dallas Market Center, World Trade Center 11th floor, 2050 N Stemmons Fwy, Dallas. Thu is ticketed Preview Night. Sources: chiomegachristmasmarket.org; 99.5 The Wolf / New Country 96.3 market-hours posts, Oct 2026."}, {"n": 12, "title": "FOODEESFEST Hurst", "type": "happening", "town": "Hurst", "drive": "10", "when": "Fri Nov 20, 1–7pm; Sat–Sun Nov 21–22, 11am–7pm", "why": "The traveling food-and-crafts festival lands at North East Mall: 40+ food trucks and vendors plus dozens of artisans, free admission, ten minutes from home. (The Grand Prairie edition was dealt before; this is the Hurst stop.)", "stretch": false, "maybe_review": false, "kind": "food festival", "when_or_hours": "Fri Nov 20, 1–7pm; Sat–Sun Nov 21–22, 11am–7pm", "startDate": "2026-11-20", "dueDate": "2026-11-20", "oneShot": false, "band": "core", "notes": "North East Mall, 1101 Melbourne Rd, Hurst. Free, rain or shine. Sources: foodeesfest.com Hurst event page; Eventbrite listing."}, {"n": 13, "title": "Texas Christkindl Market — Opening Weekend", "type": "happening", "town": "Arlington", "drive": "25", "when": "Fri Nov 20 – Sun Nov 22, 11am–8pm daily (season runs to Dec 23)", "why": "The 16th annual German Christmas market on Globe Life Field's North Plaza: handcrafted gifts, German food and drink, live entertainment and scheduled 'snowfall' — free admission, and opening weekend is the least crowded of the season.", "stretch": false, "maybe_review": false, "kind": "German Christmas market", "when_or_hours": "Fri Nov 20 – Sun Nov 22, 11am–8pm daily (season runs to Dec 23)", "startDate": "2026-11-20", "dueDate": "2026-11-20", "oneShot": false, "band": "core", "notes": "North Plaza, Globe Life Field, 1650 E Randol Mill Rd, Arlington. Free. Sources: txchristkindlmarket.com; Arlington CVB coverage, Oct 27, 2026."}, {"n": 14, "title": "Granbury Wine Celebration: Holiday Edition", "type": "happening", "town": "Granbury", "drive": "50", "when": "Fri Nov 20, 2–8pm; Sat Nov 21, 12–8pm", "why": "The third annual holiday-edition wine celebration on Granbury's historic square — Texas wineries pouring amid the square's shops and lights, with a full Saturday afternoon session.", "stretch": false, "maybe_review": false, "kind": "wine festival", "when_or_hours": "Fri Nov 20, 2–8pm; Sat Nov 21, 12–8pm", "startDate": "2026-11-20", "dueDate": "2026-11-20", "oneShot": false, "band": "adjacent", "notes": "Historic Granbury Square, Granbury. Sources: granburywine.com; Visit Granbury Christmas page."}, {"n": 15, "title": "Fort Worth Stockyards Food, Country & Family Festival", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Fri Nov 20 – Sun Nov 22, from 10am", "why": "A three-day food, country and family festival at Trinity Park by the Stockyards team — food vendors, country flavor and family activities in an open park setting.", "stretch": false, "maybe_review": false, "kind": "food festival", "when_or_hours": "Fri Nov 20 – Sun Nov 22, from 10am", "startDate": "2026-11-20", "dueDate": "2026-11-20", "oneShot": false, "band": "core", "notes": "Trinity Park, Fort Worth. Source: AllEvents / HappeningNext Fort Worth festival listings."}, {"n": 16, "title": "Vintage Market Days of Dallas–McKinney", "type": "happening", "town": "McKinney", "drive": "55", "when": "Fri Nov 20 – Sun Nov 22", "why": "The big vintage market weekend at Myers Park: antiques, original art, jewelry, home decor and handmade one-of-a-kind finds — serious browsing territory.", "stretch": false, "maybe_review": false, "kind": "vintage market", "when_or_hours": "Fri Nov 20 – Sun Nov 22", "startDate": "2026-11-20", "dueDate": "2026-11-20", "oneShot": false, "band": "adjacent", "notes": "Myers Park & Event Center, 7117 County Road 166, McKinney. Source: The Scout Guide Plano/Frisco/McKinney November events roundup, Nov 2, 2026."}, {"n": 17, "title": "Denton Arts & Artisan Festival", "type": "happening", "town": "Denton", "drive": "40", "when": "Fri Nov 20 – Sun Nov 22, from 10am", "why": "A three-day arts and artisan festival in Denton — a new-town stretch with makers and art rather than the usual market rows, in the Carroll Blvd corridor.", "stretch": true, "maybe_review": false, "kind": "arts festival", "when_or_hours": "Fri Nov 20 – Sun Nov 22, from 10am", "startDate": "2026-11-20", "dueDate": "2026-11-20", "oneShot": false, "band": "core", "notes": "2217 Carroll Blvd, Denton. Source: AllEvents Denton festival listings, November 2026."}, {"n": 18, "title": "Tree Tour — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Nov 21, 9–10am", "why": "A naturalist-led hour learning the refuge's trees — ID, natural history and fall change — on the Nature Center's trails. Pre-registration required, small fee with admission.", "stretch": false, "maybe_review": false, "kind": "nature walk", "when_or_hours": "Sat Nov 21, 9–10am", "startDate": "2026-11-21", "dueDate": "2026-11-21", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd, Fort Worth. Activity 54215. Source: FWNC November 2026 program calendar (fwnaturecenter.org)."}, {"n": 19, "title": "Discover Forest Bathing: November", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Nov 21, 9–10:30am", "why": "Shinrin-yoku in the Japanese Garden: a slow, guided, senses-first morning walk among the maples at peak fall color. A different register from a bird walk — quiet, small and early.", "stretch": true, "maybe_review": false, "kind": "garden class", "when_or_hours": "Sat Nov 21, 9–10:30am", "startDate": "2026-11-21", "dueDate": "2026-11-21", "oneShot": true, "band": "core", "notes": "Japanese Garden, Fort Worth Botanic Garden, 3220 Botanic Garden Blvd, Fort Worth. Source: FWBG event calendar / adult education listings."}, {"n": 20, "title": "Viridian Holiday Market", "type": "happening", "town": "Arlington", "drive": "20", "when": "Sat Nov 21, 10am–1pm", "why": "A short, sweet resident holiday market at Viridian's Lake Club in north Arlington — local vendors, three hours only, with the Sailing Center open house next door.", "stretch": false, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Sat Nov 21, 10am–1pm", "startDate": "2026-11-21", "dueDate": "2026-11-21", "oneShot": true, "band": "core", "notes": "The Lake Club, 1200 Viridian Park Ln, Arlington. Source: DFW Craft Shows listing, updated Nov 6, 2026."}, {"n": 21, "title": "Christmas in Cleburne", "type": "happening", "town": "Cleburne", "drive": "45", "when": "Sat Nov 21, from 11am", "why": "Cleburne's big Christmas market day at the Conference Center — a new-town holiday browse in Johnson County, easy to pair with the JN Long arts center a few blocks away.", "stretch": true, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Sat Nov 21, from 11am", "startDate": "2026-11-21", "dueDate": "2026-11-21", "oneShot": true, "band": "adjacent", "notes": "Cleburne Conference Center, 1501 W Henderson St, Cleburne. Source: AllEvents Cleburne November 2026 listings."}, {"n": 22, "title": "Fort Worth Texas Temple Open House Tours", "type": "happening", "town": "Burleson", "drive": "35", "when": "Through Sat Nov 21, daily except Sundays (final day)", "why": "A rare, once-only chance: free public tours of the new Fort Worth Texas Temple in Burleson before it is dedicated — tours run through Nov 21 (closed Sundays), no reservations needed. After dedication, temples close to the public, so this window does not come back.", "stretch": true, "maybe_review": false, "kind": "open house tour", "when_or_hours": "Through Sat Nov 21, daily except Sundays (final day)", "startDate": "2026-11-21", "dueDate": "2026-11-21", "oneShot": true, "band": "core", "notes": "1851 Greenridge Dr, Burleson. Free, no reservations. Source: Cleburne Times-Review report via Hood County Express Microplex News, Nov 7, 2026."}, {"n": 23, "title": "Rock 'n' Roll Rummage Sale", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Nov 21, from 12pm", "why": "Fort Worth's beloved vintage and art market on South Main: 140+ vendors, live music and food trucks, free entry — records, vintage gear and odd finds to dig through.", "stretch": false, "maybe_review": false, "kind": "vintage market", "when_or_hours": "Sat Nov 21, from 12pm", "startDate": "2026-11-21", "dueDate": "2026-11-21", "oneShot": true, "band": "core", "notes": "105 S Main St, Fort Worth. Free entry. Sources: AllEvents Fort Worth festival listings; StayHappening Fort Worth."}, {"n": 24, "title": "Caprock Stroll — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sun Nov 22, 11am & 2pm", "why": "A naturalist-led stroll along the Caprock Trail: fossils in the ridge, fall wildlife and wide views over the refuge. Two sessions, pre-registration required, small fee with admission.", "stretch": false, "maybe_review": false, "kind": "nature walk", "when_or_hours": "Sun Nov 22, 11am & 2pm", "startDate": "2026-11-22", "dueDate": "2026-11-22", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd, Fort Worth. Activities 54223/54224. Source: FWNC November 2026 program calendar (fwnaturecenter.org)."}, {"n": 25, "title": "Turtle Creek Fall Arts Festival 2026 (Sunday)", "type": "happening", "town": "Dallas", "drive": "40", "when": "Sun Nov 22, from 11am", "why": "The Sunday session of the Turtle Creek fall arts festival in Reverchon Park — outdoor art booths along the creek in one of Dallas's oldest parks.", "stretch": false, "maybe_review": false, "kind": "arts festival", "when_or_hours": "Sun Nov 22, from 11am", "startDate": "2026-11-22", "dueDate": "2026-11-22", "oneShot": true, "band": "core", "notes": "Reverchon Park, Dallas. Source: AllEvents Dallas fall festival listings, November 2026."}, {"n": 26, "title": "GM Financial Parade of Lights", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sun Nov 22, 6–8pm", "why": "Fort Worth's 44th Parade of Lights: 100+ illuminated floats, marching bands and Santa closing the route through downtown. The one evening card in the deck — it starts at 6 and wraps by 8. Sidewalk viewing free; arrive early for a spot.", "stretch": false, "maybe_review": false, "kind": "parade", "when_or_hours": "Sun Nov 22, 6–8pm", "startDate": "2026-11-22", "dueDate": "2026-11-22", "oneShot": true, "band": "core", "notes": "Downtown Fort Worth; parade begins at Weatherford & Throckmorton. Free; reserved Street Seats sold separately. Sources: Fort Worth Magazine event listing; Downtown Fort Worth Inc."}, {"n": 27, "title": "38th Annual Carol of Lights", "type": "happening", "town": "Grapevine", "drive": "15", "when": "Mon Nov 23, 4–8pm", "why": "Grapevine flips the switch on the Christmas Capital of Texas season: live music on three stages, shops open late, Santa, a snow hill and the official lighting of Historic Main Street. One day past the near window — dealt as the horizon card, since it anchors the whole Grapevine season.", "stretch": true, "maybe_review": false, "kind": "tree lighting festival", "when_or_hours": "Mon Nov 23, 4–8pm", "startDate": "2026-11-23", "dueDate": "2026-11-23", "oneShot": true, "band": "core", "notes": "Historic Main Street, Grapevine. Free. Sources: Grapevine CVB Christmas Capital easy-reference guide; grapevinetexasusa.com."}, {"n": 28, "title": "Weston Gardens In Bloom", "type": "place", "town": "Fort Worth", "drive": "35", "when": "Mon–Fri 10am–6pm; Sat 9am–6pm; Sun 12–5pm", "why": "Four acres of historic 1930s demonstration gardens across from one of Fort Worth's first native-plant nurseries — mature plantings to wander for ideas (bird and pollinator beds included), then the nursery and gift shop. Gardens free to visit in business hours.", "stretch": false, "maybe_review": false, "kind": "garden center", "when_or_hours": "Mon–Fri 10am–6pm; Sat 9am–6pm; Sun 12–5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "8101 Anglin Dr, Fort Worth. Sources: westongardens.com history/hours pages."}, {"n": 29, "title": "Blue Bonnet Bakery", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Mon–Fri 7am–6pm; Sat 7am–4pm; closed Sun", "why": "Fort Worth staple since 1934, now baking inside a renovated 1920s brick church on Camp Bowie — stained glass, pews for seats, and cases of petit fours, king cake and custard Bismarcks. The clear reason: nearly a century of history you can eat lunch in.", "stretch": false, "maybe_review": false, "kind": "bakery", "when_or_hours": "Mon–Fri 7am–6pm; Sat 7am–4pm; closed Sun", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "4705 Camp Bowie Blvd, Fort Worth. Sources: bluebonnetbakery.com; Fort Worth Magazine listing."}, {"n": 30, "title": "Carshon's Delicatessen", "type": "place", "town": "Fort Worth", "drive": "30", "when": "Mon–Sat 9am–3pm; closed Sun", "why": "Family-run kosher-style deli since 1928 — Fort Worth's first Jewish deli, in its Cleburne Road spot since 1973. Towering Reubens, matzo ball soup and homemade pies, lunch only. The clear reason: it is one of the oldest restaurants in the city, still family-run.", "stretch": false, "maybe_review": false, "kind": "deli", "when_or_hours": "Mon–Sat 9am–3pm; closed Sun", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "3133 Cleburne Rd, Fort Worth. Sources: carshonsdeli.com; deli histories published Oct 2026."}, {"n": 31, "title": "Klyde Warren Park", "type": "place", "town": "Dallas", "drive": "40", "when": "Daily 6am–11pm", "why": "Dallas's 5.2-acre deck park built over Woodall Rodgers Freeway: free daily programming, food-truck row, the Nancy Best Fountain's noon show, and the Arts District on one side and Uptown on the other. Free, and an easy anchor for a downtown Dallas day.", "stretch": false, "maybe_review": false, "kind": "park", "when_or_hours": "Daily 6am–11pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "2012 Woodall Rodgers Fwy, Dallas. Free admission. Sources: klydewarrenpark.org park information."}, {"n": 32, "title": "Mineral Wells Fossil Park", "type": "place", "town": "Mineral Wells", "drive": "55", "when": "Fri–Mon 8am–dusk", "why": "An eight-acre former borrow pit where you hunt 300-million-year-old Pennsylvanian sea fossils — crinoids, brachiopods, trilobites, shark teeth — and keep everything you find. Completely free; bring small hand tools, a bucket and water. The far-edge stretch place of the run, right at the drive limit.", "stretch": true, "maybe_review": false, "kind": "fossil park", "when_or_hours": "Fri–Mon 8am–dusk", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "2375 Indian Creek Rd, Mineral Wells. Free; city-run. Hours Fri–Mon per city/TripAdvisor listings (some listings show daily — check mineralwellsfossilpark.com before going)."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
