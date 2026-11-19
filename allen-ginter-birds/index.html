@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Allen &amp; Ginter — Birds of America: my collection</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         background: #faf7f0; color: #222; font-size: 17px; line-height: 1.45; }
+  header { background: #fffdf8; border-bottom: 2px solid #d8cfc0; padding: 16px 16px 12px;
+           position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .counts { font-size: 19px; font-weight: 700; margin: 4px 0; }
+  .counts .n4 { color: #7a4b12; } .counts .n37 { color: #14532d; }
+  .explainer { margin: 6px 0 10px; color: #444; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+  .toolbar button, .toolbar label.btn { font-size: 16px; padding: 12px 14px; min-height: 48px;
+    border-radius: 10px; border: 1px solid #8a7f6a; background: #fff; color: #222; cursor: pointer; }
+  .toolbar button:active, .toolbar label.btn:active { background: #eee5d3; }
+  main { padding: 12px; max-width: 720px; margin: 0 auto; }
+  .card { background: #fff; border: 1px solid #ddd3c0; border-radius: 14px; padding: 12px;
+          margin-bottom: 14px; }
+  .card.owned-both { border-color: #14532d; box-shadow: 0 0 0 1px #14532d inset; }
+  .card-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+  .card-head .num { font-weight: 700; color: #8a7f6a; font-size: 16px; }
+  .card-head h2 { font-size: 20px; margin: 0; }
+  .card-main { display: flex; gap: 12px; }
+  .ref { flex: 0 0 118px; text-align: center; text-decoration: none; color: #14532d; }
+  .ref img { width: 118px; height: auto; border: 1px solid #ccc; border-radius: 6px; display: block; }
+  .ref span { font-size: 13px; display: block; margin-top: 4px; }
+  .slots { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .slot { border: 1px solid #e2dac8; border-radius: 10px; padding: 10px; background: #fffdf8; }
+  .slot-title { font-weight: 700; font-size: 16px; margin-bottom: 8px; }
+  .slot-title .got { color: #14532d; font-weight: 700; }
+  .photo-box { border: 2px dashed #c9bda3; border-radius: 8px; min-height: 84px;
+               display: flex; align-items: center; justify-content: center; color: #8a7f6a;
+               font-size: 15px; text-align: center; padding: 8px; margin-bottom: 8px; background: #fff; }
+  .photo-box img { max-width: 100%; max-height: 170px; border-radius: 6px; display: block; }
+  .photo-box.filled { border-style: solid; border-color: #14532d; padding: 4px; }
+  .slot-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+  .slot-actions button { font-size: 16px; padding: 10px 14px; min-height: 48px; border-radius: 10px;
+    border: 1px solid #8a7f6a; background: #fff; cursor: pointer; }
+  .slot-actions button.primary { background: #14532d; border-color: #14532d; color: #fff; }
+  .slot-actions button.danger { color: #8f1d1d; border-color: #c9a3a3; }
+  label.own { display: flex; align-items: center; gap: 10px; font-size: 16px; padding: 6px 0; cursor: pointer; }
+  label.own input { width: 26px; height: 26px; accent-color: #14532d; }
+  .note { margin-top: 10px; font-size: 15px; color: #555; background: #f6f1e5;
+          border-radius: 8px; padding: 8px 10px; }
+  footer { max-width: 720px; margin: 0 auto; padding: 8px 16px 40px; color: #555; font-size: 15px; }
+  footer p { margin: 8px 0; }
+  .hidden-input { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+</style>
+</head>
+<body>
+<!-- Allen & Ginter Birds of America collection tracker.
+     Built to grow: the whole card list is one data block (SET.cards) at the top of the
+     first script below. Tracking a different set is a data swap, not a rewrite.
+     Your check marks and photos never enter this file — they live on your phone. -->
+<header>
+  <h1>Allen &amp; Ginter — Birds of America: my collection</h1>
+  <div class="counts"><span class="n4" id="count-n4">N4: 0 of 50</span> &middot; <span class="n37" id="count-n37">N37: 0 of 50</span></div>
+  <p class="explainer">Tap <b>Add photo</b> on a card you own, snap it or pick it from your photo roll,
+     and the page marks it yours and keeps your picture beside the reference card.</p>
+  <div class="toolbar">
+    <button id="btn-export" type="button">Export</button>
+    <button id="btn-export-photos" type="button">Export with photos (bigger file)</button>
+    <label class="btn" for="import-input">Import</label>
+  </div>
+</header>
+<main id="cards"></main>
+<footer>
+  <p><b>Private by design:</b> your check marks and photos stay on this phone, in this browser —
+     this page sends nothing anywhere.</p>
+  <p><b>One honest catch:</b> photos live in this browser's storage on this phone. If the browser
+     clears its storage, they're gone — use <b>Export with photos</b> now and then to keep a backup
+     file, and <b>Import</b> to bring it back.</p>
+  <p>Reference pictures are the larger N37 cards, from the Metropolitan Museum of Art's Open Access
+     Burdick Collection (public domain) — the N4 and N37 cards carry the same artwork. The sets are
+     Allen &amp; Ginter's <i>Birds of America</i>: N4 from 1888; N37 dated 1890 by TCDB/PSA and 1888
+     by the Met. The cards themselves are unnumbered — the numbers here are checklist positions.</p>
+  <p>Built to grow: the card list is one data block at the top of this page's code, so a future set
+     is a data swap, not a rewrite.</p>
+</footer>
+<input class="hidden-input" type="file" id="photo-input" accept="image/*">
+<input class="hidden-input" type="file" id="import-input" accept=".json,application/json">
+
+<script>
+"use strict";
+/* ===== Set data — swap this block to track a different set. ===== */
+var SET = {
+  id: "ag-1888-birds",
+  title: "Allen & Ginter — Birds of America",
+  cards: [
+ {
+  "n": 1,
+  "name": "Albatross",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838960.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421590"
+ },
+ {
+  "n": 2,
+  "name": "Baltimore Oriole",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838961.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421601"
+ },
+ {
+  "n": 3,
+  "name": "Barn Swallow",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838962.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421602"
+ },
+ {
+  "n": 4,
+  "name": "Blue Bird",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838963.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421603"
+ },
+ {
+  "n": 5,
+  "name": "Blue Bunting",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838964.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421608"
+ },
+ {
+  "n": 6,
+  "name": "Blue Jay",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838965.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421609"
+ },
+ {
+  "n": 7,
+  "name": "Bob-O-Link",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838966.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421611"
+ },
+ {
+  "n": 8,
+  "name": "Cardinal Grosbeak",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838967.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421612"
+ },
+ {
+  "n": 9,
+  "name": "Carolina Parrot",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838968.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421801"
+ },
+ {
+  "n": 10,
+  "name": "Carrier Pigeon",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838969.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421802"
+ },
+ {
+  "n": 11,
+  "name": "Catbird",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838970.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421803"
+ },
+ {
+  "n": 12,
+  "name": "Chickadee",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838971.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421804"
+ },
+ {
+  "n": 13,
+  "name": "Crossbill",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838972.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421805"
+ },
+ {
+  "n": 14,
+  "name": "Crow",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838973.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/421806"
+ },
+ {
+  "n": 15,
+  "name": "Cuckoo",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838974.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422070"
+ },
+ {
+  "n": 16,
+  "name": "Dipper",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838975.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422071"
+ },
+ {
+  "n": 17,
+  "name": "Eagle",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838976.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422072"
+ },
+ {
+  "n": 18,
+  "name": "Fantail Pigeon",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838977.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422073"
+ },
+ {
+  "n": 19,
+  "name": "Goldfinch",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838978.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422075"
+ },
+ {
+  "n": 20,
+  "name": "Great Northern Diver (Loon)",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838979.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422076"
+ },
+ {
+  "n": 21,
+  "name": "Horned Owl",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838980.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422078"
+ },
+ {
+  "n": 22,
+  "name": "Humming Bird",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838981.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422079"
+ },
+ {
+  "n": 23,
+  "name": "Kingfisher",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838982.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422080"
+ },
+ {
+  "n": 24,
+  "name": "Magpie",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838983.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422081"
+ },
+ {
+  "n": 25,
+  "name": "Martin",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838984.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422085"
+ },
+ {
+  "n": 26,
+  "name": "Meadow Lark",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838985.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422086"
+ },
+ {
+  "n": 27,
+  "name": "Mocking Bird",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838986.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422087"
+ },
+ {
+  "n": 28,
+  "name": "Mother Carey's Chicken",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838987.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422088"
+ },
+ {
+  "n": 29,
+  "name": "Osprey",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838988.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422100"
+ },
+ {
+  "n": 30,
+  "name": "Pouter Pigeon",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838989.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422101"
+ },
+ {
+  "n": 31,
+  "name": "Raven",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838990.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422102"
+ },
+ {
+  "n": 32,
+  "name": "Red Bird",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838991.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422103"
+ },
+ {
+  "n": 33,
+  "name": "Redstart",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838992.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422106"
+ },
+ {
+  "n": 34,
+  "name": "Robin",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838993.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422107"
+ },
+ {
+  "n": 35,
+  "name": "Scarlet Tanager",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838994.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422108"
+ },
+ {
+  "n": 36,
+  "name": "Sea Gull",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838995.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422109"
+ },
+ {
+  "n": 37,
+  "name": "Snow Bird",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838997.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422111"
+ },
+ {
+  "n": 38,
+  "name": "Snow Bunting",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838996.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422112"
+ },
+ {
+  "n": 39,
+  "name": "Snowy Owl",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838998.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422113"
+ },
+ {
+  "n": 40,
+  "name": "Song Sparrow",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP838999.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422114"
+ },
+ {
+  "n": 41,
+  "name": "Red-winged Starling",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP839000.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422117",
+  "note": "On the N37 card this bird is captioned just “Starling” — same bird, same card (TCDB's N4 list calls it Red-winged Starling)."
+ },
+ {
+  "n": 42,
+  "name": "Swallow-Tailed Flycatcher",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP839001.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422118"
+ },
+ {
+  "n": 43,
+  "name": "Swallow-Tailed Hawk",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP839002.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422119"
+ },
+ {
+  "n": 44,
+  "name": "Tumbler Pigeon",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP839003.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422120"
+ },
+ {
+  "n": 45,
+  "name": "Whip-Poor-Will",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP839004.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422124"
+ },
+ {
+  "n": 46,
+  "name": "Wood Thrush",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP839006.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422127"
+ },
+ {
+  "n": 47,
+  "name": "Wood Warbler",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP839007.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422128"
+ },
+ {
+  "n": 48,
+  "name": "Woodpecker",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP839005.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422125"
+ },
+ {
+  "n": 49,
+  "name": "Wren",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP839008.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422130"
+ },
+ {
+  "n": 50,
+  "name": "Yellow-breasted Chat",
+  "refImg": "https://images.metmuseum.org/CRDImages/dp/web-large/DP839009.jpg",
+  "refPage": "https://www.metmuseum.org/art/collection/search/422131"
+ }
+]
+};
+var SET_KEYS = ["N4", "N37"];
+
+/* ===== Pure state helpers (no DOM in here) ===== */
+var OWNED_LS_KEY = "ag-owned:" + SET.id;
+var DB_NAME = "allen-ginter-collection";
+var DB_STORE = "photos";
+
+function photoKey(n, setKey) { return n + ":" + setKey; }
+
+function loadOwned() {
+  try { var o = JSON.parse(localStorage.getItem(OWNED_LS_KEY)); return (o && typeof o === "object") ? o : {}; }
+  catch (e) { return {}; }
+}
+function saveOwned(o) { localStorage.setItem(OWNED_LS_KEY, JSON.stringify(o)); }
+function isOwned(o, n, setKey) { return !!o[photoKey(n, setKey)]; }
+function setOwned(o, n, setKey, v) {
+  if (v) { o[photoKey(n, setKey)] = true; } else { delete o[photoKey(n, setKey)]; }
+}
+function countOwned(o, setKey) {
+  var c = 0;
+  SET.cards.forEach(function (card) { if (isOwned(o, card.n, setKey)) { c++; } });
+  return c;
+}
+function ownedList(o, setKey) {
+  var a = [];
+  SET.cards.forEach(function (card) { if (isOwned(o, card.n, setKey)) { a.push(card.n); } });
+  return a;
+}
+function todayStr(d) {
+  d = d || new Date();
+  function p(x) { return (x < 10 ? "0" : "") + x; }
+  return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+}
+function buildExport(o, photos) {
+  var out = {
+    app: "allen-ginter-collection",
+    setId: SET.id,
+    title: SET.title,
+    exported: todayStr(),
+    owned: { N4: ownedList(o, "N4"), N37: ownedList(o, "N37") }
+  };
+  if (photos) { out.photos = photos; }
+  return out;
+}
+function ownedFromExport(data) {
+  if (!data || typeof data !== "object" || data.setId !== SET.id || !data.owned) { return null; }
+  var o = {};
+  SET_KEYS.forEach(function (s) {
+    var list = data.owned[s];
+    if (Array.isArray(list)) {
+      list.forEach(function (n) { if (typeof n === "number" && n >= 1 && n <= SET.cards.length) { o[photoKey(n, s)] = true; } });
+    }
+  });
+  return o;
+}
+function validPhotoEntry(k, v) {
+  return /^\d+:(N4|N37)$/.test(k) && typeof v === "string" && v.indexOf("data:image") === 0;
+}
+
+/* ===== IndexedDB photo store (keys like "4:N4") ===== */
+function idbOpen() {
+  return new Promise(function (resolve, reject) {
+    var req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = function () { req.result.createObjectStore(DB_STORE); };
+    req.onsuccess = function () { resolve(req.result); };
+    req.onerror = function () { reject(req.error); };
+  });
+}
+function idbReq(makeReq) {
+  return idbOpen().then(function (db) {
+    return new Promise(function (resolve, reject) {
+      var req = makeReq(db.transaction(DB_STORE, "readwrite").objectStore(DB_STORE));
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+    });
+  });
+}
+function idbPut(key, val) { return idbReq(function (st) { return st.put(val, key); }); }
+function idbDelete(key) { return idbReq(function (st) { return st.delete(key); }); }
+function idbClear() { return idbReq(function (st) { return st.clear(); }); }
+function idbGetAll() {
+  return idbOpen().then(function (db) {
+    return new Promise(function (resolve, reject) {
+      var st = db.transaction(DB_STORE, "readonly").objectStore(DB_STORE);
+      var keysReq = st.getAllKeys(), valsReq = st.getAll();
+      var keys = null, vals = null;
+      function done() {
+        if (keys === null || vals === null) { return; }
+        var out = {};
+        keys.forEach(function (k, i) { out[k] = vals[i]; });
+        resolve(out);
+      }
+      keysReq.onsuccess = function () { keys = keysReq.result; done(); };
+      valsReq.onsuccess = function () { vals = valsReq.result; done(); };
+      keysReq.onerror = function () { reject(keysReq.error); };
+      valsReq.onerror = function () { reject(valsReq.error); };
+    });
+  });
+}
+</script>
+
+<script>
+"use strict";
+/* ===== Page wiring ===== */
+var owned = loadOwned();
+var photos = {};            // photoKey -> data URL, loaded from IndexedDB at start
+var pendingSlot = null;     // {n, setKey} the hidden file input is currently serving
+
+var cardsEl = document.getElementById("cards");
+var photoInput = document.getElementById("photo-input");
+var importInput = document.getElementById("import-input");
+
+function el(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) { e.className = cls; }
+  if (text != null) { e.textContent = text; }
+  return e;
+}
+
+function renderCounts() {
+  document.getElementById("count-n4").textContent = "N4: " + countOwned(owned, "N4") + " of " + SET.cards.length;
+  document.getElementById("count-n37").textContent = "N37: " + countOwned(owned, "N37") + " of " + SET.cards.length;
+}
+
+function renderSlot(slotEl, n, setKey) {
+  var key = photoKey(n, setKey);
+  var hasPhoto = !!photos[key];
+  var mine = isOwned(owned, n, setKey);
+  slotEl.innerHTML = "";
+
+  var title = el("div", "slot-title");
+  title.appendChild(document.createTextNode("My " + setKey + " "));
+  if (mine) { var got = el("span", "got", "✓ yours"); title.appendChild(got); }
+  slotEl.appendChild(title);
+
+  var box = el("div", "photo-box" + (hasPhoto ? " filled" : ""));
+  if (hasPhoto) {
+    var img = document.createElement("img");
+    img.src = photos[key];
+    img.alt = "My " + setKey + " card photo";
+    img.setAttribute("data-action", "photo-tap");
+    img.setAttribute("data-n", n);
+    img.setAttribute("data-set", setKey);
+    box.appendChild(img);
+  } else {
+    box.textContent = "No photo yet";
+  }
+  slotEl.appendChild(box);
+
+  var actions = el("div", "slot-actions");
+  if (!hasPhoto) {
+    var add = el("button", "primary", "Add photo");
+    add.type = "button";
+    add.setAttribute("data-action", "add-photo");
+    add.setAttribute("data-n", n);
+    add.setAttribute("data-set", setKey);
+    actions.appendChild(add);
+  } else {
+    var rep = el("button", "", "Replace");
+    rep.type = "button";
+    rep.setAttribute("data-action", "add-photo");
+    rep.setAttribute("data-n", n);
+    rep.setAttribute("data-set", setKey);
+    var rem = el("button", "danger", "Remove");
+    rem.type = "button";
+    rem.setAttribute("data-action", "remove-photo");
+    rem.setAttribute("data-n", n);
+    rem.setAttribute("data-set", setKey);
+    actions.appendChild(rep);
+    actions.appendChild(rem);
+  }
+  slotEl.appendChild(actions);
+
+  var lab = el("label", "own");
+  var cb = document.createElement("input");
+  cb.type = "checkbox";
+  cb.checked = mine;
+  cb.setAttribute("data-action", "own-toggle");
+  cb.setAttribute("data-n", n);
+  cb.setAttribute("data-set", setKey);
+  lab.appendChild(cb);
+  lab.appendChild(document.createTextNode("I own it — no photo"));
+  slotEl.appendChild(lab);
+}
+
+function slotElFor(n, setKey) {
+  return cardsEl.querySelector('.slot[data-n="' + n + '"][data-set="' + setKey + '"]');
+}
+function refreshSlot(n, setKey) {
+  var s = slotElFor(n, setKey);
+  if (s) { renderSlot(s, n, setKey); }
+  var cardEl = cardsEl.querySelector('.card[data-n="' + n + '"]');
+  if (cardEl) {
+    var both = isOwned(owned, n, "N4") && isOwned(owned, n, "N37");
+    cardEl.classList.toggle("owned-both", both);
+  }
+  renderCounts();
+}
+
+function renderAll() {
+  cardsEl.innerHTML = "";
+  SET.cards.forEach(function (card) {
+    var sec = el("section", "card");
+    sec.setAttribute("data-n", card.n);
+
+    var head = el("div", "card-head");
+    head.appendChild(el("span", "num", "#" + card.n));
+    head.appendChild(el("h2", "", card.name));
+    sec.appendChild(head);
+
+    var main = el("div", "card-main");
+    var a = document.createElement("a");
+    a.className = "ref";
+    a.href = card.refPage;
+    a.target = "_blank";
+    a.rel = "noopener";
+    var img = document.createElement("img");
+    img.src = card.refImg;
+    img.alt = card.name + " — reference card (N37)";
+    img.loading = "lazy";
+    a.appendChild(img);
+    a.appendChild(el("span", "", "Reference card (N37) — tap for the Met page"));
+    main.appendChild(a);
+
+    var slots = el("div", "slots");
+    SET_KEYS.forEach(function (setKey) {
+      var slot = el("div", "slot");
+      slot.setAttribute("data-n", card.n);
+      slot.setAttribute("data-set", setKey);
+      slots.appendChild(slot);
+      renderSlot(slot, card.n, setKey);
+    });
+    main.appendChild(slots);
+    sec.appendChild(main);
+
+    if (card.note) { sec.appendChild(el("div", "note", card.note)); }
+    cardsEl.appendChild(sec);
+  });
+  SET.cards.forEach(function (card) { refreshSlot(card.n, "N4"); refreshSlot(card.n, "N37"); });
+  renderCounts();
+}
+
+/* Downscale a picked photo: max 900px on the long edge, JPEG ~0.85. */
+function fileToDataURL(file) {
+  return new Promise(function (resolve, reject) {
+    var url = URL.createObjectURL(file);
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var max = 900;
+        var w = img.naturalWidth, h = img.naturalHeight;
+        var scale = Math.min(1, max / Math.max(w, h));
+        var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(h * scale));
+        var cv = document.createElement("canvas");
+        cv.width = cw; cv.height = ch;
+        cv.getContext("2d").drawImage(img, 0, 0, cw, ch);
+        URL.revokeObjectURL(url);
+        resolve(cv.toDataURL("image/jpeg", 0.85));
+      } catch (e) { URL.revokeObjectURL(url); reject(e); }
+    };
+    img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("read")); };
+    img.src = url;
+  });
+}
+
+function pickPhoto(n, setKey) {
+  pendingSlot = { n: n, setKey: setKey };
+  photoInput.value = "";
+  photoInput.click();
+}
+
+photoInput.addEventListener("change", function () {
+  var file = photoInput.files && photoInput.files[0];
+  var target = pendingSlot;
+  pendingSlot = null;
+  if (!file || !target) { return; }
+  fileToDataURL(file).then(function (dataUrl) {
+    var key = photoKey(target.n, target.setKey);
+    return idbPut(key, dataUrl).then(function () {
+      photos[key] = dataUrl;
+      setOwned(owned, target.n, target.setKey, true);   // a photo means it's yours
+      saveOwned(owned);
+      refreshSlot(target.n, target.setKey);
+    });
+  }).catch(function () {
+    alert("Sorry — that photo could not be saved. Try again, or use “I own it — no photo”.");
+  });
+});
+
+document.addEventListener("click", function (ev) {
+  var t = ev.target.closest ? ev.target.closest("[data-action]") : null;
+  if (!t) { return; }
+  var action = t.getAttribute("data-action");
+  var n = parseInt(t.getAttribute("data-n"), 10);
+  var setKey = t.getAttribute("data-set");
+  if (action === "add-photo") {
+    pickPhoto(n, setKey);
+  } else if (action === "remove-photo") {
+    if (confirm("Remove this photo? (Your check mark stays as it is.)")) {
+      var key = photoKey(n, setKey);
+      idbDelete(key).then(function () {
+        delete photos[key];
+        refreshSlot(n, setKey);
+      });
+    }
+  } else if (action === "photo-tap") {
+    // Tapping your photo jumps to its Replace / Remove buttons.
+    var s = slotElFor(n, setKey);
+    if (s) {
+      var btn = s.querySelector(".slot-actions button");
+      if (btn) { btn.focus(); btn.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    }
+  }
+});
+
+document.addEventListener("change", function (ev) {
+  var t = ev.target;
+  if (!t.getAttribute || t.getAttribute("data-action") !== "own-toggle") { return; }
+  var n = parseInt(t.getAttribute("data-n"), 10);
+  var setKey = t.getAttribute("data-set");
+  setOwned(owned, n, setKey, t.checked);
+  saveOwned(owned);
+  refreshSlot(n, setKey);
+});
+
+function downloadJSON(obj, filename) {
+  var blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+}
+
+document.getElementById("btn-export").addEventListener("click", function () {
+  downloadJSON(buildExport(owned, null), "allen-ginter-collection-" + todayStr() + ".json");
+});
+document.getElementById("btn-export-photos").addEventListener("click", function () {
+  var ph = {};
+  Object.keys(photos).forEach(function (k) { if (photos[k]) { ph[k] = photos[k]; } });
+  downloadJSON(buildExport(owned, ph), "allen-ginter-collection-with-photos-" + todayStr() + ".json");
+});
+
+importInput.addEventListener("change", function () {
+  var file = importInput.files && importInput.files[0];
+  importInput.value = "";
+  if (!file) { return; }
+  file.text().then(function (text) {
+    var data;
+    try { data = JSON.parse(text); } catch (e) { alert("That file is not a collection export — nothing was changed."); return; }
+    var newOwned = ownedFromExport(data);
+    if (!newOwned) { alert("That file does not match this set — nothing was changed."); return; }
+    if (!confirm("Import this file? It replaces your current check marks" +
+                 (data.photos ? " and photos" : "") + " on this phone.")) { return; }
+    owned = newOwned;
+    saveOwned(owned);
+    if (data.photos && typeof data.photos === "object") {
+      var entries = Object.keys(data.photos).filter(function (k) { return validPhotoEntry(k, data.photos[k]); });
+      idbClear().then(function () {
+        return Promise.all(entries.map(function (k) { return idbPut(k, data.photos[k]); }));
+      }).then(function () {
+        photos = {};
+        entries.forEach(function (k) { photos[k] = data.photos[k]; });
+        renderAll();
+        alert("Import done.");
+      }).catch(function () { renderAll(); alert("Check marks imported, but the photos hit a snag."); });
+    } else {
+      renderAll();
+      alert("Import done.");
+    }
+  });
+});
+
+/* Start: load photos from IndexedDB, then draw. */
+idbGetAll().then(function (all) {
+  photos = all || {};
+  renderAll();
+}).catch(function () {
+  photos = {};
+  renderAll();
+});
+</script>
+</body>
+</html>
