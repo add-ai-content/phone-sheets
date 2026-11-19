@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-11-19</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-11-19";
+const CARDS = [{"n": 1, "title": "Opening Weekend of The Market at Glade Parks", "type": "happening", "town": "Euless", "drive": "20", "when": "Fri Nov 20, 4:30pm opening; market season follows", "why": "A brand-new outdoor market opens at Glade Parks in Euless on Friday afternoon — opening weekend is the browse, with local vendors in the mall plaza twenty minutes from home. A new venue and a new town for the deck.", "stretch": false, "maybe_review": false, "kind": "market opening", "when_or_hours": "Fri Nov 20, 4:30pm opening; market season follows", "startDate": "2026-11-20", "dueDate": "2026-11-20", "oneShot": true, "band": "core", "notes": "Glade Parks, Euless. Source: DFW Pulse weekend listings, Nov 20-22, 2026 (Opening Weekend of The Market at Glade Parks, Nov 20, 4:30pm, Glade Parks Mall Plaza, Euless)."}, {"n": 2, "title": "Begonia Terrariums for Beginners", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Nov 21", "why": "A hands-on Saturday class at the Botanic Garden: build a begonia terrarium to take home. Small, daytime, and plant-first — right in the garden lane that keeps landing.", "stretch": false, "maybe_review": false, "kind": "garden class", "when_or_hours": "Sat Nov 21", "startDate": "2026-11-21", "dueDate": "2026-11-21", "oneShot": true, "band": "core", "notes": "Fort Worth Botanic Garden / BRIT, 3220 Botanic Garden Blvd, Fort Worth. Source: FWBG full calendar (Begonia Terrariums for Beginners, Nov 21, 2026)."}, {"n": 3, "title": "Wetland Wonder Tour — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Nov 21, 11:30am", "why": "World Fisheries Day at the Nature Center: a naturalist walk out to the wetlands to talk about why they matter to local plants and animals. Late-morning start, $5 with admission.", "stretch": false, "maybe_review": false, "kind": "nature walk", "when_or_hours": "Sat Nov 21, 11:30am", "startDate": "2026-11-21", "dueDate": "2026-11-21", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd, Fort Worth. Activity 54211. Pre-registration required, $5 / members $3 plus admission. Source: FWNC November 2026 program calendar."}, {"n": 4, "title": "Marvel at the Moon — Dinosaur Valley State Park", "type": "happening", "town": "Glen Rose", "drive": "55", "when": "Sat Nov 21, 6–7pm", "why": "A ranger-led hour with the moon at Dinosaur Valley — telescopes and the Paluxy River tracks in the same stop. A Glen Rose stretch; the one early-evening nature card in the deck.", "stretch": true, "maybe_review": false, "kind": "ranger program", "when_or_hours": "Sat Nov 21, 6–7pm", "startDate": "2026-11-21", "dueDate": "2026-11-21", "oneShot": true, "band": "adjacent", "notes": "Dinosaur Valley State Park, Glen Rose. Free with park entry. Sources: Texas Parks & Wildlife events calendar (Marvel at the Moon, Nov 21, 6pm); CrunchyMama DFW Thanksgiving-break guide (Nov 21, 6-7pm)."}, {"n": 5, "title": "Winter Wonderland Market at The District at Willow Park", "type": "happening", "town": "Willow Park", "drive": "40", "when": "Sun Nov 22, 12–5pm", "why": "A Sunday-afternoon holiday market in Willow Park — local boutiques, handmade gifts and holiday decor in a small shopping district Scout has never dealt. A new-town stretch, all daylight.", "stretch": true, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Sun Nov 22, 12–5pm", "startDate": "2026-11-22", "dueDate": "2026-11-22", "oneShot": true, "band": "core", "notes": "The District at Willow Park, 460 Shops Blvd, Willow Park. Source: CrunchyMama DFW Thanksgiving-break guide (Winter Wonderland Market, Sun Nov 22, noon-5pm)."}, {"n": 6, "title": "Bison Feeding Hayrides — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Tue Nov 24 – Wed Nov 25 & Fri Nov 27, 10am & 1pm", "why": "Thanksgiving-week hayrides out to the bison pasture, with a chance to help staff feed the herd. Three days to pick from, all daytime, and the Nature Center's signature program.", "stretch": false, "maybe_review": false, "kind": "hayride", "when_or_hours": "Tue Nov 24 – Wed Nov 25 & Fri Nov 27, 10am & 1pm", "startDate": "2026-11-24", "dueDate": "2026-11-24", "oneShot": false, "band": "core", "notes": "Fort Worth Nature Center & Refuge, Fort Worth. Activities 54169-54171, 54194-54196. Pre-registration required, $21 / members $15 plus admission; arrive 15 minutes early. Source: FWNC November 2026 program calendar (Bison Feeding Hayrides, Nov 24-25 & 27, 2026)."}, {"n": 7, "title": "Fort Worth YMCA Turkey Trot", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Thu Nov 26 (Thanksgiving), 1K 7:45am; 5K & 8K 8:30am", "why": "The 45th annual Thanksgiving-morning trot from General Worth Square — walkers are welcome in the 5K, courses close at 10:30am, and you'd be home before the turkey goes in. Spectating from the square is free.", "stretch": false, "maybe_review": false, "kind": "fun run", "when_or_hours": "Thu Nov 26 (Thanksgiving), 1K 7:45am; 5K & 8K 8:30am", "startDate": "2026-11-26", "dueDate": "2026-11-26", "oneShot": true, "band": "core", "notes": "General Worth Square, 916 Main St, Fort Worth. 5K $55 / 8K $60 timed (fees rise Nov 20). Sources: RunSignup race page (45th annual, Nov 26, 2026, checked Nov 14, 2026); DFWChild Thanksgiving events guide."}, {"n": 8, "title": "Grapevine Christmas Market", "type": "happening", "town": "Grapevine", "drive": "15", "when": "Opens Fri Nov 27; daily 11am–9:30pm through Dec 30 (closed Dec 24–25)", "why": "Opening day of the open-air Christmas market in the Cotton Belt Depot District — artisan vendors, treats and photo spots, a short walk from Main Street's lights. Runs all season, so any day works.", "stretch": false, "maybe_review": false, "kind": "christmas market", "when_or_hours": "Opens Fri Nov 27; daily 11am–9:30pm through Dec 30 (closed Dec 24–25)", "startDate": "2026-11-27", "dueDate": "2026-11-27", "oneShot": false, "band": "core", "notes": "Cotton Belt Depot District, 701 S Main St, Grapevine. Sources: Grapevine CVB 2026 Christmas Capital guide via Tammie Lee Tips and Dallasites101 (Grapevine Christmas Market, Nov 27 - Dec 30, 11am-9:30pm)."}, {"n": 9, "title": "Home for the Holidays, A McKinney Christmas", "type": "happening", "town": "McKinney", "drive": "55", "when": "Fri Nov 27 – Sun Nov 29", "why": "McKinney's downtown Christmas weekend on the historic square — the town's big holiday kickoff across three days. A McKinney stretch in a format (small-square holiday browse) that has landed before.", "stretch": true, "maybe_review": false, "kind": "holiday festival", "when_or_hours": "Fri Nov 27 – Sun Nov 29", "startDate": "2026-11-27", "dueDate": "2026-11-27", "oneShot": false, "band": "adjacent", "notes": "Historic downtown McKinney square. Source: FindLittleOutings McKinney guide (Home for the Holidays, A McKinney Christmas, Nov 27-29, 2026; dates checked Nov 18, 2026)."}, {"n": 10, "title": "Christmas in Grapevine Craft Show", "type": "happening", "town": "Grapevine", "drive": "15", "when": "Sat Nov 28 – Sun Nov 29", "why": "A two-day indoor craft show at the Grapevine Convention Center: 90+ vendors, $5 admission, kids and military free. Easy Saturday browse fifteen minutes away.", "stretch": false, "maybe_review": false, "kind": "craft show", "when_or_hours": "Sat Nov 28 – Sun Nov 29", "startDate": "2026-11-28", "dueDate": "2026-11-28", "oneShot": false, "band": "core", "notes": "Grapevine Convention Center, Grapevine. Sources: Grapevine CVB 2026 guide via Cuisineist (Christmas in Grapevine Craft Show, Nov 28-29, 90+ vendors, $5); KidsOutAndAbout Fort Worth holiday list (Nov 28-29, 2026)."}, {"n": 11, "title": "Backcountry Walk — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sat Nov 28, 9am–12pm", "why": "A three-hour naturalist hike into parts of the Refuge normally closed to the public — wear shoes you don't mind getting wet. The deepest-woods card in the deck.", "stretch": false, "maybe_review": false, "kind": "guided hike", "when_or_hours": "Sat Nov 28, 9am–12pm", "startDate": "2026-11-28", "dueDate": "2026-11-28", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, Fort Worth. Activity 54218. Pre-registration required, $5 / members $3 plus admission. Source: FWNC November 2026 program calendar (Backcountry Walk, Nov 28, 2026, 9am-noon)."}, {"n": 12, "title": "Christmas at Camp Carter", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Runs Nov 12 – Dec 30, select evenings", "why": "A brand-new one-mile drive-through lights display on YMCA Camp Carter's 360 acres — including a botanicals section — with warm donuts and hot chocolate delivered to your car. $40-46 per vehicle depending on the night.", "stretch": false, "maybe_review": false, "kind": "drive-thru lights", "when_or_hours": "Runs Nov 12 – Dec 30, select evenings", "startDate": "2026-11-12", "dueDate": "2026-11-12", "oneShot": false, "band": "core", "notes": "YMCA Camp Carter, 6200 Sand Springs Rd, Fort Worth. Source: DFWChild Christmas lights guide (Christmas at Camp Carter, Nov 12 - Dec 30, 2026; updated Nov 17, 2026)."}, {"n": 13, "title": "Sundance Square Community Tree Lighting", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Tue Dec 1, 6–8pm; tree lights at 7pm", "why": "The 80th annual lighting of Texas's tallest live Christmas tree — a Michigan spruce with hand-painted ornaments — with a pre-lighting concert by Michael Martin Murphey at 6:30pm. Free, downtown, and done by 8.", "stretch": false, "maybe_review": false, "kind": "tree lighting", "when_or_hours": "Tue Dec 1, 6–8pm; tree lights at 7pm", "startDate": "2026-12-01", "dueDate": "2026-12-01", "oneShot": true, "band": "core", "notes": "Sundance Square Plaza, 420 Main St, Fort Worth. Free. Sources: Fort Worth holiday guide, fortworth.com (Dec 1, 2026, concert 6:30pm, lighting 7pm); DFWChild tree lightings guide (80th annual)."}, {"n": 14, "title": "Waxahachie Christmas Parade & Community Tree Lighting", "type": "happening", "town": "Waxahachie", "drive": "50", "when": "Tue Dec 1, 6–9pm", "why": "Waxahachie's parade and tree lighting on the courthouse square, same Tuesday as Sundance but a whole different town — the Ellis County square at Christmas. A horizon stretch south.", "stretch": true, "maybe_review": false, "kind": "holiday parade", "when_or_hours": "Tue Dec 1, 6–9pm", "startDate": "2026-12-01", "dueDate": "2026-12-01", "oneShot": true, "band": "adjacent", "notes": "Downtown Waxahachie. Source: B96 Dallas/Fort Worth 2026 parades & tree lightings roundup, published Nov 16, 2026 (Waxahachie Christmas Parade & Community Tree Lighting, Tue Dec 1, 6-9pm)."}, {"n": 15, "title": "Holiday Bricktacular at LEGOLAND Discovery Center", "type": "happening", "town": "Grapevine", "drive": "20", "when": "Thu Dec 3 – Dec 31", "why": "LEGOLAND's holiday takeover at Grapevine Mills — LEGO builds and seasonal displays inside the Discovery Center. A new venue type for Scout: part exhibit, part play space, all indoors.", "stretch": true, "maybe_review": false, "kind": "holiday exhibit", "when_or_hours": "Thu Dec 3 – Dec 31", "startDate": "2026-12-03", "dueDate": "2026-12-03", "oneShot": false, "band": "core", "notes": "LEGOLAND Discovery Center, Grapevine Mills, Grapevine. Source: Fort Worth Vibe Grapevine Christmas guide, 2026 (Holiday Bricktacular, Dec 3-31)."}, {"n": 16, "title": "Creative Explorations: Silk Printing — Fort Worth Botanic Garden", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Thu Dec 3", "why": "The Garden's Creative Explorations series turns to silk printing — a small daytime make-and-take class at BRIT, in the same series as the paper-marbling session dealt earlier this fall.", "stretch": false, "maybe_review": false, "kind": "garden class", "when_or_hours": "Thu Dec 3", "startDate": "2026-12-03", "dueDate": "2026-12-03", "oneShot": true, "band": "core", "notes": "Fort Worth Botanic Garden / BRIT, 3220 Botanic Garden Blvd, Fort Worth. Source: FWBG event calendar (Creative Explorations: Silk Printing, Dec 3, 2026)."}, {"n": 17, "title": "Keller Holly Days", "type": "happening", "town": "Keller", "drive": "10", "when": "Fri Dec 4, 5–9pm; Very Merry Light Parade 7pm", "why": "The closest big Christmas night of the season: Keller Town Center's light parade at 7pm, tree lighting and fireworks around 7:45, plus a snow hill, Santa photos and food trucks. Ten minutes from home.", "stretch": false, "maybe_review": false, "kind": "tree lighting", "when_or_hours": "Fri Dec 4, 5–9pm; Very Merry Light Parade 7pm", "startDate": "2026-12-04", "dueDate": "2026-12-04", "oneShot": true, "band": "core", "notes": "Keller Town Center, 1100 Bear Creek Pkwy, Keller. Free. Sources: Hidalgo Team 2026 Grapevine/Southlake/Keller holiday guide (Keller Holly Days, Fri Dec 4, 5-9pm); Family eGuide holiday parades (parade 7pm, fireworks ~7:45pm)."}, {"n": 18, "title": "Whistle Stop Lighted Christmas Parade — Cleburne", "type": "happening", "town": "Cleburne", "drive": "40", "when": "Fri Dec 4, 6:45pm", "why": "Cleburne's lighted parade rolls through downtown to Hulen Park, where 30 years of Whistle Stop Christmas lights are already up (Nov 23 - Jan 3). Parade first, then a walk through the lit park.", "stretch": false, "maybe_review": false, "kind": "holiday parade", "when_or_hours": "Fri Dec 4, 6:45pm", "startDate": "2026-12-04", "dueDate": "2026-12-04", "oneShot": true, "band": "adjacent", "notes": "Downtown Cleburne / Hulen Park, 1010 Hillsboro St, Cleburne. Source: whistlestopchristmas.com (Lighted Christmas Parade, Fri Dec 4, 2026, 6:45pm; lights Nov 23, 2026 - Jan 3, 2027)."}, {"n": 19, "title": "Granbury Candlelight Tour of Homes", "type": "happening", "town": "Granbury", "drive": "50", "when": "Fri Dec 4 – Sun Dec 6", "why": "Granbury's candlelight weekend: a selected group of private historic homes around the square open to the public, with docents, carols, treats and carriage rides. The most Granbury card of the season.", "stretch": false, "maybe_review": false, "kind": "home tour", "when_or_hours": "Fri Dec 4 – Sun Dec 6", "startDate": "2026-12-04", "dueDate": "2026-12-04", "oneShot": false, "band": "adjacent", "notes": "Historic Granbury Square, Granbury. Source: Visit Granbury Christmas in Granbury page (Candlelight Tour, Dec 4-6, 2026)."}, {"n": 20, "title": "Christmas on the Square — Weatherford", "type": "happening", "town": "Weatherford", "drive": "40", "when": "Sat Dec 5, daytime; Lights the Night Parade 6:30pm", "why": "Weatherford's Gingerbread Christmas on the historic square: daytime shopping, entertainment, food and Santa visits, then the illuminated Lights the Night Parade at 6:30pm if you stay. Come for the day part; the parade is the bonus.", "stretch": false, "maybe_review": false, "kind": "holiday festival", "when_or_hours": "Sat Dec 5, daytime; Lights the Night Parade 6:30pm", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": false, "band": "core", "notes": "Historic Downtown Weatherford. Sources: Century21 Judge Fite 2026 holiday guide (Christmas on the Square, Dec 5, 2026, Gingerbread Christmas theme); Family eGuide (Weatherford Lights the Night Parade, Dec 5, 6:30pm)."}, {"n": 21, "title": "Dallas Holiday Parade", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat Dec 5, 8:30am", "why": "The 39th annual Dallas Holiday Parade: giant character balloons, marching bands and floats through downtown on a Saturday morning. Free curbside viewing; reserved bleachers if you want a seat.", "stretch": false, "maybe_review": false, "kind": "holiday parade", "when_or_hours": "Sat Dec 5, 8:30am", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "adjacent", "notes": "Downtown Dallas. Free viewing. Sources: B96 Dallas/Fort Worth roundup, Nov 16, 2026 (39th Annual Dallas Holiday Parade, Sat Dec 5, 8:30am); Silver Elk Realty Fort Worth holiday guide (Dec 5, 8:30am)."}, {"n": 22, "title": "Clearfork Holiday Market", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Dec 5, 9am–3pm", "why": "Fifty-plus local vendors, live music and Santa photos on the plaza and lawn at The Shops at Clearfork — a daytime gift-shopping market on the west side, free admission.", "stretch": false, "maybe_review": false, "kind": "holiday market", "when_or_hours": "Sat Dec 5, 9am–3pm", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "core", "notes": "The Shops at Clearfork, Fort Worth. Free. Sources: fortworth.com holiday guide (Clearfork Holiday Market, Dec 5, 50+ vendors); Silver Elk Realty guide (Dec 5, 9am-3pm)."}, {"n": 23, "title": "Roanoke Hometown Holiday", "type": "happening", "town": "Roanoke", "drive": "25", "when": "Sat Dec 5, 2–7pm", "why": "Roanoke's hometown Christmas afternoon downtown: a holiday parade, the tree lighting and Santa visits, starting at 2pm so most of it is daylight. The dining-capital town does Christmas its own way.", "stretch": false, "maybe_review": false, "kind": "holiday festival", "when_or_hours": "Sat Dec 5, 2–7pm", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "core", "notes": "Downtown Roanoke. Sources: Hidalgo Team 2026 holiday guide (Roanoke Hometown Holiday, Sat Dec 5, 2-7pm); Family eGuide holiday parades (Roanoke Hometown Holiday Parade, Dec 5)."}, {"n": 24, "title": "NTX Sports Card Show — Lewisville", "type": "happening", "town": "Lewisville", "drive": "35", "when": "Sat Dec 5 – Sun Dec 6", "why": "Four hundred sports-card tables at NTX Arena: graded slabs, raw vintage, fresh wax and bargain boxes across baseball, football, basketball, hockey and soccer. The sports-only sibling of the TCG shows dealt this fall.", "stretch": false, "maybe_review": false, "kind": "card show", "when_or_hours": "Sat Dec 5 – Sun Dec 6", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": false, "band": "core", "notes": "NTX Arena, Lewisville. Source: TX Card Shows newsletter, Nov 16, 2026 (NTX Sports Card Show, Dec 5-6, NTX Arena, Lewisville, 400 sports card tables)."}, {"n": 25, "title": "Klyde Warren Park Tree Lighting Celebration", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sat Dec 5, 4–7pm", "why": "Dallas's deck-park tree lighting: an afternoon-to-early-evening celebration over the freeway park, easy to pair with the morning parade across downtown. Free.", "stretch": false, "maybe_review": false, "kind": "tree lighting", "when_or_hours": "Sat Dec 5, 4–7pm", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "adjacent", "notes": "Klyde Warren Park, 2012 Woodall Rodgers Fwy, Dallas. Free. Source: DFWChild tree lightings guide (Klyde Warren Park Tree Lighting Celebration, Sat Dec 5, 2026, 4-7pm)."}, {"n": 26, "title": "Herd Here: Chamber Music at Trinity River Audubon Center", "type": "happening", "town": "Dallas", "drive": "40", "when": "Sun Dec 6, 11am–12:30pm", "why": "A late-morning chamber music performance inside the Audubon Center in the Great Trinity Forest — music first, then the trails. Daytime, seated, and a genuinely new pairing for the deck.", "stretch": false, "maybe_review": false, "kind": "concert", "when_or_hours": "Sun Dec 6, 11am–12:30pm", "startDate": "2026-12-06", "dueDate": "2026-12-06", "oneShot": true, "band": "core", "notes": "Trinity River Audubon Center, 6500 S Great Trinity Forest Way, Dallas. Source: Audubon events listing (Herd Here, a family-friendly Chamber Music Performance, Dec 6, 11am-12:30pm, Trinity River Audubon Center)."}, {"n": 27, "title": "Merry & Bright Drone Show — Grapevine", "type": "happening", "town": "Grapevine", "drive": "15", "when": "Mon Dec 7, 7pm", "why": "Six hundred drones draw Christmas pictures over Historic Main Street — the 6th annual show, launched from the Northwest Highway side. Free, outdoors, and over by about 7:30.", "stretch": false, "maybe_review": false, "kind": "drone show", "when_or_hours": "Mon Dec 7, 7pm", "startDate": "2026-12-07", "dueDate": "2026-12-07", "oneShot": true, "band": "core", "notes": "Historic Main Street, Grapevine. Free. Sources: Grapevine CVB 2026 Christmas Capital guide via Minteer Team guide, Nov 16, 2026, and Dallasites101 (Merry & Bright Drone Show, Mon Dec 7, 7pm, 600 drones)."}, {"n": 28, "title": "Advanced iNaturalist — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "30", "when": "Sun Dec 13, 10am–12pm", "why": "The Cross Timbers Master Naturalists go deeper on iNaturalist — the citizen-science app that turns your trail photos into species records. Free with admission, and it feeds straight into the backyard-ID habit. The far-horizon card, saved for a clear Sunday.", "stretch": false, "maybe_review": false, "kind": "nature class", "when_or_hours": "Sun Dec 13, 10am–12pm", "startDate": "2026-12-13", "dueDate": "2026-12-13", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd, Fort Worth. Activity 54243. Pre-registration required, FREE with paid admission. Source: FWNC December 2026 program calendar (Advanced iNaturalist, Sun Dec 13, 10am-noon)."}, {"n": 29, "title": "Fossil Rim Wildlife Center", "type": "place", "town": "Glen Rose", "drive": "60", "when": "Daily 8:30am–4:30pm (last car in by 4:30pm; closed Thanksgiving, Christmas Eve & Day)", "why": "A 1,800-acre conservation center with a 7-plus-mile drive-through safari: giraffes you can hand-feed, rhinos, zebras and cheetahs in open pastures, plus an overlook cafe halfway. The biggest wildlife day trip inside the drive cap — go early, animals are most active in the morning.", "stretch": true, "maybe_review": false, "kind": "wildlife safari", "when_or_hours": "Daily 8:30am–4:30pm (last car in by 4:30pm; closed Thanksgiving, Christmas Eve & Day)", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "2299 County Rd 2008, Glen Rose. Admission about $25-30 adult; tickets online in advance with an arrival window. Sources: fossilrim.org listings and Day Out With The Kids (updated Oct 17, 2026): daily 8:30am-4:30pm, last vehicle out 6:30pm."}, {"n": 30, "title": "White Rock Lake Park", "type": "place", "town": "Dallas", "drive": "50", "when": "Daily 6am–11pm", "why": "Dallas's big lake park: a 9.33-mile hike-and-bike loop, fishing piers, wetlands and a designated bird-watching area — white pelicans work the spillway in winter. Pick a segment rather than the whole loop; the east shore is the birdy side.", "stretch": true, "maybe_review": false, "kind": "lake park", "when_or_hours": "Daily 6am–11pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "8300 E Lawther Dr, Dallas. Free. Sources: Dallas Parks White Rock Lake page (daily 6am-11pm); Tourism Dallas White Rock Lake guide (9.33-mile loop, bird-watching area)."}, {"n": 31, "title": "Joppa Preserve", "type": "place", "town": "Dallas", "drive": "45", "when": "Daily 5am–11pm", "why": "A 296-acre Dallas County preserve in the Great Trinity Forest by the historic Joppa freedman's community: a paved shared-use trail that connects toward the Trinity River Audubon Center, bottomland woods and quiet birding. A new corner of the Trinity forest for the deck.", "stretch": true, "maybe_review": false, "kind": "nature preserve", "when_or_hours": "Daily 5am–11pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "Joppa Preserve, Great Trinity Forest, Dallas. Free. Source: Dallas County Open Spaces page (Joppa Preserve, 296 acres, hours 5am-11pm, Trinity Forest Trail)."}, {"n": 32, "title": "Lynn Creek Park at Joe Pool Lake", "type": "place", "town": "Grand Prairie", "drive": "35", "when": "Daily 6am–10pm", "why": "The Joe Pool Lake day-use park as a standing place, separate from its December lights: shoreline, swim beach in season, trails and picnic grounds on the lake's east shore. A calm weekday-morning lake stop half an hour away.", "stretch": false, "maybe_review": false, "kind": "lake park", "when_or_hours": "Daily 6am–10pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "5610 Lake Ridge Pkwy, Grand Prairie. Source: Grand Prairie Lynn Creek Park listing (daily 6am-10pm)."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
