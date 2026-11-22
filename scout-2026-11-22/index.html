@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout swipe &mdash; 2026-11-22</title>
+<style>
+:root{
+  --ink:#1c1a17; --muted:#6b6259; --paper:#faf8f4; --card:#ffffff; --line:#e8e2d8;
+  --approve:#2e7d4f; --love:#8a5a00; --pass:#7a7a7a; --never:#b3372f; --maybe:#a86e00;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding:16px 16px 110px}
+header.top{padding:8px 4px 6px}
+h1{font-size:22px;margin:0 0 8px}
+.sub{color:var(--muted);font-size:14px;line-height:1.55}
+.sub b{color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:14px 14px 12px;margin:12px 0}
+.card.decided{padding:10px 14px;cursor:pointer}
+.cardhead{display:flex;gap:10px;align-items:center}
+.num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;background:#efe9dd;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.title{font-size:17px;font-weight:700;flex:1}
+.meta{color:var(--muted);font-size:13.5px;margin:8px 0 6px 38px}
+.why{font-size:14.5px;line-height:1.45;margin:0 0 10px 38px}
+.badge{display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;padding:2px 8px;border-radius:999px;margin-left:8px;vertical-align:2px}
+.badge.stretch{background:#e7f0ff;color:#2456a6}
+.badge.review{background:#fff3d6;color:#8a5a00}
+.btns{display:flex;gap:8px;margin:4px 0 0 38px}
+.btn{flex:1 1 0;min-height:48px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.btn:active{transform:scale(.97)}
+.btn.s-approve{background:#e5f4ea;border-color:var(--approve);color:var(--approve)}
+.btn.s-pass{background:#efefef;border-color:var(--pass);color:#555}
+.btn.s-maybe{background:#fdf3dd;border-color:var(--maybe);color:var(--maybe)}
+.btn.s-love{background:#fbf0d9;border-color:var(--love);color:var(--love)}
+.neverrow{margin:10px 0 0 38px;font-size:13px;color:var(--muted)}
+.neverrow button{border:none;background:none;color:var(--never);font-weight:700;
+  font-family:inherit;font-size:13px;cursor:pointer;padding:8px 4px;text-decoration:underline}
+.neverrow button.on{text-decoration:none;background:#fbe7e5;border-radius:8px}
+.verdict{font-size:13.5px;font-weight:700;white-space:nowrap}
+.v-approve{color:var(--approve)} .v-love{color:var(--love)} .v-pass{color:var(--pass)}
+.v-never{color:var(--never)} .v-maybe{color:var(--maybe)} .v-undecided{color:var(--muted)}
+footer.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.barinner{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.progress{font-size:13.5px;color:var(--muted);flex:1}
+.save{min-height:52px;padding:0 22px;border:none;border-radius:12px;background:#1c1a17;
+  color:#fff;font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+.reset{border:none;background:none;color:var(--muted);font-size:12.5px;font-family:inherit;
+  text-decoration:underline;cursor:pointer;padding:10px 6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Scout swipe</h1>
+    <div class="sub">
+      Tap a verdict on each card. <b>Love it</b> boards the idea <i>and</i> puts it on your
+      calendar (we'll confirm the details in chat first). For <b>dated events</b>,
+      <b>pass</b> means <i>not this date</i> &mdash; use <b>never</b> to kill it for good.
+      For <b>always-open places</b>, pass means gone for good.
+      Cards you skip get parked for later. When you're done, hit
+      <b>Save verdicts</b> and attach the downloaded file in chat.
+    </div>
+  </header>
+  <div id="cards"></div>
+</div>
+<footer class="bar"><div class="barinner">
+  <div class="progress" id="progress"></div>
+  <button class="reset" id="reset">start over</button>
+  <button class="save" id="save">Save verdicts &darr;</button>
+</div></footer>
+<script>
+const RUN = "2026-11-22";
+const CARDS = [{"n": 1, "title": "Kayak Tour — Fort Worth Nature Center", "type": "happening", "town": "Fort Worth", "drive": "35", "when": "Sun Nov 29, 10am–noon", "why": "Paddle the Trinity with the Nature Center crew and look for late-autumn wildlife; all equipment provided, pre-registration required.", "stretch": false, "maybe_review": false, "kind": "nature", "when_or_hours": "Sun Nov 29, 10am–noon", "startDate": "2026-11-29", "dueDate": "2026-11-29", "oneShot": true, "band": "core", "notes": "Fort Worth Nature Center & Refuge, 9601 Fossil Ridge Rd. $25 with admission / members $20 per FWNC program calendar."}, {"n": 2, "title": "Coffee with a Ranger — Dinosaur Valley State Park", "type": "happening", "town": "Glen Rose", "drive": "55", "when": "Sun Nov 29, 10am", "why": "Sit down with a Dinosaur Valley ranger and ask anything about the park, the tracks and the Paluxy — an easy add to a Glen Rose day.", "stretch": true, "maybe_review": false, "kind": "nature", "when_or_hours": "Sun Nov 29, 10am", "startDate": "2026-11-29", "dueDate": "2026-11-29", "oneShot": true, "band": "stretch", "notes": "Dinosaur Valley State Park, 1629 Park Rd 59, Glen Rose. Per TPWD calendar."}, {"n": 3, "title": "Abram Street Christmas Market", "type": "happening", "town": "Arlington", "drive": "25", "when": "Fri–Sat Nov 27–28, 10am", "why": "Downtown Arlington holiday market on Abram Street — browsing-style local vendors, good daytime wander.", "stretch": false, "maybe_review": false, "kind": "market", "when_or_hours": "Fri–Sat Nov 27–28, 10am–4pm", "startDate": "2026-11-27", "dueDate": "2026-11-28", "oneShot": false, "band": "core", "notes": "201 W Abram St, Arlington."}, {"n": 4, "title": "Cocoa, Cookies & Christmas", "type": "happening", "town": "DeSoto", "drive": "45", "when": "Sat Nov 28, 10am–2pm", "why": "Small-town holiday stop in DeSoto — cocoa, cookies and Christmas browsing in a new town for Scout.", "stretch": true, "maybe_review": false, "kind": "market", "when_or_hours": "Sat Nov 28, 10am–2pm", "startDate": "2026-11-28", "dueDate": "2026-11-28", "oneShot": true, "band": "stretch", "notes": "1400 Academy Way, DeSoto."}, {"n": 5, "title": "Kennedale Hometown Christmas", "type": "happening", "town": "Kennedale", "drive": "25", "when": "Sat Nov 28, 2–6pm", "why": "Kennedale's hometown Christmas afternoon — small, local and daytime, not a mega-festival.", "stretch": false, "maybe_review": false, "kind": "happening", "when_or_hours": "Sat Nov 28, 2–6pm", "startDate": "2026-11-28", "dueDate": "2026-11-28", "oneShot": true, "band": "adjacent", "notes": "405 Municipal Dr, Kennedale."}, {"n": 6, "title": "Gentle Yoga: December — Fort Worth Botanic Garden", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Wed Dec 2", "why": "All-levels morning yoga in the Garden Center at FWBG — a quiet, daytime garden visit with a purpose.", "stretch": false, "maybe_review": false, "kind": "nature", "when_or_hours": "Wed Dec 2, morning", "startDate": "2026-12-02", "dueDate": "2026-12-02", "oneShot": true, "band": "core", "notes": "Fort Worth Botanic Garden, 3220 Botanic Garden Blvd."}, {"n": 7, "title": "1st Friday Feathers – Kelly Park", "type": "happening", "town": "Arlington", "drive": "20", "when": "Fri Dec 4, morning", "why": "Fort Worth Audubon's monthly first-Friday bird walk at Kelly Park in Arlington — your kind of morning.", "stretch": false, "maybe_review": false, "kind": "nature", "when_or_hours": "Fri Dec 4, morning", "startDate": "2026-12-04", "dueDate": "2026-12-04", "oneShot": true, "band": "core", "notes": "Kelly Park, Arlington. FWAS local monthly walk series."}, {"n": 8, "title": "Track Talk — Dinosaur Valley State Park", "type": "happening", "town": "Glen Rose", "drive": "55", "when": "Sat Dec 5, 10am", "why": "A ranger tells the 113-million-year-old story of the dinosaur tracks in the Paluxy riverbed.", "stretch": false, "maybe_review": false, "kind": "nature", "when_or_hours": "Sat Dec 5, 10am", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "core", "notes": "Dinosaur Valley State Park, Glen Rose. Per TPWD park events."}, {"n": 9, "title": "Winter vs. Wildlife — Dinosaur Valley State Park", "type": "happening", "town": "Glen Rose", "drive": "55", "when": "Sat Dec 5, 11am", "why": "How Texas animals get ready for winter — a short ranger program, easy to pair with Track Talk the same morning.", "stretch": false, "maybe_review": false, "kind": "nature", "when_or_hours": "Sat Dec 5, 11am", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "core", "notes": "Dinosaur Valley State Park, Glen Rose."}, {"n": 10, "title": "Junior Ranger Academy — Dinosaur Valley State Park", "type": "happening", "town": "Glen Rose", "drive": "55", "when": "Sat Dec 5, 2pm", "why": "Afternoon ranger program at Dinosaur Valley — learn the Junior Ranger side of the park, badge and all.", "stretch": false, "maybe_review": false, "kind": "nature", "when_or_hours": "Sat Dec 5, 2pm", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "core", "notes": "Dinosaur Valley State Park, Glen Rose."}, {"n": 11, "title": "First Saturday Dec – Talons & Treasures", "type": "happening", "town": "Lucas", "drive": "55", "when": "Sat Dec 5, 9am", "why": "Blackland Prairie Raptor Center's first-Saturday public day — education raptors up close, prairie trails and Lavon Lake backdrop.", "stretch": true, "maybe_review": false, "kind": "nature", "when_or_hours": "Sat Dec 5, 9am", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "stretch", "notes": "Blackland Prairie Raptor Center, 1625 Brockdale Park Rd, Lucas."}, {"n": 12, "title": "Drawing in the Garden: BRIT Library", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Dec 5, 9–11am", "why": "Sketch inside the BRIT Library at the Botanic Garden — a quiet, indoor, daytime creative morning.", "stretch": false, "maybe_review": false, "kind": "arts", "when_or_hours": "Sat Dec 5, 9–11am", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "core", "notes": "BRIT Library, Fort Worth Botanic Garden, 3220 Botanic Garden Blvd."}, {"n": 13, "title": "12th Annual BHS Honeycomb Holiday Market", "type": "happening", "town": "Fort Worth", "drive": "20", "when": "Sat Dec 5, 9:30am–2pm", "why": "Brewer High School's big annual holiday market — 100+ vendors, food and crafts, a school-fundraiser browsing market.", "stretch": false, "maybe_review": false, "kind": "market", "when_or_hours": "Sat Dec 5, 9:30am–2pm", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "core", "notes": "Brewer High School, 1025 W Loop 820 N, Fort Worth."}, {"n": 14, "title": "DHJ FFA Holly & Harvest Festival", "type": "happening", "town": "Fort Worth", "drive": "20", "when": "Sat Dec 5, 1–5pm", "why": "Diamond Hill-Jarvis FFA holiday festival and craft fair — free admission, local and low-key.", "stretch": false, "maybe_review": false, "kind": "market", "when_or_hours": "Sat Dec 5, 1–5pm", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "core", "notes": "1411 Maydell St, Fort Worth."}, {"n": 15, "title": "Fort Worth Holiday Wine Fest", "type": "happening", "town": "Fort Worth", "drive": "20", "when": "Sat Dec 5, 12–8pm", "why": "Indoor Texas wine festival with 40+ wines, classes and live music at Ironwood Event Center — go early for the daytime session.", "stretch": false, "maybe_review": false, "kind": "food", "when_or_hours": "Sat Dec 5, 12–8pm", "startDate": "2026-12-05", "dueDate": "2026-12-05", "oneShot": true, "band": "adjacent", "notes": "Ironwood Event Center, 5501 Thelin St, Fort Worth. Ticketed."}, {"n": 16, "title": "Sundance Square Winter Wonderland Weekends", "type": "happening", "town": "Fort Worth", "drive": "20", "when": "Sat–Sun Dec 5–6, daytime", "why": "Opening weekend of Sundance Square's Winter Wonderland — Texas' tallest live tree, gift market, music and food trucks downtown.", "stretch": false, "maybe_review": false, "kind": "happening", "when_or_hours": "Dec 5–7, 12–14 and 19–21 weekends", "startDate": "2026-12-05", "dueDate": "2026-12-06", "oneShot": false, "band": "core", "notes": "Sundance Square Plaza, downtown Fort Worth."}, {"n": 17, "title": "42nd Annual Candlelight Christmas in Ryan Place", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sat Dec 5 noon–8pm · Sun Dec 6 noon–5pm", "why": "Self-guided tour of five historic Ryan Place homes plus St. John's Church and Daggett Elementary — Fort Worth history at Christmas.", "stretch": false, "maybe_review": false, "kind": "history", "when_or_hours": "Sat Dec 5 noon–8pm, Sun Dec 6 noon–5pm", "startDate": "2026-12-05", "dueDate": "2026-12-06", "oneShot": false, "band": "core", "notes": "Check-in St. John's Anglican Church, 2401 College Ave, Fort Worth. Ticketed."}, {"n": 18, "title": "Open Studio at Dallas Museum of Art — Dec 6", "type": "happening", "town": "Dallas", "drive": "45", "when": "Sun Dec 6, 12–4pm", "why": "Free Open Studio afternoon at the DMA — drop in, make something, then wander the galleries.", "stretch": false, "maybe_review": false, "kind": "arts", "when_or_hours": "Sun Dec 6, 12–4pm", "startDate": "2026-12-06", "dueDate": "2026-12-06", "oneShot": true, "band": "adjacent", "notes": "Dallas Museum of Art, 1717 N Harwood St, Dallas."}, {"n": 19, "title": "A Christmas Carol — Sensory-Friendly Performance at Casa Mañana", "type": "happening", "town": "Fort Worth", "drive": "25", "when": "Sun Dec 6, 11am", "why": "A relaxed, sensory-friendly morning performance of A Christmas Carol at Casa Mañana — daytime theatre, gentler house.", "stretch": false, "maybe_review": false, "kind": "arts", "when_or_hours": "Sun Dec 6, 11am", "startDate": "2026-12-06", "dueDate": "2026-12-06", "oneShot": true, "band": "adjacent", "notes": "Casa Mañana, 3101 W Lancaster Ave, Fort Worth. Ticketed."}, {"n": 20, "title": "Christmas on the Farm — Cedar Hill State Park", "type": "happening", "town": "Cedar Hill", "drive": "40", "when": "Sat Dec 12, 10am–2pm", "why": "Penn Farm does Christmas the old way — ranger-led farm tour, historical games, hot drinks and treats at the fire ring. Horizon pick, a week further out.", "stretch": true, "maybe_review": false, "kind": "history", "when_or_hours": "Sat Dec 12, 10am–2pm", "startDate": "2026-12-12", "dueDate": "2026-12-12", "oneShot": true, "band": "stretch", "notes": "Penn Farm, Cedar Hill State Park, 1570 FM 1382, Cedar Hill. Free with park entry."}, {"n": 21, "title": "Fantastic Flora: Fairies and Fabled Creatures", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Daily, through Feb 26, 2027", "why": "BRIT Library's fall exhibit — fairies, fabled creatures and personified plants in illustrations and specimens. An easy Cultural District add-on.", "stretch": false, "maybe_review": false, "kind": "arts", "when_or_hours": "Exhibit Oct 28, 2026–Feb 26, 2027, Madeline Samples Exhibit Hall", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "Botanical Research Institute of Texas, 3220 Botanic Garden Blvd, Fort Worth. Free."}, {"n": 22, "title": "The Trains at NorthPark", "type": "place", "town": "Dallas", "drive": "45", "when": "Daily through Jan 1, mall hours", "why": "The beloved model-train display at NorthPark Center — 750 feet of track through miniature America, a Dallas holiday institution.", "stretch": false, "maybe_review": false, "kind": "happening", "when_or_hours": "Nov 27, 2026–Jan 1, 2027, NorthPark Center hours", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "NorthPark Center, 8687 N Central Expy, Dallas."}, {"n": 23, "title": "Original Market Diner", "type": "place", "town": "Dallas", "drive": "40", "when": "Daily to 3pm", "why": "Dallas diner since 1947 on Harry Hines — biscuits and gravy, chicken-fried steak and a pie case. Historic, daytime-only, exactly the Scout food pattern.", "stretch": false, "maybe_review": false, "kind": "food", "when_or_hours": "Mon–Fri from 6am, Sat 6:30am, Sun 7am; closes 3pm daily", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "4434 Harry Hines Blvd, Dallas. Historic diner, est. 1947."}, {"n": 24, "title": "The Zodiac Room", "type": "place", "town": "Dallas", "drive": "40", "when": "Lunch, Mon–Sat", "why": "Neiman Marcus' downtown lunch room since 1953 — popovers with strawberry butter and the famous chicken salad. A stretch venue type: the classic department-store lunch.", "stretch": true, "maybe_review": false, "kind": "food", "when_or_hours": "Lunch service, Neiman Marcus flagship, downtown Dallas", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "Neiman Marcus, 1618 Main St, Dallas. Est. 1953."}, {"n": 25, "title": "Burger House", "type": "place", "town": "Dallas", "drive": "45", "when": "Daily, lunch & dinner", "why": "Old-school Dallas burger stand since 1951 — straightforward, no-frills, and still going. Historic fast-food the local way.", "stretch": false, "maybe_review": false, "kind": "food", "when_or_hours": "Daily lunch and dinner hours", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "Burger House, Dallas. Est. 1951."}, {"n": 26, "title": "The Original Mexican Eats Café", "type": "place", "town": "Fort Worth", "drive": "25", "when": "Daily, lunch & dinner", "why": "Camp Bowie institution where FDR and Eleanor ate when in town — the Roosevelt Special is still on the menu, named for his order.", "stretch": false, "maybe_review": false, "kind": "food", "when_or_hours": "Daily lunch and dinner, Camp Bowie Blvd", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "The Original Mexican Eats Café, Camp Bowie Blvd, Fort Worth."}, {"n": 27, "title": "Riscky's Bar-B-Q", "type": "place", "town": "Fort Worth", "drive": "20", "when": "Daily, lunch & dinner", "why": "Started as Riscky's Grocery & Market in 1927 by the Stockyards — a century of Fort Worth barbecue history in one stop.", "stretch": false, "maybe_review": false, "kind": "food", "when_or_hours": "Daily lunch and dinner hours", "startDate": "", "dueDate": "", "oneShot": false, "band": "core", "notes": "Riscky's, Fort Worth Stockyards area. Est. 1927."}, {"n": 28, "title": "Somervell County Museum", "type": "place", "town": "Glen Rose", "drive": "55", "when": "Fri–Sat 11am–4pm · Sun 1:30–4pm", "why": "Free local-history museum on Glen Rose's courthouse square — moonshiner's still, dinosaur casts and pioneer history. Pairs with a Dinosaur Valley day.", "stretch": true, "maybe_review": false, "kind": "history", "when_or_hours": "Fri–Sat 11am–4pm, Sun 1:30–4pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "101 SW Vernon St, Glen Rose. Free, donations welcome."}, {"n": 29, "title": "Penn Farm at Cedar Hill State Park", "type": "place", "town": "Cedar Hill", "drive": "40", "when": "Daily, park hours", "why": "The Penn family farm, settled in 1854 and frozen in time inside Cedar Hill State Park — buildings, implements and prairie history, stroll at your own pace.", "stretch": false, "maybe_review": false, "kind": "history", "when_or_hours": "Daily during park hours, 6am–10pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "adjacent", "notes": "Penn Farm, Cedar Hill State Park, 1570 FM 1382, Cedar Hill. Park entry fee applies."}, {"n": 30, "title": "Blackland Prairie Raptor Center (visit)", "type": "place", "town": "Lucas", "drive": "55", "when": "Public days: first Saturdays", "why": "The raptor hospital itself — 1625 Brockdale Park Rd on Lavon Lake, with prairie trails and education birds. Public access centres on its first-Saturday events.", "stretch": true, "maybe_review": false, "kind": "nature", "when_or_hours": "Open to the public first Saturday of each month; site hours listed 9am–5pm", "startDate": "", "dueDate": "", "oneShot": false, "band": "stretch", "notes": "1625 Brockdale Park Rd, Lucas."}];
+const LS_KEY = "scout-swipe-" + RUN;
+let decisions = {};
+try { decisions = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e) { decisions = {}; }
+const expanded = {}; // n -> true while being re-decided
+
+const VERDICT_LABEL = {
+  "approve": ["✓ approved", "v-approve"],
+  "love-it": ["♥ love it", "v-love"],
+  "pass": ["passed", "v-pass"],
+  "never": ["✕ never", "v-never"],
+  "maybe": ["maybe later", "v-maybe"]
+};
+
+function persist() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(decisions)); } catch(e) {}
+}
+
+function setDecision(n, d) {
+  if (d && decisions[n] === d) { delete decisions[n]; }
+  else if (d) { decisions[n] = d; }
+  else { delete decisions[n]; }
+  delete expanded[n];
+  persist();
+  render();
+}
+
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function cardHTML(c) {
+  const d = decisions[c.n];
+  const isOpen = !d || expanded[c.n];
+  if (!isOpen) {
+    const lbl = VERDICT_LABEL[d] || [d, "v-undecided"];
+    return '<div class="card decided" data-open="' + c.n + '">' +
+      '<div class="cardhead"><div class="num">' + c.n + '</div>' +
+      '<div class="title">' + esc(c.title) + '</div>' +
+      '<div class="verdict ' + lbl[1] + '">' + lbl[0] + '</div></div></div>';
+  }
+  let badges = "";
+  if (c.stretch) badges += '<span class="badge stretch">stretch</span>';
+  if (c.maybe_review) badges += '<span class="badge review">from your maybe list</span>';
+  const meta = [c.town, c.drive ? c.drive + " min" : "", c.when].filter(Boolean).join(" · ");
+  let html = '<div class="card"><div class="cardhead"><div class="num">' + c.n + '</div>' +
+    '<div class="title">' + esc(c.title) + badges + '</div></div>' +
+    '<div class="meta">' + esc(meta) + '</div>' +
+    '<p class="why">' + esc(c.why) + '</p>' +
+    '<div class="btns">' +
+    '<button class="btn' + (d === "approve" ? " s-approve" : "") + '" data-d="approve" data-n="' + c.n + '">Approve</button>' +
+    '<button class="btn' + (d === "pass" ? " s-pass" : "") + '" data-d="pass" data-n="' + c.n + '">Pass</button>' +
+    '<button class="btn' + (d === "maybe" ? " s-maybe" : "") + '" data-d="maybe" data-n="' + c.n + '">Maybe</button>' +
+    '<button class="btn' + (d === "love-it" ? " s-love" : "") + '" data-d="love-it" data-n="' + c.n + '">Love it</button>' +
+    '</div>';
+  if (c.type === "happening") {
+    html += '<div class="neverrow">pass means <i>not this date</i> &mdash; ' +
+      '<button data-never="' + c.n + '" class="' + (d === "never" ? "on" : "") + '">' +
+      (d === "never" ? "never ✓ (tap to undo)" : "never show this again") + '</button></div>';
+  }
+  return html + '</div>';
+}
+
+function render() {
+  document.getElementById("cards").innerHTML = CARDS.map(cardHTML).join("");
+  const done = CARDS.filter(c => decisions[c.n]).length;
+  document.getElementById("progress").textContent = done + " of " + CARDS.length + " decided";
+}
+
+document.getElementById("cards").addEventListener("click", (e) => {
+  const nb = e.target.closest("[data-never]");
+  if (nb) {
+    const n = +nb.getAttribute("data-never");
+    setDecision(n, decisions[n] === "never" ? null : "never");
+    return;
+  }
+  const b = e.target.closest("[data-d]");
+  if (b) { setDecision(+b.getAttribute("data-n"), b.getAttribute("data-d")); return; }
+  const op = e.target.closest("[data-open]");
+  if (op) { expanded[+op.getAttribute("data-open")] = true; render(); }
+});
+
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Clear all verdicts on this page and start over?")) return;
+  decisions = {};
+  for (const k in expanded) delete expanded[k];
+  persist();
+  render();
+});
+
+document.getElementById("save").addEventListener("click", () => {
+  const verdicts = CARDS.map(c => ({
+    n: c.n,
+    title: c.title,
+    type: c.type,
+    town: c.town || "",
+    drive: c.drive || "",
+    kind: c.kind || "",
+    when_or_hours: c.when_or_hours || c.when || "",
+    startDate: c.startDate || "",
+    dueDate: c.dueDate || "",
+    oneShot: !!c.oneShot,
+    band: c.band || "core",
+    notes: c.notes || "",
+    decision: decisions[c.n] || "undecided"
+  }));
+  const payload = { run: RUN, generator: "scout-swipe", verdicts: verdicts };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "scout-verdicts-" + RUN + ".json";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+});
+
+render();
+</script>
+</body>
+</html>
